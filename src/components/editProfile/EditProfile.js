@@ -5,7 +5,6 @@ import noCover from "../../assets/appImages/noCover.jpg";
 import sampleProPic from "../../assets/appImages/user.png";
 import Topbar from "../timeline/topbar/Topbar";
 import Sidebar from "../timeline/sidebar/Sidebar";
-import { useParams } from "react-router-dom";
 import useAuth from "../../context/auth/AuthContext";
 import { BASE_URL } from "../../context/apiCall";
 import axios from "axios";
@@ -28,7 +27,7 @@ const EditProfile = () => {
 
   const [user, setUser] = useState({});
 
-  const params = useParams();
+  
 
   // from context
   const { user: currentUser } = useAuth();
@@ -40,17 +39,17 @@ const EditProfile = () => {
     const fetchUsers = async () => {
       const config = {
         headers: {
-          Authorization: `Bearer ${currentUser.token}`,
+          Authorization: `Bearer ${currentUser.accessToken}`,
         },
       };
       const res = await axios.get(
-        `${BASE_URL}/user?userId=${params.userId}`,
+        `${BASE_URL}/v1/user/profile`,
         config
       );
-      setUser(res.data);
+      setUser(res.data.result);
     };
     fetchUsers();
-  }, [params.userId, currentUser.token]);
+  }, [currentUser.accessToken]);
 
   // upload user profile picture to cloudinary
   const postProPic = (pics) => {
@@ -164,7 +163,7 @@ const EditProfile = () => {
                   <input
                     className="editProfile-input"
                     type="text"
-                    placeholder={user?.name}
+                    placeholder={user?.fullName}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                   />
@@ -179,7 +178,7 @@ const EditProfile = () => {
                     className="editProfile-input"
                     type="text"
                     placeholder={
-                      user?.desc ? user?.desc : "Describe yourself...."
+                      user?.about ? user?.about : "Describe yourself...."
                     }
                     value={userDesc}
                     onChange={(e) => setUserDesc(e.target.value)}
@@ -187,7 +186,7 @@ const EditProfile = () => {
                   <input
                     className="editProfile-input"
                     type="text"
-                    placeholder={user?.city ? user?.city : "Which city...."}
+                    placeholder={user?.address ? user?.address : "Which address...."}
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                   />
@@ -195,7 +194,7 @@ const EditProfile = () => {
                     className="editProfile-input"
                     type="text"
                     placeholder={
-                      user?.from ? user?.from : "Where are you from...."
+                      user?.dateOfBirth ? user?.dateOfBirth : "Date of birth...."
                     }
                     value={from}
                     onChange={(e) => setFrom(e.target.value)}

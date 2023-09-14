@@ -80,9 +80,10 @@ const Topbar = ({ searchHandler, setSearchKey, searchKey, menuHandler }) => {
               {theme.background === "#ffffff" ? <NightsStay /> : <WbSunny />}
             </div>
           </div>
-          <Link to={`/profile/${currentUser.accessToken}`}>
+          <Link to={`/profile/${currentUser.userId}`}>
+  
             <img
-              src={user?.profilePicture ? user?.profilePicture : noAvatar}
+              src={user?.avatar ? user?.avatar : noAvatar}
               alt="..."
               className="topbarImg"
             />

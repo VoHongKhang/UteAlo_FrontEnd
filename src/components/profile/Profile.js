@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./Profile.css";
 import noCover from "../../assets/appImages/noCover.jpg";
 import sampleProPic from "../../assets/appImages/user.png";
-import { Link, useParams } from "react-router-dom";
+import { Link,useParams  } from "react-router-dom";
 import axios from "axios";
 import { BASE_URL } from "../../context/apiCall";
 import Feed from "../timeline/feed/Feed";
@@ -19,10 +19,14 @@ import useTheme from "../../context/ThemeContext";
 
 const Profile = () => {
   const [user, setUser] = useState({});
+  let listMessage = ['Retrieving user profile successfully and access update denied','Retrieving user profile successfully and access update']
+  const [message , setMessage] = useState("");
+
+  const params = useParams();
 
 
   const { user: currentUser } = useAuth();
-  console.log(user.id);
+
   const { theme } = useTheme();
 
   // get user details
@@ -34,13 +38,14 @@ const Profile = () => {
         },
       };
       const res = await axios.get(
-        `${BASE_URL}/v1/user/profile`,
+        `${BASE_URL}/v1/user/profile/${params.userId}`,
         config
       );
       setUser(res.data.result);
+      setMessage(res.data.message);
     };
     fetchUsers();
-  }, [currentUser.accessToken]);
+  }, [params.userId,currentUser.accessToken]);
 
   return (
     <>
@@ -67,8 +72,8 @@ const Profile = () => {
                 src={user.profilePicture || sampleProPic}
                 alt="..."
               />
-              { currentUser.accessToken !== undefined && (
-                <Link to={`/editProfile/${currentUser._id}`}>
+              { message === listMessage[1] && (
+                <Link to={`/update/${currentUser.userId}`}>
                   <div className="profile-edit-icon">
                     <Avatar
                       style={{ cursor: "pointer", backgroundColor: "blue" }}>

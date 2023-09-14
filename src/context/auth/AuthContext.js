@@ -28,18 +28,20 @@ export const AuthProvider = ({ children }) => {
       );
   
       if (response.status === 200) {
-        const { accessToken, refreshToken } = response.data.result;
-        console.log(accessToken, refreshToken);
+        const { accessToken, refreshToken,userId} = response.data.result;
+        console.log(accessToken, refreshToken,userId);
         dispatch({
           type: "LOGIN_SUCCESS",
           payload: {
             accessToken,
             refreshToken,
+            userId
           },
         });
         localStorage.setItem("userInfo", JSON.stringify({
           accessToken,
           refreshToken,
+          userId
         }));
         toast.success("Logged in successfully", successOptions);
       } else {

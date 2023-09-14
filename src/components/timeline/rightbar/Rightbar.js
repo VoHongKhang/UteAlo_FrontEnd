@@ -77,7 +77,7 @@ const Rightbar = ({ user }) => {
           },
         };
         const { data } = await axios.get(
-          `${BASE_URL}/user/friends/${params.userId}`,
+          `${BASE_URL}/v1/user/profile`,
           config
         );
         setFriends(data);
@@ -122,15 +122,15 @@ const Rightbar = ({ user }) => {
             {followed ? <Remove /> : <Add />}
           </button>
         )}
-        <h4 className="rightbarTitle">User information</h4>
+        <h4 className="rightbarTitle">rmation</h4>
         <div className="rightbarInfo">
           <div className="rightbarInfoItem">
-            <span className="rightbarInfoKey">City:</span>
-            <span className="rightbarInfoValue">{user?.city || "-"}</span>
+            <span className="rightbarInfoKey">Address:</span>
+            <span className="rightbarInfoValue">{user?.address || "-"}</span>
           </div>
           <div className="rightbarInfoItem">
-            <span className="rightbarInfoKey">From:</span>
-            <span className="rightbarInfoValue">{user?.from || "-"}</span>
+            <span className="rightbarInfoKey">Gender:</span>
+            <span className="rightbarInfoValue">{user?.gender || "-"}</span>
           </div>
           <div className="rightbarInfoItem">
             <span className="rightbarInfoKey">Relationship:</span>

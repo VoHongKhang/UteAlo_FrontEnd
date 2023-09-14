@@ -24,7 +24,7 @@ function App() {
             component={Profile}></ProtectedRoute>
           <ProtectedRoute
             excat
-            path="/editProfile/:userId"
+            path="/update/:userId"
             component={EditProfile}></ProtectedRoute>
           <ProtectedRoute excat path="/" component={Timeline}></ProtectedRoute>
         </Switch>

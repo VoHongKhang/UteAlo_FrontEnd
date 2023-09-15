@@ -1,8 +1,6 @@
-@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700&display=swap");
 * {
 	margin: 0;
 	padding: 0;
-  font-size: 14px;
 	box-sizing: border-box;
 	font-family: 'Dosis', sans-serif !important;
 	scroll-behavior: smooth;
@@ -31,32 +29,4 @@ body {
 /* Disable space in MUI Input */
 fieldset > legend {
 	width: 0;
-}
-.homeContainer {
-  display: flex;
-  width: 100%;
-}
-a{
-  text-decoration: none;
-}
-.errorMsg {
-  color: red;
-  font-size: 12px;
-  height: 0px;
-}
-
-a {
-  color: inherit;
-}
-
-.sidebar-resp {
-  height: max-content;
-  padding-top: 1.2rem;
-  z-index: 99;
-  background-color: rgb(26, 32, 44);
-  color: white;
-}
-
-.sb {
-  padding: 10px 0;
 }

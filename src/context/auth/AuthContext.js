@@ -7,7 +7,6 @@ import {
 } from "../../components/utils/toastStyle";
 import { BASE_URL } from "../apiCall";
 import authReducer, { initialState } from "./authReducer";
-
 const AuthContext = createContext(initialState);
 
 export const AuthProvider = ({ children }) => {
@@ -29,7 +28,6 @@ export const AuthProvider = ({ children }) => {
   
       if (response.status === 200) {
         const { accessToken, refreshToken,userId} = response.data.result;
-        console.log(accessToken, refreshToken,userId);
         dispatch({
           type: "LOGIN_SUCCESS",
           payload: {
@@ -43,6 +41,7 @@ export const AuthProvider = ({ children }) => {
           refreshToken,
           userId
         }));
+      
         toast.success("Logged in successfully", successOptions);
       } else {
         dispatch({

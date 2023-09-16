@@ -34,7 +34,6 @@ const Topbar = ({ searchHandler, setSearchKey, searchKey, menuHandler }) => {
         `${BASE_URL}/v1/user/profile`,
         config
       );
-      
       setUser(res.data.result);
     };
     fetchUsers();

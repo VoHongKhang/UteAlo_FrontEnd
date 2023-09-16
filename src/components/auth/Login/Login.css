@@ -8,8 +8,8 @@
 }
 
 .loginWrapper {
-  width: 70%;
-  height: 70%;
+  width: 90%;
+  height: 90%;
   display: flex;
 }
 
@@ -36,58 +36,85 @@
   font-weight: 600;
   font-size: 22px;
 }
-
+.login-subtitle{
+  text-align: center;
+  font-weight: 400;
+  font-size: 16px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
 .loginBox {
-  height: 375px;
+  height: 400px;
+  width: 80%;
   padding: 20px;
   background-color: white;
-  border-radius: 10px;
+  border-radius: 6px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
 .loginInput {
-  height: 50px;
-  border-radius: 10px;
+  height: 40px;
+  border-radius: 6px;
   border: 1px solid gray;
-  font-size: 18px;
-  padding-left: 20px;
+  font-size: 14px;
+  padding: 4px 11px;
+  margin-bottom: 6px;
 }
 
 .loginInput:focus {
   outline: none;
 }
+.label_email,
+.label_password{
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 5px;
 
+}
+.label_email::before,
+.label_password::before{
+  display: inline-block;
+    margin-inline-end: 4px;
+    color: #ff4d4f;
+    font-size: 14px;
+    font-family: SimSun,sans-serif;
+    line-height: 1;
+    content: "*";
+}
+.label_password{
+  margin-top: 22px;
+}
 .loginBtn {
-  height: 50px;
-  border-radius: 10px;
+  height: 32px;
+  border-radius: 6px;
   border: none;
+  padding: 4px 15px;
   background-color: #1775ee;
-  font-size: 20px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   color: white;
+  
 }
-
+.color_link{
+  color: #1775ee;
+  cursor: pointer;
+}
+.contaner_login_btn{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 23px;
+}
 .loginBtnDisabled {
-  height: 50px;
-  border-radius: 10px;
+  height: 32px;
+  border-radius: 6px;
+  padding: 4px 15px;
   border: none;
   background-color: #7d99bd;
-  font-size: 20px;
-  font-weight: 500;
-  cursor: pointer;
-  color: white;
-}
-
-.loginregistrationButton {
-  width: 45%;
-  height: 30px;
-  border-radius: 10px;
-  border: none;
-  background-color: #42b72a;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   color: white;

@@ -69,7 +69,7 @@ const Profile = () => {
 
               <img
                 className="profileUserImg"
-                src={user.profilePicture || sampleProPic}
+                src={user.avatar || sampleProPic}
                 alt="..."
               />
               { message === listMessage[1] && (

@@ -30,6 +30,27 @@ const profileReducer = (state, action) => {
         error: payload,
         success: false,
       };
+    case "UPDATE_USER_AVATAR_REQUEST":
+      return {
+        ...state,
+        loading: true,
+        success: false,
+        error: null,
+      };
+    case "UPDATE_USER_AVATAR_SUCCESS":
+      return {
+        profile: payload,
+        loading: false,
+        success: true,
+        error: null,
+      };
+    case "UPDATE_USER_AVATAR_FAIL":
+      return {
+        ...state,
+        loading: false,
+        error: payload,
+        success: false,
+      };
 
     default:
       throw new Error(`No case for type ${type} found in profileReducer.`);

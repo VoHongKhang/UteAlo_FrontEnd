@@ -50,3 +50,54 @@
 .profilePicPreview {
   word-wrap: break-word;
 }
+
+
+.editAvatar-btnBox {
+  margin: 10px 0;
+  text-align: center;
+  margin-top: 54px;
+}
+
+
+
+.editProfile-input {
+  display: flex;
+  flex-direction: column;
+}
+
+.radio-label {
+  margin-bottom: 10px; /* Khoảng cách giữa các nút radio */
+  display: flex;
+  align-items: center;
+}
+
+.radio-label input {
+  margin-right: 5px; /* Khoảng cách giữa nút radio và văn bản */
+}
+
+/* Loại bỏ ô trống dư phía sau "FEMALE" */
+.radio-label:last-child {
+  margin-right: 0;
+}
+
+
+/* Định dạng input date */
+.custom-datepicker {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+/* Định dạng placeholder */
+.custom-datepicker::placeholder {
+  color: #888;
+}
+
+/* Định dạng input khi được focus */
+.custom-datepicker:focus {
+  outline: none;
+  border-color: #007BFF;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+

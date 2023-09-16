@@ -10,29 +10,30 @@ import { BASE_URL } from "../../context/apiCall";
 import axios from "axios";
 import useProfile from "../../context/profile/ProfileContext";
 import { Box, CircularProgress } from "@material-ui/core";
-import toast, { Toaster } from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
 import { Helmet } from "react-helmet";
 import useTheme from "../../context/ThemeContext";
+import toast from "react-hot-toast";
+import {
+  errorOptions
+} from "../../components/utils/toastStyle";
 
 const EditProfile = () => {
-  // all states for user update fields
-  const [name, setName] = useState("");
-  const [from, setFrom] = useState("");
-  const [city, setCity] = useState("");
-  const [email, setEmail] = useState("");
-  const [userDesc, setUserDesc] = useState("");
-  const [proPicUrl, setProPicUrl] = useState("");
-  const [coverPicUrl, setCoverPicUrl] = useState("");
-  const [picLoading, setPicLoading] = useState(false);
-
   const [user, setUser] = useState({});
-
-  
 
   // from context
   const { user: currentUser } = useAuth();
-  const { editUser, loading } = useProfile();
+  const { editUser, loading, updateUserAvatar } = useProfile();
   const { theme } = useTheme();
+
+  // all states for user update fields
+  const [fullName, setFullName] = useState(user.fullName);
+  const [about, setAbout] = useState(user.about);
+  const [address, setAddress] = useState(user.address);
+  const [phone, setPhone] = useState(user.phone);
+  const [gender, setGender] = useState(user.gender);
+  const [dateOfBirth, setDateOfBirth] = useState(user.dateOfBirth);
+  const [avatar, setAvatar] = useState(user.avatar);
 
   // get user details
   useEffect(() => {
@@ -42,91 +43,40 @@ const EditProfile = () => {
           Authorization: `Bearer ${currentUser.accessToken}`,
         },
       };
-      const res = await axios.get(
-        `${BASE_URL}/v1/user/profile`,
-        config
-      );
+      const res = await axios.get(`${BASE_URL}/v1/user/profile`, config);
       setUser(res.data.result);
     };
     fetchUsers();
   }, [currentUser.accessToken]);
 
-  // upload user profile picture to cloudinary
-  const postProPic = (pics) => {
-    setPicLoading(true);
-    if (pics === undefined) {
-      toast.error("Please Select an Image!");
-      return;
-    }
-    if (pics.type === "image/jpeg" || pics.type === "image/png") {
-      const data = new FormData();
-      data.append("file", pics);
-      data.append("upload_preset", "splash-social_media");
-      data.append("cloud_name", "splashcloud");
-      fetch("https://api.cloudinary.com/v1_1/splashcloud/image/upload", {
-        method: "post",
-        body: data,
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          setProPicUrl(data.secure_url);
-          setPicLoading(false);
-        })
-        .catch((err) => {
-          console.log(err);
-          setPicLoading(false);
-        });
-    } else {
-      toast.error("Please select an image with png/jpg type");
-      setPicLoading(false);
-      return;
-    }
-  };
-
-  // upload user cover picture to cloudinary
-  const postCoverPic = (pics) => {
-    setPicLoading(true);
-    if (pics === undefined) {
-      toast.error("Please Select an Image!");
-      return;
-    }
-    if (pics.type === "image/jpeg" || pics.type === "image/png") {
-      const data = new FormData();
-      data.append("file", pics);
-      data.append("upload_preset", "splash-social_media");
-      data.append("cloud_name", "splashcloud");
-      fetch("https://api.cloudinary.com/v1_1/splashcloud/image/upload", {
-        method: "post",
-        body: data,
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          setCoverPicUrl(data.secure_url);
-          setPicLoading(false);
-        })
-        .catch((err) => {
-          console.log(err);
-          setPicLoading(false);
-        });
-    } else {
-      toast.error("Please select an image with png/jpg type");
-      setPicLoading(false);
-      return;
-    }
-  };
-
   // update user profile
   const updateProfileHandler = (e) => {
     e.preventDefault();
-    editUser(name, email, userDesc, city, from, proPicUrl, coverPicUrl);
+    editUser(fullName, about, address, phone, gender, dateOfBirth);
   };
 
-  // if user profile get's updated, push to home/ timeline screen
-  // useEffect(() => {
-  //   if (success) {
-  //     history.push("/");
-  //   }
-  // }, [success, history]);
+  // update user avatar
+  const updateAvatarHandler = async (e) => {
+    e.preventDefault();
+    if (!avatar) {
+      toast.error("Please Select an Image!", errorOptions);
+      return; // Ngăn việc tiếp tục xử lý nếu không có tệp ảnh
+    }
+    // Kiểm tra kích thước tệp ảnh
+    if (avatar.size > 1024 * 1024) {
+      // 1MB = 1024 * 1024 bytes
+      toast.error("Image must not exceed 1MB!", errorOptions);
+      return; // Ngăn việc tiếp tục xử lý nếu kích thước vượt quá 1MB
+    }
+    if (avatar) {
+      await updateUserAvatar(avatar);
+    }
+  };
+
+  const handleFileInputChange = (e) => {
+    const file = e.target.files[0];
+    setAvatar(file);
+  };
 
   return (
     <>
@@ -135,7 +85,8 @@ const EditProfile = () => {
       <Topbar />
       <div
         className="profile"
-        style={{ color: theme.foreground, background: theme.background }}>
+        style={{ color: theme.foreground, background: theme.background }}
+      >
         <Sidebar />
         <div className="profileRight">
           <div className="profileRightTop">
@@ -145,11 +96,27 @@ const EditProfile = () => {
                 src={user.coverPicture || noCover}
                 alt="..."
               />
-              <img
-                className="profileUserImg"
-                src={user.profilePicture || sampleProPic}
-                alt="..."
-              />
+              <form onSubmit={updateAvatarHandler} className="formAvatar">
+                <label htmlFor="avatar" className="profileImageLabel">
+                  <img
+                    className="profileUserImg"
+                    src={user.avatar || sampleProPic}
+                    alt="..."
+                  />
+                  <input
+                    type="file"
+                    accept=".png, .jpeg, .jpg"
+                    id="avatar" // Đặt id để liên kết với htmlFor
+                    onChange={handleFileInputChange}
+                    style={{ display: "none" }} // Ẩn input
+                  />
+                </label>
+                <div className="editAvatar-btnBox">
+                  <button type="submit" className="editProfile-btn">
+                    Update Avatar
+                  </button>
+                </div>
+              </form>
             </div>
             {loading && (
               <Box display="flex" justifyContent="center" sx={{ my: 2 }}>
@@ -160,89 +127,96 @@ const EditProfile = () => {
               <div className="editProfile-box">
                 <h3 className="editProfile-heading">Update Profile</h3>
                 <form onSubmit={updateProfileHandler}>
+                  <label htmlFor="about">Full Name</label>
                   <input
                     className="editProfile-input"
                     type="text"
                     placeholder={user?.fullName}
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required
                   />
-                  <input
-                    className="editProfile-input"
-                    type="email"
-                    placeholder={user?.email}
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
+                  <label htmlFor="about">Bio</label>
                   <input
                     className="editProfile-input"
                     type="text"
                     placeholder={
                       user?.about ? user?.about : "Describe yourself...."
                     }
-                    value={userDesc}
-                    onChange={(e) => setUserDesc(e.target.value)}
+                    value={about}
+                    onChange={(e) => setAbout(e.target.value)}
+                    required
                   />
-                  <input
-                    className="editProfile-input"
-                    type="text"
-                    placeholder={user?.address ? user?.address : "Which address...."}
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                  />
+                  <label htmlFor="about">Address</label>
                   <input
                     className="editProfile-input"
                     type="text"
                     placeholder={
-                      user?.dateOfBirth ? user?.dateOfBirth : "Date of birth...."
+                      user?.address ? user?.address : "Which address...."
                     }
-                    value={from}
-                    onChange={(e) => setFrom(e.target.value)}
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    required
                   />
-                  {picLoading && (
-                    <Box display="flex" justifyContent="center" sx={{ my: 2 }}>
-                      <CircularProgress color="secondary" />
-                    </Box>
-                  )}
-                  <div>
-                    <label htmlFor="proPic" className="editProfile-label">
-                      Upload Profile Picture
-                    </label>
-                    <input
-                      id="proPic"
-                      className="editProfileFile-input"
-                      type="file"
-                      accept=".png, .jpeg, .jpg"
-                      onChange={(e) => postProPic(e.target.files[0])}
-                    />
-                    {proPicUrl && (
-                      <div className="profilePicPreview">
-                        <a href={proPicUrl} target="_blank" rel="noreferrer">
-                          {proPicUrl}
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                  <label htmlFor="coverPic" className="editProfile-label">
-                    Upload Cover Picture
-                  </label>
+                  <label htmlFor="about">Phone</label>
                   <input
-                    className="editProfileFile-input"
-                    id="coverPic"
-                    type="file"
-                    accept=".png, .jpeg, .jpg"
-                    onChange={(e) => postCoverPic(e.target.files[0])}
+                    className="editProfile-input"
+                    type="text"
+                    placeholder={user?.phone ? user?.phone : "Which phone...."}
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    required
                   />
-                  {coverPicUrl && (
-                    <div className="profilePicPreview">
-                      <a href={coverPicUrl} target="_blank" rel="noreferrer">
-                        {coverPicUrl}
-                      </a>
-                    </div>
-                  )}
+                  <label htmlFor="about">Gender</label>
+                  <div className="editProfile-input">
+                    <label className="radio-label">
+                      <input
+                        type="radio"
+                        value="MALE"
+                        name="gender"
+                        checked={gender === "MALE"}
+                        onChange={(e) => setGender(e.target.value)}
+                      />
+                      MALE
+                    </label>
+                    <label className="radio-label">
+                      <input
+                        type="radio"
+                        value="FEMALE"
+                        name="gender"
+                        checked={gender === "FEMALE"}
+                        onChange={(e) => setGender(e.target.value)}
+                      />
+                      FEMALE
+                    </label>
+                    <label className="radio-label">
+                      <input
+                        type="radio"
+                        value="OTHER"
+                        name="gender"
+                        checked={gender === "OTHER"}
+                        onChange={(e) => setGender(e.target.value)}
+                      />
+                      OTHER
+                    </label>
+                  </div>
+
+                  <div className="editProfile-input">
+                    <label htmlFor="dateOfBirth">Date of Birth</label>
+                    <input
+                      id="dateOfBirth"
+                      className="custom-datepicker"
+                      type="date"
+                      placeholder="Date of birth...."
+                      value={dateOfBirth}
+                      onChange={(e) => setDateOfBirth(e.target.value)}
+                      required
+                    />
+                  </div>
+
                   <div className="editProfile-btnBox">
                     <button type="submit" className="editProfile-btn">
-                      Update
+                      Update Profile
                     </button>
                   </div>
                 </form>

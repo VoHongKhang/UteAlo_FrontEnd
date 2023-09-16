@@ -76,7 +76,7 @@ const Login = () => {
                   id="email"
                   className="loginInput"
                 />
-                <ErrorMessage name="email" component={TextError} />
+                <ErrorMessage name="credentialId" component={TextError} />
                 <Field
                   type="password"
                   placeholder="Password"

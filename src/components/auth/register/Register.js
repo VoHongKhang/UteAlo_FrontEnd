@@ -9,7 +9,7 @@ import TextError from "../TextError";
 import { CircularProgress } from "@material-ui/core";
 import { Toaster } from "react-hot-toast";
 import { Helmet } from "react-helmet";
-import RegistrationForm from "./RegistionForm.js";
+import RegisterForm from "./RegistionForm.js";
 // Formik initial input values
 const initialValues = {
   name: "",
@@ -47,7 +47,7 @@ const Register = () => {
     <>
       <Helmet title="UTEALO - Đăng ký" />
       <Toaster />
-      <RegistrationForm />
+      <RegisterForm />
     </>
   );
 };

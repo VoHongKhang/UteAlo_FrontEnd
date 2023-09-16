@@ -6,7 +6,6 @@ import TextError from '../TextError';
 import useAuth from '../../../context/auth/AuthContext';
 import { useHistory } from 'react-router-dom';
 import { CircularProgress } from '@material-ui/core';
-
 // Formik initial input values
 const initialValues = {
 	credentialId: '', // Sửa lại thành "credentialId"

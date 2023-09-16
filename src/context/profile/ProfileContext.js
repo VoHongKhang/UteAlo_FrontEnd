@@ -18,13 +18,12 @@ export const ProfileProvider = ({ children }) => {
 
   // update user req
   const editUser = async (
-    name,
-    email,
-    desc,
-    city,
-    from,
-    profilePicture,
-    coverPicture
+    fullName,
+    about,
+    address,
+    phone,
+    gender,
+    dateOfBirth
   ) => {
     try {
       dispatch({
@@ -33,12 +32,12 @@ export const ProfileProvider = ({ children }) => {
       const config = {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${loggedUser.token}`,
+          Authorization: `Bearer ${loggedUser.accessToken}`,
         },
       };
       const { data } = await axios.put(
-        `${BASE_URL}/user/profile/update`,
-        { name, email, desc, city, from, profilePicture, coverPicture },
+        `${BASE_URL}/v1/user/update`,
+        { fullName, about, address, phone, gender, dateOfBirth },
         config
       );
       dispatch({
@@ -50,6 +49,41 @@ export const ProfileProvider = ({ children }) => {
       console.log(error.response.data.message);
       dispatch({
         type: "UPDATE_USER_FAIL",
+        payload: error.response.data.message,
+      });
+      toast.error(error.response.data.message, errorOptions);
+    }
+  };
+
+  // update user avatar req
+  const updateUserAvatar = async (imageFile) => {
+    try {
+      dispatch({
+        type: "UPDATE_USER_AVATAR_REQUEST",
+      });
+      const config = {
+        headers: {
+          Authorization: `Bearer ${loggedUser.accessToken}`,
+        },
+      };
+      const formData = new FormData();
+      formData.append("imageFile", imageFile);
+
+      const { data } = await axios.put(
+        `${BASE_URL}/v1/user/avatar`,
+        formData,
+        config
+      );
+      console.log(data);
+      dispatch({
+        type: "UPDATE_USER_AVATAR_SUCCESS",
+        payload: data.result, // Điều này phụ thuộc vào cách server trả về dữ liệu mới của avatar
+      });
+      toast.success("Avatar updated successfully", successOptions);
+    } catch (error) {
+      console.log(error.response.data.message);
+      dispatch({
+        type: "UPDATE_USER_AVATAR_FAIL",
         payload: error.response.data.message,
       });
       toast.error(error.response.data.message, errorOptions);
@@ -94,6 +128,7 @@ export const ProfileProvider = ({ children }) => {
     error: state.error,
     success: state.success,
     editUser,
+    updateUserAvatar,
     followUser,
     unfollowUser,
   };

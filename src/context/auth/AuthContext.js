@@ -1,10 +1,6 @@
 import axios from "axios";
 import { createContext, useContext, useReducer } from "react";
 import toast from "react-hot-toast";
-import {
-  errorOptions,
-  successOptions,
-} from "../../components/utils/toastStyle";
 import { BASE_URL } from "../apiCall";
 import authReducer, { initialState } from "./authReducer";
 const AuthContext = createContext(initialState);
@@ -13,6 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   const loginReq = async (credentialId, password) => {
+    const toastId = toast.loading('Đang gửi yêu cầu...');
     try {
       dispatch({
         type: "LOGIN_REQUEST",
@@ -42,25 +39,26 @@ export const AuthProvider = ({ children }) => {
           userId
         }));
       
-        toast.success("Logged in successfully", successOptions);
+        toast.success("Logged in successfully", { id: toastId });
       } else {
         dispatch({
           type: "LOGIN_FAIL",
           payload: response.data.message,
         });
-        toast.error(response.data.message, errorOptions);
+        toast.error(response.data.message, { id: toastId });
       }
     } catch (error) {
       dispatch({
         type: "LOGIN_FAIL",
         payload: error.response.data.message,
       });
-      toast.error(error.response.data.message, errorOptions);
+      toast.error(error.response.data.message, { id: toastId });
     }
   };
 
   // user register
   const register = async (name, email, password) => {
+    const toastId = toast.loading('Đang gửi yêu cầu...');
     try {
       dispatch({
         type: "REGISTER_REQUEST",
@@ -81,13 +79,13 @@ export const AuthProvider = ({ children }) => {
         payload: data,
       });
       localStorage.setItem("userInfo", JSON.stringify(data));
-      toast.success("Registered successfully", successOptions);
+      toast.success("Registered successfully", { id: toastId });
     } catch (error) {
       dispatch({
         type: "REGISTER_FAIL",
         payload: error.response.data.message,
       });
-      toast.error(error.response.data.message, errorOptions);
+      toast.error(error.response.data.message, { id: toastId });
     }
   };
 

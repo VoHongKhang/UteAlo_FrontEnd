@@ -90,6 +90,41 @@ export const ProfileProvider = ({ children }) => {
     }
   };
 
+  // update user background req
+  const updateUserBackground = async (imageFile) => {
+    try {
+      dispatch({
+        type: "UPDATE_USER_BACKGROUND_REQUEST",
+      });
+      const config = {
+        headers: {
+          Authorization: `Bearer ${loggedUser.accessToken}`,
+        },
+      };
+      const formData = new FormData();
+      formData.append("imageFile", imageFile);
+
+      const { data } = await axios.put(
+        `${BASE_URL}/v1/user/background`,
+        formData,
+        config
+      );
+      console.log(data);
+      dispatch({
+        type: "UPDATE_USER_BACKGROUND_SUCCESS",
+        payload: data.result, // Điều này phụ thuộc vào cách server trả về dữ liệu mới của avatar
+      });
+      toast.success("Background updated successfully", successOptions);
+    } catch (error) {
+      console.log(error.response.data.message);
+      dispatch({
+        type: "UPDATE_USER_BACKGROUND_FAIL",
+        payload: error.response.data.message,
+      });
+      toast.error(error.response.data.message, errorOptions);
+    }
+  };
+
   // follow user req
   const followUser = async (userId) => {
     try {
@@ -129,6 +164,7 @@ export const ProfileProvider = ({ children }) => {
     success: state.success,
     editUser,
     updateUserAvatar,
+    updateUserBackground,
     followUser,
     unfollowUser,
   };

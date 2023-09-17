@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Chọn và cắt ảnh trong modal Bootstrap</title>
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+		<link href="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.css" rel="stylesheet" />
+	</head>
+	<body>
+		<div class="container mt-5">
+			<h1>Chọn và cắt ảnh trong modal Bootstrap</h1>
+			<input type="file" id="imageInput" style="display: none" />
+			<button type="button" class="btn btn-primary" id="openImageInput">Chọn ảnh</button>
+
+			<!-- Modal hiển thị ảnh và chức năng cắt ảnh -->
+			<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+				<div class="modal-dialog modal-lg">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="imageModalLabel">Cắt ảnh</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<img id="selectedImage" src="" alt="Ảnh đã chọn" class="img-fluid" />
+							<!-- Thêm phần tử img để hiển thị ảnh cắt -->
+							<img
+								id="croppedResultImage"
+								src=""
+								alt="Ảnh đã cắt"
+								class="img-fluid"
+								style="display: none"
+							/>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+							<button type="button" class="btn btn-primary" id="cropImage">Cắt</button>
+							<button type="button" class="btn btn-success" id="saveImage" style="display: none">
+								Lưu
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Container để hiển thị ảnh đã cắt -->
+			<div id="resultContainer" class="mt-3"></div>
+		</div>
+
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/cropperjs@1.5.12/dist/cropper.min.js"></script>
+		<script>
+			const imageInput = document.querySelector('#imageInput');
+			const selectedImage = document.querySelector('#selectedImage');
+			const openImageInput = document.querySelector('#openImageInput');
+			const cropImageButton = document.querySelector('#cropImage');
+			const saveImageButton = document.querySelector('#saveImage');
+			let cropper; // Biến lưu trữ đối tượng Cropper
+
+			openImageInput.addEventListener('click', () => {
+				imageInput.click();
+			});
+
+			imageInput.addEventListener('change', (event) => {
+				const selectedFile = event.target.files[0];
+				const imageUrl = URL.createObjectURL(selectedFile);
+				selectedImage.src = imageUrl;
+
+				// Khởi tạo đối tượng Cropper và hiển thị khung cắt
+				cropper = new Cropper(selectedImage, {
+					aspectRatio: 1, // Tỷ lệ cắt ảnh (1:1)
+					viewMode: 2, // Chế độ xem toàn bộ ảnh
+					autoCropArea: 1, // Tự động cắt toàn bộ ảnh
+					ready() {
+						// Sau khi khởi tạo, bạn có thể điều chỉnh khung cắt theo ý muốn.
+						// Ví dụ: cropper.setData({ width: 200, height: 200 });
+					},
+				});
+
+				$('#imageModal').modal('show');
+			});
+
+			// Xử lý sự kiện khi bấm nút "Cắt"
+			cropImageButton.addEventListener('click', () => {
+				// Ẩn phần tử cropper-container và cropper-bg
+				document.querySelector('.cropper-container').style.display = 'none';
+				document.querySelector('.cropper-bg').style.display = 'none';
+
+				// Lấy ảnh cắt
+				const croppedImageData = cropper.getCroppedCanvas().toDataURL('image/jpeg');
+
+				// Hiển thị ảnh đã cắt trong modal
+				selectedImage.style.display = 'none';
+				const croppedResultImage = document.querySelector('#croppedResultImage');
+				croppedResultImage.src = croppedImageData;
+				croppedResultImage.style.display = 'block';
+
+				// Hiển thị nút "Lưu" và ẩn nút "Cắt"
+				cropImageButton.style.display = 'none';
+				saveImageButton.style.display = 'block';
+			});
+
+			// Xử lý sự kiện khi bấm nút "Lưu"
+			saveImageButton.addEventListener('click', () => {
+				// Lấy ảnh cắt
+				const croppedImageData = cropper.getCroppedCanvas().toDataURL('image/jpeg');
+				// Thực hiện lưu ảnh cắt hoặc xử lý dữ liệu ở đây
+				// Ví dụ: có thể gửi dữ liệu lên máy chủ để lưu ảnh.
+				console.log('Dữ liệu ảnh cắt:', croppedImageData);
+
+				// Đóng modal sau khi cắt và lưu ảnh
+				$('#imageModal').modal('hide');
+			});
+
+			// Xử lý sự kiện khi bấm nút "Lưu"
+			saveImageButton.addEventListener('click', () => {
+				// Lấy ảnh cắt
+				const croppedImageData = cropper.getCroppedCanvas().toDataURL('image/jpeg');
+
+				// Tạo một phần tử img mới để hiển thị ảnh đã cắt
+				const croppedImageElement = document.createElement('img');
+				croppedImageElement.src = croppedImageData;
+				croppedImageElement.alt = 'Ảnh đã cắt';
+
+				// Thêm ảnh đã cắt vào một thẻ div có id là "resultContainer" để hiển thị
+				const resultContainer = document.querySelector('#resultContainer');
+				resultContainer.innerHTML = ''; // Xóa nội dung cũ (nếu có)
+				resultContainer.appendChild(croppedImageElement);
+
+				// Đóng modal sau khi cắt và lưu ảnh
+				$('#imageModal').modal('hide');
+			});
+		</script>
+	</body>
+</html>

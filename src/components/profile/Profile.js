@@ -63,7 +63,7 @@ const Profile = () => {
               style={{ color: theme.foreground, background: theme.background }}>
               <img
                 className="profileCoverImg"
-                src={user.coverPicture || noCover}
+                src={user.background || noCover}
                 alt="..."
               />
 

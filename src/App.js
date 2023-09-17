@@ -7,15 +7,22 @@ import Timeline from './components/timeline/Timeline';
 import Profile from './components/profile/Profile';
 import EditProfile from './components/editProfile/EditProfile';
 import RefreshToken from './components/auth/RefreshToken';
+import { Toaster } from 'react-hot-toast';
+import ForgotPassword from './components/auth/ForgotPassword/ForgotPassword';
 function App() {
 	RefreshToken();
 	return (
 		<>
+		<Toaster />
 			<Router>
 				<Switch>
 					<Route excat path="/login">
 						<Login />
 					</Route>
+					<Route excat path="/forgot-password">
+						<ForgotPassword />
+					</Route>
+					
 					<Route excat path="/register">
 						<Register />
 					</Route>

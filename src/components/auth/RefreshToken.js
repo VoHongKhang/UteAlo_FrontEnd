@@ -31,7 +31,7 @@ const RefreshToken = () => {
 		};
 		const intervalId = setInterval(() => {
 			fetchUsers();
-		}, 5000); // 1 giờ = 3600000 mili giây
+		}, 5000000); // 1 giờ = 3600000 mili giây
 
 		// Xóa interval khi component unmounted
 		return () => clearInterval(intervalId);

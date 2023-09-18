@@ -1,0 +1,139 @@
+.authEmail {
+  width: 100vw;
+  height: 100vh;
+  background-color: #f0f2f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.authEmailWrapper {
+  width: 90%;
+  height: 90%;
+  display: flex;
+}
+
+.authEmailLeft,
+.authEmailRight {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.authEmailLogo {
+  font-size: 50px;
+  font-weight: 800;
+  color: #1775ee;
+}
+
+.authEmailDesc {
+  font-size: 22px;
+}
+
+.authEmail-title {
+  text-align: center;
+  font-weight: 600;
+  font-size: 22px;
+}
+.authEmail-subtitle{
+  text-align: center;
+  font-weight: 400;
+  font-size: 16px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+.authEmailBox {
+  height: 400px;
+  width: 80%;
+  padding: 20px;
+  background-color: white;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.authEmailInput {
+  height: 40px;
+  border-radius: 6px;
+  border: 1px solid gray;
+  font-size: 14px;
+  padding: 4px 11px;
+  margin-bottom: 6px;
+}
+
+.authEmailInput:focus {
+  outline: none;
+}
+.label_email,
+.label_password{
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 5px;
+
+}
+.label_email::before,
+.label_password::before{
+  display: inline-block;
+    margin-inline-end: 4px;
+    color: #ff4d4f;
+    font-size: 14px;
+    font-family: SimSun,sans-serif;
+    line-height: 1;
+    content: "*";
+}
+.label_password{
+  margin-top: 22px;
+}
+.authEmailBtn {
+  height: 32px;
+  border-radius: 6px;
+  border: none;
+  padding: 4px 15px;
+  background-color: #1775ee;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  color: white;
+  
+}
+.color_link{
+  color: #1775ee;
+  cursor: pointer;
+}
+.contaner_authEmail_btn{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 23px;
+}
+.authEmailBtnDisabled {
+  height: 32px;
+  border-radius: 6px;
+  padding: 4px 15px;
+  border: none;
+  background-color: #7d99bd;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  color: white;
+}
+
+.authEmailBtnCenter {
+  text-align: center;
+}
+
+@media screen and (max-width: 820px) {
+  .authEmailLeft {
+    display: none;
+  }
+
+  .authEmailWrapper {
+    width: 90%;
+  }
+
+  .authEmailregistrationButton {
+    width: 75%;
+  }
+}

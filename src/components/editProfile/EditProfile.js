@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import './EditProfile.css';
 import '../profile/Profile.css';
 import noCover from '../../assets/appImages/noCover.jpg';
@@ -15,10 +15,6 @@ import { Helmet } from 'react-helmet';
 import useTheme from '../../context/ThemeContext';
 import toast from 'react-hot-toast';
 import { errorOptions } from '../../components/utils/toastStyle';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'cropperjs/dist/cropper.min.css';
-import { Modal, Button } from 'react-bootstrap';
-import Cropper from 'react-cropper';
 
 const EditProfile = () => {
 	const [user, setUser] = useState({});
@@ -37,6 +33,7 @@ const EditProfile = () => {
 	const [dateOfBirth, setDateOfBirth] = useState(user.dateOfBirth);
 	const [avatar, setAvatar] = useState(user.avatar);
 	const [background, setBackground] = useState(user.background);
+  
 
 	// get user details
 	useEffect(() => {
@@ -76,7 +73,13 @@ const EditProfile = () => {
 			await updateUserAvatar(avatar);
 		}
 	};
-	// update user avatar
+
+	const handleFileInputChange = (e) => {
+		const file = e.target.files[0];
+		setAvatar(file);
+	};
+
+	// update user background
 	const updateBackgroundHandler = async (e) => {
 		e.preventDefault();
 		if (!background) {
@@ -92,47 +95,11 @@ const EditProfile = () => {
 		if (background) {
 			await updateUserBackground(background);
 		}
-		handleCloseModal();
 	};
 
 	const handleFileBackgroundInputChange = (e) => {
 		const file = e.target.files[0];
 		setBackground(file);
-	};
-	// Thêm các biến state và hàm xử lý cho việc cắt ảnh
-	const [selectedImage, setSelectedImage] = useState(null);
-	const [showModal, setShowModal] = useState(false);
-	const [croppedImage, setCroppedImage] = useState(null); // Trạng thái để lưu ảnh đã cắt
-	const cropperRef = useRef();
-
-	const handleOpenModal = () => {
-		setShowModal(true);
-	};
-
-	const handleCloseModal = () => {
-		setShowModal(false);
-	};
-	
-
-	const handleImageInputChange = (e) => {
-		const file = e.target.files[0];
-		setSelectedImage(URL.createObjectURL(file));
-		handleOpenModal();
-	};
-
-	const handleCropImage = () => {
-		console.log(cropperRef.current); 
-		if (cropperRef.current) {
-			const canvas = cropperRef.current.getCroppedCanvas();
-			if (canvas) {
-				const croppedDataUrl = canvas.toDataURL('image/jpeg');
-				setCroppedImage(croppedDataUrl);
-			} else {
-				console.error('getCroppedCanvas returned null');
-			}
-		} else {
-			console.error('cropperRef is not initialized');
-		}
 	};
 
 	return (
@@ -145,6 +112,7 @@ const EditProfile = () => {
 				<div className="profileRight">
 					<div className="profileRightTop">
 						<div className="profileCover">
+
 							<form onSubmit={updateBackgroundHandler} className="formAvatar">
 								<label htmlFor="background" className="profileImageLabel">
 									<img className="profileCoverImg" src={user.background || noCover} alt="..." />
@@ -162,6 +130,25 @@ const EditProfile = () => {
 									</button>
 								</div>
 							</form>
+
+							<form onSubmit={updateAvatarHandler} className="formAvatar">
+								<label htmlFor="avatar" className="profileImageLabel">
+									<img className="profileUserImg" src={user.avatar || sampleProPic} alt="..." />
+									<input
+										type="file"
+										accept=".png, .jpeg, .jpg"
+										id="avatar" // Đặt id để liên kết với htmlFor
+										onChange={handleFileInputChange}
+										style={{ display: 'none' }} // Ẩn input
+									/>
+								</label>
+								<div className="editAvatar-btnBox">
+									<button type="submit" className="editProfile-btn">
+										Update Avatar
+									</button>
+								</div>
+							</form>
+              
 						</div>
 						{loading && (
 							<Box display="flex" justifyContent="center" sx={{ my: 2 }}>
@@ -194,8 +181,7 @@ const EditProfile = () => {
 											/>
 											<label htmlFor="about">Address</label>
 											<input
-												className="editProfile-input"
-												gender
+												className="editProfile-input"gender
 												type="text"
 												placeholder={user?.address ? user?.address : 'Which address....'}
 												value={address}
@@ -269,63 +255,6 @@ const EditProfile = () => {
 								</form>
 							</div>
 						</section>
-						<div className="container mt-5">
-							<h1>Chọn và cắt ảnh trong modal Bootstrap</h1>
-							<input
-								type="file"
-								id="imageInput"
-								style={{ display: 'none' }}
-								onChange={handleImageInputChange}
-							/>
-							<button
-								type="button"
-								className="btn btn-primary"
-								onClick={() => document.querySelector('#imageInput').click()}
-							>
-								Chọn ảnh
-							</button>
-
-							<Modal show={showModal} onHide={handleCloseModal} size="lg">
-								<Modal.Header closeButton>
-									<Modal.Title>Cắt ảnh</Modal.Title>
-								</Modal.Header>
-								<Modal.Body>
-									{selectedImage && (
-										<>
-											<Cropper
-												src={selectedImage}
-												style={{ height: 400, width: '100%' }}
-												aspectRatio={1}
-												guides={true}
-												ref={cropperRef}
-											/>
-											<div className="text-center">
-												<button className="btn btn-primary" onClick={handleCropImage}>
-													Cắt
-												</button>
-											</div>
-										</>
-									)}
-									{croppedImage && (
-										<div className="text-center mt-3">
-											<img src={croppedImage} alt="Ảnh đã cắt" className="img-fluid" />
-										</div>
-									)}
-								</Modal.Body>
-								<Modal.Footer>
-									{selectedImage && !croppedImage && (
-										<Button variant="secondary" onClick={handleCloseModal}>
-											Hủy
-										</Button>
-									)}
-									{croppedImage && (
-										<Button variant="success" onClick={updateAvatarHandler}>
-											Lưu
-										</Button>
-									)}
-								</Modal.Footer>
-							</Modal>
-						</div>
 					</div>
 				</div>
 			</div>

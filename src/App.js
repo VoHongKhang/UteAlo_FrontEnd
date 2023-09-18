@@ -9,6 +9,8 @@ import EditProfile from './components/editProfile/EditProfile';
 import RefreshToken from './components/auth/RefreshToken';
 import { Toaster } from 'react-hot-toast';
 import ForgotPassword from './components/auth/ForgotPassword/ForgotPassword';
+import AuthEmail from './components/auth/AuthEmail/AuthEmail';
+import ResetPassord from './components/auth/ResetPassword/ResetPassword';
 function App() {
 	RefreshToken();
 	return (
@@ -22,6 +24,13 @@ function App() {
 					<Route excat path="/forgot-password">
 						<ForgotPassword />
 					</Route>
+					<Route excat path="/auth-email">
+						<AuthEmail />
+					</Route>
+					<Route excat path="/reset-password">
+						<ResetPassord />
+					</Route>
+
 					
 					<Route excat path="/register">
 						<Register />

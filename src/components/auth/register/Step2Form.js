@@ -36,15 +36,18 @@ function Step2Form({ onSubmit, data }) {
 						// còn lại thì không cần kiểm tra
 						{
 							pattern:
-
 								data === 'SinhVien'
-									? /^[\w-\.]+@student.hcmute.edu.vn$/
+									? /student.hcmute.edu.vn/
 									: data === 'GiangVien'
-									? /^[\w-\.]+@edu.hcmute.vn$/
-									: /^[\w-\.]+@[\w-\.]+\.\w{2,4}$/,
-							message: 'Email không hợp lệ!',
+									? /edu.hcmute.vn/
+									: null,
+							message:
+								data === 'SinhVien'
+									? 'Email phải là email sinh viên!'
+									: data === 'GiangVien'
+									? 'Email phải là email giảng viên!'
+									: null,
 						},
-						
 					]}
 				>
 					<Input />

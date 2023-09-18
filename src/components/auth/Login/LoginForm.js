@@ -1,34 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
+import React, { useEffect } from 'react';
+import { Button, Card, Divider, Form, Input, theme, Typography } from 'antd';
 import { Link } from 'react-router-dom';
-import TextError from '../TextError';
 import useAuth from '../../../context/auth/AuthContext';
 import { useHistory } from 'react-router-dom';
-import { CircularProgress } from '@material-ui/core';
-// Formik initial input values
-const initialValues = {
-	credentialId: '', // Sửa lại thành "credentialId"
-	password: '',
-};
-const savedValues = {
-	credentialId: 'vohongkhang202@gmail.com',
-	password: 'Khang2002##',
-};
-// validate using yup
-const validationSchema = Yup.object({
-	credentialId: Yup.string().required('Email is required'), // Sửa lại thành "credentialId"
-	password: Yup.string().required('Password is required'),
-});
 
 const LoginForm = () => {
 	const history = useHistory();
-    const [formData, setFormData] = useState(initialValues);
 	const { user, loading, loginReq } = useAuth();
-
+	const { token } = theme.useToken();
+	const [form] = Form.useForm();
 	// Login submit handler
-	const onSubmit = (values) => {
-		loginReq(values.credentialId, values.password);
+	const onFinish = () => {
+		console.log(form.getFieldValue('credentialId'), form.getFieldValue('password'));
+		loginReq(form.getFieldValue('credentialId'), form.getFieldValue('password'));
 	};
 
 	// if req is successfull, i.e. if user is found in local storage push to timeline screen.
@@ -38,58 +22,80 @@ const LoginForm = () => {
 		}
 	}, [user, history]);
 	return (
-		<div>
-			<Formik
-				initialValues={formData||initialValues}
-				validationSchema={validationSchema}
-				onSubmit={onSubmit}
-				enableReinitialize
-			>
-				<div className="loginRight">
-					<Form className="loginBox">
-						<div className="login-title">Đăng nhập</div>
-						<div className="login-subtitle">Vui lòng nhập email và mật khẩu để đăng nhập</div>
+		<Card
+			title={
+				<Typography.Title level={2} style={{ color: token.colorPrimary, margin: 0, textAlign: 'center' }}>
+					Đăng nhập
+				</Typography.Title>
+			}
+			style={{ width: 480, margin: 'auto' }}
+		>
+			<Form layout="vertical" form={form} onFinish={onFinish}>
+				<Form.Item
+					label="Email"
+					name="credentialId"
+					rules={[
+						{
+							required: true,
+							message: 'Vui lòng nhập email!',
+						},
+						{
+							type: 'email',
+							message: 'Email không hợp lệ!',
+						},
+					]}
+				>
+					<Input />
+				</Form.Item>
 
-						<label className="label_email">Email</label>
-						<Field type="email" placeholder="Email" name="credentialId" id="email" className="loginInput" />
-						<ErrorMessage name="credentialId" component={TextError} />
+				<Form.Item
+					label="Mật khẩu"
+					name="password"
+					rules={[
+						{
+							required: true,
+							message: 'Vui lòng nhập mật khẩu!',
+						},
+						{
+							min: 8,
+							message: 'Mật khẩu phải có ít nhất 8 ký tự!',
+						},
+						{
+							max: 32,
+							message: 'Mật khẩu không được vượt quá 32 ký tự!',
+						},
+						{
+							pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{6,20})/,
+							message:
+								'Mật khẩu phải chứa ít nhất 1 ký tự hoa, 1 ký tự thường, 1 số và 1 ký tự đặc biệt!',
+						},
+					]}
+				>
+					<Input.Password />
+				</Form.Item>
 
-						<label className="label_password">Mật khẩu</label>
-						<Field
-							type="password"
-							placeholder="Mật khẩu"
-							className="loginInput"
-							name="password"
-							id="password"
-						/>
-						<ErrorMessage name="password" component={TextError} />
-						<div className="contaner_login_btn">
-							<div className="login_btn_forgot">
-								<Link className="forgot_link" to="/forgot-password">
-									<p className="color_link">Quên mật khẩu?</p>
-								</Link>
-							</div>
-							<button className="loginBtn" type="button" onClick={() => setFormData(savedValues)}>
-								Get Test User credentials
-							</button>
-							<button
-								className={loading ? 'loginBtnDisabled' : 'loginBtn'}
-								type="submit"
-								disabled={loading ? true : false}
-							>
-								{loading ? <CircularProgress color="secondary" size="22px" /> : 'Đăng nhập'}
-							</button>
-						</div>
-						<div className="login-subtitle">
-							Bạn chưa có tài khoản?
-							<Link className="register_link" to="/register">
-								<p className="color_link">Đăng ký ngay!</p>
-							</Link>
-						</div>
-					</Form>
-				</div>
-			</Formik>
-		</div>
+				<Button type="primary" htmlType="submit" loading={loading} style={{ float: 'right' }}>
+					Đăng nhập
+				</Button>
+
+				<Form.Item>
+					<Link to="/forgot-password">
+						<Button type="link" style={{ padding: 0 }}>
+							Quên mật khẩu?
+						</Button>
+					</Link>
+				</Form.Item>
+
+				<Divider>Hoặc</Divider>
+
+				<Form.Item style={{ textAlign: 'center' }}>
+					Chưa có tài khoản?
+					<Link to="/register">
+						<Button type="link">Đăng ký ngay!</Button>
+					</Link>
+				</Form.Item>
+			</Form>
+		</Card>
 	);
 };
 export default LoginForm;

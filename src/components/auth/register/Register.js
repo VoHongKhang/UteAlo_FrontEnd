@@ -7,7 +7,7 @@ import { Button, Space, Steps } from 'antd';
 import './Register.css';
 import toast from 'react-hot-toast';
 import RegisterApi from '../../../api/auth/registerApi';
-
+import { Helmet } from 'react-helmet';
 const ACCOUNT_STEP = 0;
 const INFO_STEP = 2;
 
@@ -45,7 +45,7 @@ function Register() {
 			}
 			fetchData();
 		}
-	}, [formData]);
+	}, [formData,step]);
 
 	const handleStepSubmit = (stepData) => {
 		setFormData((preData) => ({ ...preData, ...stepData }));
@@ -55,7 +55,9 @@ function Register() {
 	};
 
 	return (
+		
 		<div className="register_form">
+			<Helmet title="UTEALO - Đăng ký" />
 			<div className={`step step-${step}`}>
 				<Steps current={step}>
 					<Steps.Step title="Xác nhận vai trò" />

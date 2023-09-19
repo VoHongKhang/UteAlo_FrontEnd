@@ -45,7 +45,7 @@ function Register() {
 			}
 			fetchData();
 		}
-	}, [formData,step]);
+	}, [formData]);
 
 	const handleStepSubmit = (stepData) => {
 		setFormData((preData) => ({ ...preData, ...stepData }));

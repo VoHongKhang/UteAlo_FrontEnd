@@ -9,7 +9,7 @@ import useTheme from "../../../context/ThemeContext";
 import axios from "axios";
 import { BASE_URL } from "../../../context/apiCall";
 
-const Feed = ({ userId }) => {
+const Feed = () => {
   const params = useParams();
   const { user: currentUser } = useAuth();
   const [posts, setPosts] = useState([]);
@@ -20,21 +20,20 @@ const Feed = ({ userId }) => {
     try {
       const config = {
         headers: {
-          Authorization: `Bearer ${currentUser.token}`,
+          Authorization: `Bearer ${currentUser.accessToken}`,
         },
       };
       setLoading(true);
-      const res = userId
-        ? await axios.get(`${BASE_URL}/post/profile/${params.userId}`, config)
-        : await axios.get(
-            `${BASE_URL}/post/timeline/${currentUser._id}`,
-            config
-          );
+
+      const res = await axios.get(
+        `${BASE_URL}/v1/post/${currentUser.userId}/posts`,
+        config
+      );
+      console.log(currentUser.userId);
+      console.log(res.data.result);
       setLoading(false);
       setPosts(
-        res.data.sort((p1, p2) => {
-          return new Date(p2.createdAt) - new Date(p1.createdAt);
-        })
+        res.data.result
       );
     } catch (error) {
       console.log(error);
@@ -44,14 +43,15 @@ const Feed = ({ userId }) => {
   useEffect(() => {
     fetchPosts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser._id, params.userId, userId, currentUser.token]);
+  }, [currentUser.userId, currentUser.accessToken]);
 
   return (
     <div
       className="feed"
-      style={{ color: theme.foreground, background: theme.background }}>
+      style={{ color: theme.foreground, background: theme.background }}
+    >
       <div className="feedWrapper">
-        {(!userId || userId === currentUser._id) && (
+        {(!params.userId || params.userId === currentUser.userId) && (
           <Share fetchPosts={fetchPosts} />
         )}
         {loading && (

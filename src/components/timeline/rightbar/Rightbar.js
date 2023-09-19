@@ -122,7 +122,7 @@ const Rightbar = ({ user }) => {
             {followed ? <Remove /> : <Add />}
           </button>
         )}
-        <h4 className="rightbarTitle">rmation</h4>
+        <h4 className="rightbarTitle">Information</h4>
         <div className="rightbarInfo">
           <div className="rightbarInfoItem">
             <span className="rightbarInfoKey">Address:</span>

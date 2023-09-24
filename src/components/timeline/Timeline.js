@@ -9,8 +9,9 @@ import Feed from "./feed/Feed";
 import Rightbar from "./rightbar/Rightbar";
 import SearchUser from "./searchUser/SearchUser";
 import Sidebar from "./sidebar/Sidebar";
+import ShortCut from "./sidebar/Sidebar01";
 import Topbar from "./topbar/Topbar";
-
+import QuickContact from "./rightbar/QuickContact";
 const Timeline = () => {
   const [searchFriends, setSearchFriends] = useState([]);
   const [searchKey, setSearchKey] = useState("");
@@ -83,9 +84,10 @@ const Timeline = () => {
         </div>
       )}
       <div className="homeContainer">
-        <Sidebar searchFriends={searchFriends} toggle={toggle} />
+        {/* <Sidebar searchFriends={searchFriends} toggle={toggle} /> */}
+        <ShortCut />
         <Feed />
-        <Rightbar />
+        <QuickContact user={currentUser}/>
       </div>
     </>
   );

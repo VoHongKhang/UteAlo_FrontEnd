@@ -1,11 +1,17 @@
 .sidebar {
-  flex: 3;
+  flex: 2.5;
   height: calc(100vh - 50px);
   overflow-y: scroll;
   position: sticky;
   top: 50px;
 }
-
+.topbarImg {
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	object-fit: cover;
+	cursor: pointer;
+}
 ::-webkit-scrollbar {
   width: 5px;
 }

@@ -9,10 +9,10 @@ const SearchUser = ({ user }) => {
     <>
       <li className="rightbarFriend">
         <div className="rightbarProfileImgContainer">
-          <Link to={`/profile/${user._id}`}>
+          <Link to={`/profile/${user.userId}`}>
             <img
               className="rightbarProfileImg"
-              src={user.profilePicture || noAvatar}
+              src={user.avatar || noAvatar}
               alt="avatar"
             />
           </Link>

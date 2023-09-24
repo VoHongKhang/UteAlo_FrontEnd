@@ -117,6 +117,11 @@
   font-weight: bold;
 }
 
+.postCommentTextDelete {
+  margin-left: 30px;
+  cursor: pointer;
+}
+
 .postCommentUserName {
   margin-left: 5px;
 }

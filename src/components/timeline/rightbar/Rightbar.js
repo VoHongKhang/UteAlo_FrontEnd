@@ -31,12 +31,12 @@ const Rightbar = ({ user }) => {
   const fetchUsers = async () => {
     const config = {
       headers: {
-        Authorization: `Bearer ${currentUser.token}`,
+        Authorization: `Bearer ${currentUser.accessToken}`,
       },
     };
     if (currentUser._id) {
       const res = await axios.get(
-        `${BASE_URL}/user?userId=${currentUser._id}`,
+        `${BASE_URL}/v1/user/profile/${currentUser.userId}`,
         config
       );
       setLiveUser(res.data);
@@ -77,7 +77,7 @@ const Rightbar = ({ user }) => {
           },
         };
         const { data } = await axios.get(
-          `${BASE_URL}/v1/user/profile`,
+          `${BASE_URL}/v1/user/profile/${params.userId}`,
           config
         );
         setFriends(data);

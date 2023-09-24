@@ -29,12 +29,11 @@ const Feed = () => {
         `${BASE_URL}/v1/post/${currentUser.userId}/posts`,
         config
       );
-      console.log(currentUser.userId);
-      console.log(res.data.result);
       setLoading(false);
       setPosts(
         res.data.result
       );
+
     } catch (error) {
       console.log(error);
     }
@@ -64,7 +63,7 @@ const Feed = () => {
           <h2 style={{ marginTop: "20px" }}>No posts yet!</h2>
         ) : (
           posts.map((p) => (
-            <PostCard post={p} key={p._id} fetchPosts={fetchPosts} />
+            <PostCard post={p} key={p.postId} fetchPosts={fetchPosts} />
           ))
         )}
       </div>

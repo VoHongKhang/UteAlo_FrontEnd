@@ -27,11 +27,11 @@ const Topbar = ({ searchHandler, setSearchKey, searchKey, menuHandler }) => {
 					Authorization: `Bearer ${currentUser.accessToken}`,
 				},
 			};
-			const res = await axios.get(`${BASE_URL}/v1/user/profile`, config);
+			const res = await axios.get(`${BASE_URL}/v1/user/profile/${currentUser.userId}`, config);
 			setUser(res.data.result);
 		};
 		fetchUsers();
-	}, [currentUser.accessToken]);
+	}, [currentUser.accessToken,currentUser.userId]);
 
 	const buttonCenterHandler = (e, link) => {
 		if (e.tagName === 'svg') e = e.parentNode;

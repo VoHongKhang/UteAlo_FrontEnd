@@ -76,18 +76,18 @@ const Share = ({ fetchPosts }) => {
     const fetchUsers = async () => {
       const config = {
         headers: {
-          Authorization: `Bearer ${user.token}`,
+          Authorization: `Bearer ${user.accessToken}`,
         },
       };
 
       const res = await axios.get(
-        `${BASE_URL}/user?userId=${user._id}`,
+        `${BASE_URL}/v1/user/profile/${user.userId}`,
         config
       );
       setLiveUser(res.data);
     };
     fetchUsers();
-  }, [user._id, user.token]);
+  }, [user.userId, user.accessToken]);
 
   return (
     <>

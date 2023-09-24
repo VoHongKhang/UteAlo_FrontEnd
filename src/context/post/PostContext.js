@@ -16,7 +16,7 @@ export const PostProvider = ({ children }) => {
 
   const { user: loggedUser } = useAuth();
   // create post req
-  const createPost = async (user, desc, location, pic) => {
+  const createPost = async (location, content, photos, postGroupId) => {
     try {
       dispatch({
         type: "CREATE_POST_REQUEST",
@@ -24,12 +24,12 @@ export const PostProvider = ({ children }) => {
       const config = {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${loggedUser.token}`,
+          Authorization: `Bearer ${loggedUser.accessToken}`,
         },
       };
       const { data } = await axios.post(
-        `${BASE_URL}/post/create`,
-        { user, desc, location, pic },
+        `${BASE_URL}/v1/post/create`,
+        { location, content, photos, postGroupId },
         config
       );
       dispatch({
@@ -46,7 +46,8 @@ export const PostProvider = ({ children }) => {
     }
   };
 
-  // get timeline posts req
+
+  // get posts req
   const getTimelinePosts = async () => {
     try {
       dispatch({
@@ -54,10 +55,10 @@ export const PostProvider = ({ children }) => {
       });
       const config = {
         headers: {
-          Authorization: `Bearer ${loggedUser.token}`,
+          Authorization: `Bearer ${loggedUser.accessToken}`,
         },
       };
-      const url = `${BASE_URL}/post/timeline/${loggedUser._id}`;
+      const url = `${BASE_URL}/v1/post/${loggedUser.userId}/posts`;
       const { data } = await axios.get(url, config);
       dispatch({
         type: "FETCH_POSTS_SUCCESS",

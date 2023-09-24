@@ -1,1 +1,1 @@
-export const BASE_URL = "https://utealo-backend.azurewebsites.net/api";
+export const BASE_URL = "https://utealo.azurewebsites.net/api";

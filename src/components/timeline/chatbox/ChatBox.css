@@ -1,0 +1,72 @@
+.chatbox {
+	width: 328px;
+	position: fixed;
+	bottom: 0;
+	right: 10%;
+	min-height: 400px;
+	background: blanchedalmond;
+	border-radius: 4px;
+    z-index: 1000;
+}
+.chat-header {
+	position: absolute;
+	top: 0;
+    height: 44px;
+	left: 0;
+	right: 0;
+	display: flex;
+	justify-content: space-between;
+    border-bottom: #fff 1px solid;
+}
+.chat-header_left {
+	display: flex;
+    flex: 1;
+}
+.chat-header-avatar {
+	margin: 3px 0px 0px 6px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    cursor: pointer;
+}
+.chat-header-user {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	margin: 0px 6px;
+}
+.chat-messages{
+    margin: 40px 6px;
+    max-height: 300px;
+    overflow-y: scroll;
+}
+.chat-header-icon {
+	display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    cursor: pointer;
+    flex: 0.5;
+}
+
+.chat-input {
+	position: absolute;
+	bottom: 10px;
+	left: 0;
+	right: 0;
+	display: flex;
+}
+.icon-message {
+	flex: 3;
+	display: flex;
+	align-items: center;
+	justify-content: space-evenly;
+}
+.input-message {
+	flex: 4;
+	margin-right: 8px;
+}
+.button-message {
+	flex: 1;
+	margin-right: 8px;
+}

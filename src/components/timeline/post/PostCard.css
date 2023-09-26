@@ -112,10 +112,32 @@
 }
 
 .postCommentsBox {
-  margin-top: 5px;
+  margin-top: 10px;
   min-height: 40px;
   display: flex;
   align-items: center;
+  display: block;
+  padding: 6px;
+  background-color: #f0f2f5;
+  border-radius: 30px;
+  display: inline-block;
+  padding-right: 30px;
+}
+
+.postCommentAction {
+  margin-left: 45px;
+}
+
+.postCommentLike {
+  margin-left: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #65676B;
+}
+
+
+.postCommentAction span {
+  font-size: 12px;
 }
 
 .postCommentUser {
@@ -126,19 +148,25 @@
 }
 
 .postCommentContent {
-  margin-left: 8px;
-  font-size: 13px;
+  margin-left: 46px;
+  font-size: 15px;
   word-spacing: 2px;
-  font-weight: bold;
+  margin-top: -20px;
 }
 
 .postCommentTextDelete {
   margin-left: 30px;
   cursor: pointer;
+  font-weight: bold;
+  color: #65676B;
 }
 
 .postCommentUserName {
   margin-left: 5px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #050505;
+  margin-top: -18px;
 }
 
 .postCommentBtn {

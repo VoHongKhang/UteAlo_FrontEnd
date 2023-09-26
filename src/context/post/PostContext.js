@@ -21,7 +21,6 @@ export const PostProvider = ({ children }) => {
       dispatch({
         type: "CREATE_POST_REQUEST",
       });
-      console.log(location, content, photos, postGroupId);
       const config = {
         headers: {
           "Content-Type": "application/json",

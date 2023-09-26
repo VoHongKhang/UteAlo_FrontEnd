@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './PostCard.css';
-import post1 from '../../../assets/appImages/1.jpeg';
 import sampleProPic from '../../../assets/appImages/user.png';
-import likeImg from '../../../assets/appImages/heart.png';
-import heart from '../../../assets/appImages/like.png';
+import heart from '../../../assets/appImages/heart.png';
+import heartEmpty from '../../../assets/appImages/heartEmpty.png';
 import { Send } from '@material-ui/icons';
 import { Box, CircularProgress } from '@material-ui/core';
 import axios from 'axios';
-import Moment from 'react-moment';
+import moment from 'moment';
 import { Link } from 'react-router-dom';
 import { BASE_URL } from '../../../context/apiCall';
 import InputEmoji from 'react-input-emoji';
@@ -51,6 +50,7 @@ const PostCard = ({ post, fetchPosts }) => {
 	const { getTimelinePosts } = usePost();
 	const [comments, setCommentPost] = useState({});
 	const [commentlength, setCommentLength] = useState(post?.comments.length);
+
 	useEffect(() => {
 		const fetchData = async () => {
 			let resultValue = null; // Biến tạm để lưu giá trị trả về từ checkUserLikePost
@@ -66,7 +66,7 @@ const PostCard = ({ post, fetchPosts }) => {
 		fetchData();
 	}, [checkUserLikePost]);
 
-	// get comments post
+	// lấy danh sách bình luận trên bài post
 	useEffect(() => {
 		const fetchCommentPost = async () => {
 			const res = await GetCommentPostApi.getCommentPost(post.postId);
@@ -75,10 +75,10 @@ const PostCard = ({ post, fetchPosts }) => {
 		fetchCommentPost();
 	}, [post.postId]);
 
-	// like a post (1 like per user)
+	// yêu thích và bỏ yêu thích bài post
 	const likePostHandler = async () => {
 		try {
-			await LikeOrUnlikeApi.likeOrUnlike(post.postId, currentUser.accessToken,currentUser.userId);
+			await LikeOrUnlikeApi.likeOrUnlike(post.postId, currentUser.accessToken, currentUser.userId);
 		} catch (err) {
 			console.log(err);
 		}
@@ -87,9 +87,8 @@ const PostCard = ({ post, fetchPosts }) => {
 		setIsLiked(!isLiked);
 	};
 
-	// delete a comment post
-	const deleteCommentPostHandler =async (commentId) => {
-
+	// xóa bình luận trên bài post
+	const deleteCommentPostHandler = async (commentId) => {
 		const toastId = toast.loading('Đang gửi yêu cầu...');
 		try {
 			await DeleteCommentApi.deleteComment(commentId, currentUser.accessToken);
@@ -103,23 +102,34 @@ const PostCard = ({ post, fetchPosts }) => {
 		}
 	};
 
-
 	const showCommentHandler = () => {
 		setShowComment(!showComment);
 	};
 
-	// post a comment (1 comment by each user on a post, 2nd time get's edited)
+	// viết bình luận
 	const postCommentHandler = async () => {
 		try {
+			if (content === '') {
+				toast.error('Comment cannot be empty!', errorOptions);
+				return; // Dừng việc thực hiện tiếp theo nếu nội dung rỗng
+			}
 			const config = {
 				headers: {
 					'Content-Type': 'application/json',
-					Authorization: `Bearer ${currentUser.token}`,
+					Authorization: `Bearer ${currentUser.accessToken}`,
 				},
 			};
 			setCommentLoading(true);
 			if (post.postId) {
-				await axios.post(`${BASE_URL}/v1/post/comment/create`, { content: content,photo: photo, postId: post.postId }, config);
+				const rest = await axios.post(
+					`${BASE_URL}/v1/post/comment/create`,
+					{ content: content, photo: photo, postId: post.postId },
+					config
+				);
+				// Cập nhật danh sách bình luận sau khi gửi thành công
+				const newComment = rest.data.result; // Đảm bảo API trả về thông tin bình luận mới
+				setCommentPost([...comments, newComment]); // Thêm bình luận mới vào danh sách hiện có
+				setCommentLength(commentlength + 1); // Tăng độ dài của danh sách bình luận lên 1
 			}
 			setCommentLoading(false);
 			toast.success('Comment posted successfully!', successOptions);
@@ -132,21 +142,28 @@ const PostCard = ({ post, fetchPosts }) => {
 		setPhoto('');
 	};
 
-	// delete post
-	const deleteHandler = async () => {
+	// xóa bài post
+	const deletePostHandler = async () => {
 		try {
+			const isConfirmed = window.confirm('Bạn có chắc muốn xóa bài viết này?');
+
+			if (!isConfirmed) {
+				return; // Nếu người dùng không xác nhận, không thực hiện xóa
+			}
 			const config = {
 				headers: {
 					'Content-Type': 'application/json',
-					Authorization: `Bearer ${currentUser.token}`,
+					Authorization: `Bearer ${currentUser.accessToken}`,
 				},
 			};
 			setCommentLoading(true);
-			if (post._id) {
-				await axios.delete(`${BASE_URL}/post/${post._id}`, config);
+			if (post.postId) {
+				console.log(post.userId);
+				console.log(currentUser.userId);
+				await axios.put(`${BASE_URL}/v1/post/delete/${post.postId}`, post.userId, config);
 			}
 			setCommentLoading(false);
-			toast.success('Comment deleted successfully!', successOptions);
+			toast.success('Post deleted successfully!', successOptions);
 		} catch (error) {
 			setCommentLoading(false);
 			toast.error(error.response.data.message, errorOptions);
@@ -154,17 +171,13 @@ const PostCard = ({ post, fetchPosts }) => {
 		fetchPosts();
 	};
 
-	// get timeline posts
+	// lấy timeline của bài post
 	useEffect(() => {
 		getTimelinePosts();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	useEffect(() => {
-		
-
-	}, []);
-
+	useEffect(() => {}, []);
 
 	// see weather logged in user has liked the particular post if yes user can dislike else like
 	useEffect(() => {
@@ -179,13 +192,32 @@ const PostCard = ({ post, fetchPosts }) => {
 					Authorization: `Bearer ${currentUser.accessToken}`,
 				},
 			};
-			if (post.user) {
-				const res = await axios.get(`${BASE_URL}/v1/user/profile/${post.user}`, config);
-				setUser(res.data);
+			if (post.userId) {
+				const res = await axios.get(`${BASE_URL}/v1/user/profile/${post.userId}`, config);
+
+				setUser(res.data.result);
 			}
 		};
 		fetchUsers();
-	}, [post.userId, currentUser.accessToken, post.user]);
+	}, [post.userId, currentUser.accessToken]);
+
+	// Lấy thời gian đăng bài từ prop post
+	const postTime = moment(post.postTime);
+
+	// Tính khoảng thời gian giữa thời gian đăng bài và thời gian hiện tại
+	const timeDifference = moment().diff(postTime, 'minutes');
+
+	// Định dạng thời gian
+	let formattedTime;
+
+	if (timeDifference < 60) {
+		formattedTime = `${timeDifference} phút trước`;
+	} else if (timeDifference < 1440) {
+		const hours = Math.floor(timeDifference / 60);
+		formattedTime = `${hours} giờ trước`;
+	} else {
+		formattedTime = postTime.format('DD [tháng] M [lúc] HH:mm');
+	}
 
 	return (
 		<div className="post">
@@ -195,24 +227,22 @@ const PostCard = ({ post, fetchPosts }) => {
 						<Link to={`/profile/${user.userId}`}>
 							<img className="postProfileImg" src={user.avatar || sampleProPic} alt="..." />
 						</Link>
-						<span className="postUsername">{user.userName}</span>
-						<span className="postLocation">• {post.location || 'Location'}</span>
-						<span className="postDate">
-							<Moment fromNow ago>
-								{post.createdAt}
-							</Moment>{' '}
-							ago
-						</span>
+						<div className="postNameAndDate">
+							<span className="postUsername">{user.fullName}</span>
+							<span className="postDate">{formattedTime}</span>
+						</div>
+
+						<span className="postLocation">• {post.location || 'Vị trí'}</span>
 					</div>
 					<div className="postTopRight">
-						{currentUser.userId === post.user ? (
+						{currentUser.userId === post.userId ? (
 							<>
 								<button
 									style={{ backgroundColor: '#3b82f6' }}
 									className="shareButton"
-									onClick={deleteHandler}
+									onClick={deletePostHandler}
 								>
-									Delete
+									Xóa
 								</button>
 							</>
 						) : (
@@ -220,30 +250,37 @@ const PostCard = ({ post, fetchPosts }) => {
 						)}
 					</div>
 				</div>
+
 				<div className="postCenter">
-					<span className="postText">{post.desc}</span>
-					<img className="postImg" src={post.img ? post.img : post1} alt="..." />
+					<span className="postText">{post.content}</span>
+					{post.photos && <img className="postImg" src={post.photos} alt="..." />}
 				</div>
 				<div className="postBottom">
 					<div className="postBottomLeft">
-						<img className="likeIcon" onClick={likePostHandler} src={likeImg} alt="like" />
-						<img className="likeIcon" onClick={likePostHandler} src={heart} alt="heart" />
-						<span className="postLikeCounter">{like} people liked it</span>
+						<img
+							className="likeIcon"
+							onClick={likePostHandler}
+							src={isLiked ? heart : heartEmpty}
+							alt="heart"
+						/>
+						<span className="postLikeCounter">{like} người đã thích</span>
 					</div>
 					<div className="postBottomRight">
 						<span className="postCommentText" onClick={showCommentHandler}>
-							{commentlength} comments
+							{commentlength} bình luận
 						</span>
 					</div>
 				</div>
+
 				{commentLoading && (
 					<Box display="flex" justifyContent="center" sx={{ my: 2 }}>
 						<CircularProgress color="secondary" />
 					</Box>
 				)}
+
 				<div className="postCommentCont">
 					<div className="postCommentCont-1">
-						<InputEmoji value={content} onChange={setContent} placeholder={`Post a content....`} />
+						<InputEmoji value={content} onChange={setContent} placeholder={`Viết bình luận ....`} />
 					</div>
 					<div className="postCommentCont-2">
 						<button
@@ -258,32 +295,30 @@ const PostCard = ({ post, fetchPosts }) => {
 
 				{Object.values(comments).map((comment) => {
 					return (
-						<div className= {`comment_${comment.commentId}`}>
-							
-								<div
-									className="postCommentsBox"
-									style={{ display: showComment ? '' : 'none' }}
-									key={comment.commentId}
-								>
-									<div className="postCommentUser">
-										<img
-											className="postProfileImg"
-											src={comment.userAvatar || sampleProPic}
-											alt="..."
-										/>
-										<span className="postCommentUserName">{comment.userName}</span>
-									</div>
-									<div className="postCommentContent">
-										<span>{comment.content}</span>
-										<span
-											className="postCommentTextDelete"
-											onClick={() => deleteCommentPostHandler(comment.commentId)}
-										>
-											Delete
-										</span>
-									</div>
+						<div className={`comment_${comment.commentId}`}>
+							<div
+								className="postCommentsBox"
+								style={{ display: showComment ? '' : 'none' }}
+								key={comment.commentId}
+							>
+								<div className="postCommentUser">
+									<img
+										className="postProfileImg"
+										src={comment.userAvatar || sampleProPic}
+										alt="..."
+									/>
+									<span className="postCommentUserName">{comment.userName}</span>
 								</div>
-							
+								<div className="postCommentContent">
+									<span>{comment.content}</span>
+									<span
+										className="postCommentTextDelete"
+										onClick={() => deleteCommentPostHandler(comment.commentId)}
+									>
+										Xóa
+									</span>
+								</div>
+							</div>
 						</div>
 					);
 				})}

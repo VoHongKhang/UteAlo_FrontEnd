@@ -12,8 +12,10 @@ import axios from "axios";
 import { BASE_URL } from "../../../context/apiCall";
 
 const Share = ({ fetchPosts }) => {
-  const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
+  const [content, setContent] = useState("");
+  const [photos, setPhotos] = useState("");
+  const [postGroupId, setPostGroupId] = useState("");
   const [url, setUrl] = useState("");
   const [picLoading, setPicLoading] = useState(false);
   const [liveUser, setLiveUser] = useState({});
@@ -53,25 +55,27 @@ const Share = ({ fetchPosts }) => {
     }
   };
 
-  // share a post
+  // đăng bài viết
   const postSubmitHandler = (e) => {
     e.preventDefault();
-    if (url) {
+    if (true) {
       const newPost = {
-        user: user._id,
-        desc: description,
-        location: location,
-        pic: url,
+        location: location ? location : "",
+        content: content ? content : "",
+        photos:photos ? photos : "",
+        postGroupId: postGroupId ? postGroupId : 0,
+      
       };
-      createPost(newPost.user, newPost.desc, newPost.location, newPost.pic);
-      setUrl(null);
-      setDescription("");
+      createPost(newPost.location, newPost.content, newPost.photos, newPost.postGroupId);
       setLocation("");
+      setContent("");
+      setPhotos("");
+      setPostGroupId("");
       fetchPosts();
     }
   };
 
-  // get user details
+  // lấy thông tin người dùng
   useEffect(() => {
     const fetchUsers = async () => {
       const config = {
@@ -84,10 +88,12 @@ const Share = ({ fetchPosts }) => {
         `${BASE_URL}/v1/user/profile/${user.userId}`,
         config
       );
-      setLiveUser(res.data);
+      console.log(res.data.result);
+      setLiveUser(res.data.result);
     };
     fetchUsers();
   }, [user.userId, user.accessToken]);
+
 
   return (
     <>
@@ -98,14 +104,14 @@ const Share = ({ fetchPosts }) => {
             <img
               className="shareProfileImg"
               src={
-                liveUser?.profilePicture ? liveUser?.profilePicture : noAvatar
+                liveUser?.avatar ? liveUser?.avatar : noAvatar
               }
               alt="..."
             />
             <InputEmoji
-              value={description}
-              onChange={setDescription}
-              placeholder={`What's on your mind ${liveUser?.name}?`}
+              value={content}
+              onChange={setContent}
+              placeholder={`What's on your mind ${liveUser?.fullName}?`}
             />
           </div>
           <hr className="shareHr" />

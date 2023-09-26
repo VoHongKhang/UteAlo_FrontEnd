@@ -14,22 +14,23 @@ const PostContext = createContext(initialPostState);
 export const PostProvider = ({ children }) => {
   const [state, dispatch] = useReducer(postReducer, initialPostState);
 
-  const { user: loggedUser } = useAuth();
+  const { user } = useAuth();
   // create post req
   const createPost = async (location, content, photos, postGroupId) => {
     try {
       dispatch({
         type: "CREATE_POST_REQUEST",
       });
+      console.log(location, content, photos, postGroupId);
       const config = {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${loggedUser.accessToken}`,
+          Authorization: `Bearer ${user.accessToken}`,
         },
       };
       const { data } = await axios.post(
         `${BASE_URL}/v1/post/create`,
-        { location, content, photos, postGroupId },
+        { location:location, content:content, photos:photos, postGroupId:postGroupId },
         config
       );
       dispatch({
@@ -55,10 +56,10 @@ export const PostProvider = ({ children }) => {
       });
       const config = {
         headers: {
-          Authorization: `Bearer ${loggedUser.accessToken}`,
+          Authorization: `Bearer ${user.accessToken}`,
         },
       };
-      const url = `${BASE_URL}/v1/post/${loggedUser.userId}/posts`;
+      const url = `${BASE_URL}/v1/post/${user.userId}/posts`;
       const { data } = await axios.get(url, config);
       dispatch({
         type: "FETCH_POSTS_SUCCESS",

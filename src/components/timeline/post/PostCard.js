@@ -88,9 +88,13 @@ const PostCard = ({ post, fetchPosts }) => {
 	};
 
 	// xóa bình luận trên bài post
-	const deleteCommentPostHandler = async (commentId) => {
+	const deleteCommentPostHandler = async (commentId,userId) => {
 		const toastId = toast.loading('Đang gửi yêu cầu...');
 		try {
+			if (userId !== currentUser.userId) {
+				toast.error('Bạn không có quyền xóa comment này!', { id: toastId });
+				return;
+			}
 			await DeleteCommentApi.deleteComment(commentId, currentUser.accessToken);
 
 			const commentDelete = document.querySelector(`.comment_${commentId}`);
@@ -126,6 +130,7 @@ const PostCard = ({ post, fetchPosts }) => {
 					{ content: content, photo: photo, postId: post.postId },
 					config
 				);
+				console.log(rest.data.result);
 				// Cập nhật danh sách bình luận sau khi gửi thành công
 				const newComment = rest.data.result; // Đảm bảo API trả về thông tin bình luận mới
 				setCommentPost([...comments, newComment]); // Thêm bình luận mới vào danh sách hiện có
@@ -201,23 +206,26 @@ const PostCard = ({ post, fetchPosts }) => {
 		fetchUsers();
 	}, [post.userId, currentUser.accessToken]);
 
-	// Lấy thời gian đăng bài từ prop post
-	const postTime = moment(post.postTime);
+	
+	
 
-	// Tính khoảng thời gian giữa thời gian đăng bài và thời gian hiện tại
-	const timeDifference = moment().diff(postTime, 'minutes');
-
-	// Định dạng thời gian
-	let formattedTime;
-
-	if (timeDifference < 60) {
-		formattedTime = `${timeDifference} phút trước`;
-	} else if (timeDifference < 1440) {
-		const hours = Math.floor(timeDifference / 60);
-		formattedTime = `${hours} giờ trước`;
-	} else {
-		formattedTime = postTime.format('DD [tháng] M [lúc] HH:mm');
-	}
+	function formatTime(time) {
+		const postTime = moment(time);
+		const timeDifference = moment().diff(postTime, 'minutes');
+	
+		let formattedTime;
+	
+		if (timeDifference < 60) {
+			formattedTime = `${timeDifference} phút trước`;
+		} else if (timeDifference < 1440) {
+			const hours = Math.floor(timeDifference / 60);
+			formattedTime = `${hours} giờ trước`;
+		} else {
+			formattedTime = postTime.format('DD [tháng] M [lúc] HH:mm');
+		}
+	
+		return formattedTime;
+	};
 
 	return (
 		<div className="post">
@@ -229,7 +237,7 @@ const PostCard = ({ post, fetchPosts }) => {
 						</Link>
 						<div className="postNameAndDate">
 							<span className="postUsername">{user.fullName}</span>
-							<span className="postDate">{formattedTime}</span>
+							<span className="postDate">{formatTime(post.postTime)}</span>
 						</div>
 
 						<span className="postLocation">• {post.location || 'Vị trí'}</span>
@@ -295,25 +303,29 @@ const PostCard = ({ post, fetchPosts }) => {
 
 				{Object.values(comments).map((comment) => {
 					return (
-						<div className={`comment_${comment.commentId}`}>
-							<div
-								className="postCommentsBox"
-								style={{ display: showComment ? '' : 'none' }}
-								key={comment.commentId}
-							>
-								<div className="postCommentUser">
-									<img
-										className="postProfileImg"
-										src={comment.userAvatar || sampleProPic}
-										alt="..."
-									/>
-									<span className="postCommentUserName">{comment.userName}</span>
+						<div className={`comment_${comment.commentId}`} key={comment.commentId}>
+							<div className="postCommentsBox" style={{ display: showComment ? '' : 'none' }}>
+
+								<div className="postCommentInfo">
+									<div className="postCommentUser">
+										<img
+											className="postProfileImg"
+											src={comment.userAvatar || sampleProPic}
+											alt="..."
+										/>
+										<span className="postCommentUserName">{comment.userName}</span>
+									</div>
+									<div className="postCommentContent">
+										<span>{comment.content}</span>
+									</div>
 								</div>
-								<div className="postCommentContent">
-									<span>{comment.content}</span>
+
+								<div className="postCommentAction">
+									<span className="postCommentDate">{formatTime(comment.createTime)}</span>
+									<span className="postCommentLike">Thích</span>
 									<span
 										className="postCommentTextDelete"
-										onClick={() => deleteCommentPostHandler(comment.commentId)}
+										onClick={() => deleteCommentPostHandler(comment.commentId,comment.userId)}
 									>
 										Xóa
 									</span>

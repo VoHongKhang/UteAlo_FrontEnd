@@ -104,7 +104,7 @@ const EditProfile = () => {
 
 	return (
 		<>
-			<Helmet title="Edit profile | Splash Social" />
+			<Helmet title="Edit profile | UTEALO" />
 			<Toaster />
 			<Topbar />
 			<div className="profile" style={{ color: theme.foreground, background: theme.background }}>

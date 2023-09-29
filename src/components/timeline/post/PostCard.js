@@ -19,7 +19,6 @@ import LikeOrUnlikeApi from '../../../api/timeline/commentPost/likeOrUnlike';
 import GetCommentPostApi from '../../../api/timeline/commentPost/getCommentPost';
 import LikeOrUnlikeCommentApi from '../../../api/timeline/commentPost/likeOrUnlikeComment';
 
-
 const PostCard = ({ post, fetchPosts }) => {
 	const { user: currentUser } = useAuth();
 	const checkUserLikePost = useCallback(async () => {
@@ -55,6 +54,7 @@ const PostCard = ({ post, fetchPosts }) => {
 	const { getTimelinePosts } = usePost();
 	const [comments, setCommentPost] = useState({});
 	const [commentlength, setCommentLength] = useState(post?.comments.length);
+
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -124,7 +124,7 @@ const PostCard = ({ post, fetchPosts }) => {
 			const commentDelete = document.querySelector(`.comment_${commentId}`);
 			commentDelete.innerHTML = '';
 			setCommentLength(commentlength - 1);
-			toast.success('Xóa thành công comment', { id: toastId });
+			toast.success('Xóa bình luận thành công', { id: toastId });
 		} catch (error) {
 			toast.error(`Gửi yêu thất bại! Lỗi: ${error}`, { id: toastId });
 		}
@@ -138,7 +138,7 @@ const PostCard = ({ post, fetchPosts }) => {
 	const postCommentHandler = async () => {
 		try {
 			if (content === '') {
-				toast.error('Comment cannot be empty!', errorOptions);
+				toast.error('Vui lòng nhập nội dung!', errorOptions);
 				return; // Dừng việc thực hiện tiếp theo nếu nội dung rỗng
 			}
 			const config = {
@@ -161,7 +161,7 @@ const PostCard = ({ post, fetchPosts }) => {
 				setCommentLength(commentlength + 1); // Tăng độ dài của danh sách bình luận lên 1
 			}
 			setCommentLoading(false);
-			toast.success('Comment posted successfully!', successOptions);
+			toast.success('Đăng bình luận thành công!', successOptions);
 		} catch (error) {
 			setCommentLoading(false);
 			toast.error(error.response.data.message, errorOptions);
@@ -170,6 +170,8 @@ const PostCard = ({ post, fetchPosts }) => {
 		setContent('');
 		setPhoto('');
 	};
+
+	
 
 	// xóa bài post
 	const deletePostHandler = async () => {
@@ -192,7 +194,7 @@ const PostCard = ({ post, fetchPosts }) => {
 				await axios.put(`${BASE_URL}/v1/post/delete/${post.postId}`, post.userId, config);
 			}
 			setCommentLoading(false);
-			toast.success('Post deleted successfully!', successOptions);
+			toast.success('Xóa bài đăng thành công!', successOptions);
 		} catch (error) {
 			setCommentLoading(false);
 			toast.error(error.response.data.message, errorOptions);

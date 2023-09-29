@@ -16,6 +16,7 @@ const Feed = () => {
   const [loading, setLoading] = useState(false);
   const { theme } = useTheme();
 
+
   const fetchPosts = async () => {
     try {
       const config = {

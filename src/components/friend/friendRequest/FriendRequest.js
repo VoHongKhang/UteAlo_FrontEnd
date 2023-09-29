@@ -1,49 +1,73 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Helmet } from 'react-helmet';
-import GetListFriendRequestApi from '../../../api/profile/friendRequest/getList';
-import useAuth from '../../../context/auth/AuthContext';
+import { Card, Menu } from 'antd';
+import ListFriend from './ListFriend';
+import Topbar from '../../timeline/topbar/Topbar';
+import './friendRequest.css';
+
 const FriendRequest = () => {
-	const [listFriendRequest, setListFriendRequest] = useState([]);
-	const { user: currentUser } = useAuth();
-	const fetchFriendRequest = async () => {
-		const res = await GetListFriendRequestApi.getListFriendRequest(currentUser);
-		if (res.success) {
-			setListFriendRequest(res.result);
+	const [type, setType] = useState('friends');
+	const [title, setTitle] = useState('Bạn bè');
+	const changeType = (key) => {
+		switch (key) {
+			case 'friends':
+				setTitle('Bạn bè');
+				break;
+			case 'request':
+				setTitle('Lời mời kết bạn');
+				break;
+			case 'sent':
+				setTitle('Đã gửi lời mời');
+				break;
+			default:
+				setTitle('Bạn bè');
+				break;
 		}
-
+		setType(key);
 	};
-
-	useEffect(() => {
-		fetchFriendRequest();
-	}, []);
-
+	const friendTypeList = [
+		{
+			type: 'friends',
+			title: 'Bạn bè',
+			Icon: require('@ant-design/icons').UsergroupAddOutlined,
+		},
+		{
+			type: 'request',
+			title: 'Lời mời kết bạn',
+			Icon: require('@ant-design/icons').UserAddOutlined,
+		},
+		{
+			type: 'sent',
+			title: 'Đã gửi lời mời',
+			Icon: require('@ant-design/icons').UserOutlined,
+		},
+	];
 	return (
-		<div>
-			<Helmet title={`Friend Request | UTEALO`} />
-			{listFriendRequest.length > 0 ? (
-				listFriendRequest.map((user) => (
-					<div className="friend-request" key={user._id}>
-						<div className="friend-request__avatar">
-							<img src={user.avatar} alt="" />
-						</div>
-						<div className="friend-request__content">
-							<div className="friend-request__content__name">{user.name}</div>
-							<div className="friend-request__content__btn">
-								<button className="btn btn--accept">Accept</button>
-								<button className="btn btn--deny">Deny</button>
-							</div>
-						</div>
-					</div>
-				))
-			) : (
-				<div className="friend-request__empty">
-					<div className="friend-request__empty__icon">
-						<i className="fas fa-user-friends"></i>
-					</div>
-					<div className="friend-request__empty__text">You don't have any friend request</div>
+		<>
+			<Helmet title={`${title}`} />
+			<Topbar />
+			<div className="container">
+				<div className="leftbar">
+					<Card title="Danh sách" headStyle={{ padding: '0 16px' }} bodyStyle={{ padding: 8 }}>
+						<Menu
+							mode="vertical"
+							style={{ width: '100%', border: 'none' }}
+							items={friendTypeList.map((item) => ({
+								key: item.type,
+								icon: <item.Icon size={20} />,
+								label: item.title,
+							}))}
+							selectedKeys={[type]}
+							onClick={({ key }) => changeType(key)}
+						/>
+					</Card>
 				</div>
-			)}
-		</div>
+
+				<div className="centerbar">
+					<ListFriend title={`${title}`} api={`${type}`} />
+				</div>
+			</div>
+		</>
 	);
 };
 

@@ -134,6 +134,8 @@ const PostCard = ({ post, fetchPosts }) => {
 		setShowComment(!showComment);
 	};
 
+	console.log("S");
+
 	// viết bình luận
 	const postCommentHandler = async () => {
 		try {
@@ -170,6 +172,8 @@ const PostCard = ({ post, fetchPosts }) => {
 		setContent('');
 		setPhoto('');
 	};
+
+
 
 	
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import GetListFriendRequestApi from '../../../api/profile/friendRequest/getList';
+import GetListFriendRequestApi from '../../../api/profile/friendrequest/getList';
 import useAuth from '../../../context/auth/AuthContext';
 const FriendRequest = () => {
 	const [listFriendRequest, setListFriendRequest] = useState([]);

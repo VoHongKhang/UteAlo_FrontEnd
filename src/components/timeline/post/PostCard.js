@@ -17,6 +17,7 @@ import useAuth from '../../../context/auth/AuthContext';
 import DeleteCommentApi from '../../../api/timeline/commentPost/delete';
 import LikeOrUnlikeApi from '../../../api/timeline/commentPost/likeOrUnlike';
 import GetCommentPostApi from '../../../api/timeline/commentPost/getCommentPost';
+import LikeOrUnlikeCommentApi from '../../../api/timeline/commentPost/likeOrUnlikeComment';
 
 const PostCard = ({ post, fetchPosts }) => {
 	const { user: currentUser } = useAuth();
@@ -40,8 +41,11 @@ const PostCard = ({ post, fetchPosts }) => {
 		}
 	}, [currentUser.accessToken, post.postId]);
 
+	
+
 	const [like, setLike] = useState(post.likes?.length);
 	const [isLiked, setIsLiked] = useState(false);
+	const [isLikedComment, setIsLikedComment] = useState(false);
 	const [user, setUser] = useState({});
 	const [commentLoading, setCommentLoading] = useState(false);
 	const [showComment, setShowComment] = useState(false);
@@ -66,6 +70,7 @@ const PostCard = ({ post, fetchPosts }) => {
 		fetchData();
 	}, [checkUserLikePost]);
 
+
 	// lấy danh sách bình luận trên bài post
 	useEffect(() => {
 		const fetchCommentPost = async () => {
@@ -87,11 +92,29 @@ const PostCard = ({ post, fetchPosts }) => {
 		setIsLiked(!isLiked);
 	};
 
+	// yêu thích và bỏ yêu thích bình luận
+	const likeCommentHandler = async (commentId,countLike) => {
+		
+		try {
+			await LikeOrUnlikeCommentApi.likeOrUnlikeComment(commentId, currentUser.accessToken, currentUser.userId);
+		} catch (err) {
+			console.log(err);
+		}
+
+		if (isLikedComment) {
+			countLike = countLike - 1;
+		}
+		else {
+			countLike = countLike + 1;
+		}
+		setIsLikedComment(!isLikedComment);
+	};
+
 	// xóa bình luận trên bài post
-	const deleteCommentPostHandler = async (commentId,userId) => {
+	const deleteCommentPostHandler = async (commentId, userId) => {
 		const toastId = toast.loading('Đang gửi yêu cầu...');
 		try {
-			if (userId !== currentUser.userId) {
+			if (userId !== currentUser.userId && currentUser.userId !== post.userId) {
 				toast.error('Bạn không có quyền xóa comment này!', { id: toastId });
 				return;
 			}
@@ -182,14 +205,9 @@ const PostCard = ({ post, fetchPosts }) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	useEffect(() => {}, []);
 
-	// see weather logged in user has liked the particular post if yes user can dislike else like
-	useEffect(() => {
-		setIsLiked(post.likes?.includes(currentUser.userId));
-	}, [currentUser.userId, post.likes]);
 
-	// get user details
+	// lấy thông tin của người dùng hiện tại
 	useEffect(() => {
 		const fetchUsers = async () => {
 			const config = {
@@ -206,15 +224,12 @@ const PostCard = ({ post, fetchPosts }) => {
 		fetchUsers();
 	}, [post.userId, currentUser.accessToken]);
 
-	
-	
-
 	function formatTime(time) {
 		const postTime = moment(time);
 		const timeDifference = moment().diff(postTime, 'minutes');
-	
+
 		let formattedTime;
-	
+
 		if (timeDifference < 60) {
 			formattedTime = `${timeDifference} phút trước`;
 		} else if (timeDifference < 1440) {
@@ -223,9 +238,9 @@ const PostCard = ({ post, fetchPosts }) => {
 		} else {
 			formattedTime = postTime.format('DD [tháng] M [lúc] HH:mm');
 		}
-	
+
 		return formattedTime;
-	};
+	}
 
 	return (
 		<div className="post">
@@ -305,31 +320,35 @@ const PostCard = ({ post, fetchPosts }) => {
 					return (
 						<div className={`comment_${comment.commentId}`} key={comment.commentId}>
 							<div className="postCommentsBox" style={{ display: showComment ? '' : 'none' }}>
-
-								<div className="postCommentInfo">
-									<div className="postCommentUser">
-										<img
-											className="postProfileImg"
-											src={comment.userAvatar || sampleProPic}
-											alt="..."
-										/>
-										<span className="postCommentUserName">{comment.userName}</span>
+								<div>
+									<div className="postCommentInfo">
+										<div className="postCommentUser">
+											<img
+												className="postProfileImg"
+												src={comment.userAvatar || sampleProPic}
+												alt="..."
+											/>
+											<span className="postCommentUserName">{comment.userName}</span>
+										</div>
+										<div className="postCommentContent">
+											<span>{comment.content}</span>
+										</div>
 									</div>
-									<div className="postCommentContent">
-										<span>{comment.content}</span>
+
+									<div className="postCommentAction">
+										<span className="postCommentDate">{formatTime(comment.createTime)}</span>
+										<span className="postCommentLike"
+										onClick={() => likeCommentHandler(comment.commentId,comment.likes?.length)}
+										>{isLikedComment ? "Đã thích" : "Thích"}</span>
+										<span
+											className="postCommentTextDelete"
+											onClick={() => deleteCommentPostHandler(comment.commentId, comment.userId)}
+										>
+											Xóa
+										</span>
 									</div>
 								</div>
-
-								<div className="postCommentAction">
-									<span className="postCommentDate">{formatTime(comment.createTime)}</span>
-									<span className="postCommentLike">Thích</span>
-									<span
-										className="postCommentTextDelete"
-										onClick={() => deleteCommentPostHandler(comment.commentId,comment.userId)}
-									>
-										Xóa
-									</span>
-								</div>
+								<div className="postLikeCommentCounter">{comment.likes?.length}</div>
 							</div>
 						</div>
 					);

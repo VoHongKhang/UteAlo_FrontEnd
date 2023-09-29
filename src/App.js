@@ -11,11 +11,12 @@ import { Toaster } from 'react-hot-toast';
 import ForgotPassword from './components/auth/ForgotPassword/ForgotPassword';
 import AuthEmail from './components/auth/AuthEmail/AuthEmail';
 import ResetPassord from './components/auth/ResetPassword/ResetPassword';
+import FriendRequest from './components/friend/friendRequest/FriendRequest';
 function App() {
 	RefreshToken();
 	return (
 		<>
-		<Toaster />
+			<Toaster />
 			<Router>
 				<Switch>
 					<Route excat path="/login">
@@ -30,8 +31,10 @@ function App() {
 					<Route excat path="/reset-password">
 						<ResetPassord />
 					</Route>
+					<Route excat path="/friends/request">
+						<FriendRequest />
+					</Route>
 
-					
 					<Route excat path="/register">
 						<Register />
 					</Route>

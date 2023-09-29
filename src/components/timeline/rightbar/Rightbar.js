@@ -10,8 +10,8 @@ import axios from 'axios';
 import { BASE_URL } from '../../../context/apiCall';
 import ChatBox from '../chatbox/ChatBox';
 import toast from 'react-hot-toast';
-import DeleteFriendRequestApi from '../../../api/profile/friendrequest/delete';
-import AcceptFriendRequestApi from '../../../api/profile/friendrequest/accept';
+import DeleteFriendRequestApi from '../../../api/profile/friendRequest/delete';
+import AcceptFriendRequestApi from '../../../api/profile/friendRequest/accept';
 
 const Rightbar = ({ user }) => {
 	const { theme } = useTheme();
@@ -78,7 +78,7 @@ const Rightbar = ({ user }) => {
 
 	const lists = [
 		{
-			title: 'Gợi ý kết bạn',
+			title: 'Yêu cầu kết bạn',
 			data: listFriendRequest,
 		},
 		{
@@ -133,8 +133,8 @@ const Rightbar = ({ user }) => {
 										{list.title}
 									</Typography.Title>
 
-									{list.title === 'Gợi ý kết bạn' ? (
-										<Link to="/friendrequest" style={{ float: 'right', color: '#5aa7ff' }}>
+									{list.title === 'Yêu cầu kết bạn' ? (
+										<Link to="/friends/request" style={{ float: 'right', color: '#5aa7ff' }}>
 											Xem tất cả
 										</Link>
 									) : (
@@ -147,7 +147,7 @@ const Rightbar = ({ user }) => {
 						dataSource={list.data}
 						renderItem={(item) => (
 							<List.Item style={{ padding: '4px 0' }}>
-								{list.title === 'Gợi ý kết bạn' ? (
+								{list.title === 'Yêu cầu kết bạn' ? (
 									<Space align="center" style={{ width: '100%' }}>
 										<Link to={`/profile/${item.userId}`}>
 											<img src={item.avatar} alt="..." className="topbarImg" />

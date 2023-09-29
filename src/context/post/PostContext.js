@@ -36,7 +36,7 @@ export const PostProvider = ({ children }) => {
         type: "CREATE_POST_SUCCESS",
         payload: data,
       });
-      toast.success("Post created successfully", successOptions);
+      toast.success("Đăng bài thành công", successOptions);
     } catch (error) {
       dispatch({
         type: "CREATE_POST_FAIL",

@@ -42,7 +42,7 @@ const Timeline = () => {
 	};
 	return (
 		<>
-			<Helmet title="Timeline | Splash Social" />
+			<Helmet title="UTEALO" />
 			<Toaster />
 			<Topbar
 				searchHandler={searchHandler}

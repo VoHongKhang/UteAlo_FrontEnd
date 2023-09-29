@@ -50,7 +50,7 @@ const Profile = () => {
   return (
     <>
       <Helmet
-        title={`${user?.fullName ? user?.fullName : "User"} Profile | Splash Social`}
+        title={`${user?.fullName ? user?.fullName : "User"} Profile | UTEALO`}
       />
       <Toaster />
       <Topbar />

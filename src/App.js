@@ -12,6 +12,7 @@ import ForgotPassword from './components/auth/ForgotPassword/ForgotPassword';
 import AuthEmail from './components/auth/AuthEmail/AuthEmail';
 import ResetPassord from './components/auth/ResetPassword/ResetPassword';
 import FriendRequest from './components/friend/friendRequest/FriendRequest';
+import Meessage from './components/messages/Message';
 function App() {
 	RefreshToken();
 	return (
@@ -41,6 +42,7 @@ function App() {
 					<ProtectedRoute excat path="/profile/:userId" component={Profile}></ProtectedRoute>
 					<ProtectedRoute excat path="/update/:userId" component={EditProfile}></ProtectedRoute>
 					<ProtectedRoute excat path="/" component={Timeline}></ProtectedRoute>
+					<ProtectedRoute excat path="/message/:userId" component={Meessage}></ProtectedRoute>
 				</Switch>
 			</Router>
 		</>

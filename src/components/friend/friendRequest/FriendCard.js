@@ -1,0 +1,180 @@
+import { Button, Card, Dropdown, Popconfirm, theme, Tooltip, Typography, Image } from 'antd';
+import { HiDotsHorizontal } from 'react-icons/hi';
+import useUserAction from '../../action/useUserAction';
+import { Link } from 'react-router-dom';
+import useAuth from '../../../context/auth/AuthContext';
+import {
+	HiArrowDownOnSquareStack,
+	HiChatBubbleOvalLeft,
+	HiExclamationTriangle,
+	HiUser,
+	HiUserMinus,
+	HiUserPlus,
+	HiXMark,
+} from 'react-icons/hi2';
+import UserAvatar from '../../action/UserAvatar';
+const FriendCard = ({ user }) => {
+	const { token } = theme.useToken();
+	const { user: authUser } = useAuth();
+	const isAuthUser = authUser?.id === user.id;
+	const openReport = () => {};
+
+	const relationshipLabel = {
+		friend: 'Bạn bè',
+		sent: 'Đã gửi',
+		received: 'Chờ xác nhận',
+		none: 'Chưa kết bạn',
+		you: 'Bạn',
+	};
+
+	const relationshipColor = {
+		friend: 'success',
+		sent: 'secondary',
+		received: 'warning',
+		none: 'danger',
+		you: 'secondary',
+	};
+
+	const dropdownItems = [
+		{
+			key: 'report',
+			icon: <HiExclamationTriangle />,
+			label: 'Báo cáo',
+			onClick: openReport,
+		},
+	];
+
+	const {
+		relationship,
+		loading,
+		handleRequestFriend,
+		handleCancelRequestFriend,
+		handleAcceptFriend,
+		handleUnfriend,
+		handleChat,
+		handleRejectFriend,
+	} = useUserAction({ ...user, relationship: 'none' });
+	switch (relationship) {
+		case 'friend':
+			dropdownItems.unshift({
+				key: 'unfriend',
+				icon: <HiUserMinus />,
+				danger: true,
+				label: (
+					<Popconfirm
+						title="Bạn có chắc muốn hủy kết bạn?"
+						okText="Hủy kết bạn"
+						cancelText="Thoát"
+						onConfirm={handleUnfriend}
+					>
+						Hủy kết bạn
+					</Popconfirm>
+				),
+			});
+			break;
+		case 'sent':
+			dropdownItems.unshift({
+				key: 'cancel',
+				icon: <HiXMark />,
+				danger: true,
+				label: (
+					<Popconfirm
+						title="Bạn có chắc muốn hủy lời mời kết bạn?"
+						okText="Hủy lời mời"
+						cancelText="Thoát"
+						onConfirm={handleCancelRequestFriend}
+					>
+						Hủy lời mời
+					</Popconfirm>
+				),
+			});
+			break;
+		case 'received':
+			dropdownItems.unshift({
+				key: 'decline',
+				icon: <HiXMark />,
+				danger: true,
+				label: (
+					<Popconfirm
+						title="Bạn có chắc muốn từ chối lời mời kết bạn?"
+						okText="Từ chối"
+						cancelText="Thoát"
+						onConfirm={handleRejectFriend}
+					>
+						Từ chối
+					</Popconfirm>
+				),
+			});
+
+			dropdownItems.unshift({
+				key: 'accept',
+				icon: <HiArrowDownOnSquareStack />,
+				label: 'Chấp nhận lời mời',
+				onClick: handleAcceptFriend,
+			});
+			break;
+		case 'none':
+			dropdownItems.unshift({
+				key: 'add',
+				icon: <HiUserPlus />,
+				label: 'Kết bạn',
+				onClick: handleRequestFriend,
+			});
+			break;
+		default:
+            break;
+
+	}
+	return (
+		<Card
+			hoverable
+			cover={
+				<Image
+					width={200}
+					height={100}
+					src={user.coverPicture?.link || 'http://via.placeholder.com/200x100?text='}
+					alt={user.fullname}
+					style={{ objectFit: 'cover', background: token.colorBgLayout }}
+				/>
+			}
+			actions={[
+				<Tooltip key="profile" title="Trang cá nhân">
+					<Link to={`/profile?id=${user._id}`} passHref draggable>
+						<Button icon={<HiUser />} />
+					</Link>
+				</Tooltip>,
+				<Tooltip key="message" title="Nhắn tin">
+					<Button
+						icon={<HiChatBubbleOvalLeft />}
+						onClick={handleChat}
+						disabled={isAuthUser}
+						loading={loading.chat}
+					/>
+				</Tooltip>,
+				<Dropdown key="more" menu={{ items: dropdownItems }} arrow disabled={isAuthUser} trigger={['click']}>
+					<Button
+						icon={<HiDotsHorizontal />}
+						disabled={isAuthUser}
+						loading={Object.keys(loading).some((item) => item !== 'chat' && loading[item])} // loading doesn't include chat
+					/>
+				</Dropdown>,
+			]}
+			bodyStyle={{ padding: 12 }}
+		>
+			<Card.Meta
+				avatar={<UserAvatar user={user} />}
+				title={user.fullname}
+				description={
+					isAuthUser ? (
+						'Bạn'
+					) : (
+						<Typography.Text strong type={relationshipColor[relationship]}>
+							{relationshipLabel[relationship]}
+						</Typography.Text>
+					)
+				}
+			/>
+		</Card>
+	);
+};
+export default FriendCard;

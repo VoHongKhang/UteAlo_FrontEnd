@@ -12,13 +12,20 @@ const Topbar = ({ searchHandler, setSearchKey, searchKey, menuHandler }) => {
 	const [user, setUser] = useState();
 	const { user: currentUser } = useAuth();
 	const { theme, setTheme } = useTheme();
+	
+
   const history = useHistory();
 	// Toggle theme switch
 	const themeModeHandler = () => {
 		setTheme(theme === themes.light ? themes.dark : themes.light);
 		localStorage.setItem('userTheme', theme === themes.light ? 'dark' : 'light');
 	};
-
+	const handderMessageClick = () => {
+		history.push(`/message/${currentUser.userId}}`);
+	};
+	const handderNotificationClick = () => {
+		history.push(`notification/${currentUser.userId}`);
+	};
 	// get user details
 	useEffect(() => {
 		const fetchUsers = async () => {
@@ -97,10 +104,10 @@ const Topbar = ({ searchHandler, setSearchKey, searchKey, menuHandler }) => {
 
 				<div className="topbarRight">
 					<div className="button-right">
-						<Message className="button-right-message" titleAccess="Tin nhắn" />
+						<Message className="button-right-message" titleAccess="Tin nhắn" onClick={handderMessageClick} />
 					</div>
 					<div className="button-right">
-						<Notifications className="button-right-notifications" titleAccess="Thông báo" />
+						<Notifications className="button-right-notifications" titleAccess="Thông báo" onClick={handderNotificationClick}/>
 					</div>
 
 					<Link to={`/profile/${currentUser.userId}`}>

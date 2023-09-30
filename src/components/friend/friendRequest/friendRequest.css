@@ -1,0 +1,11 @@
+.container {
+	display: flex;
+	padding: 10px 10px;
+}
+.leftbar {
+	flex: 1;
+	margin-right: 10px;
+}
+.centerbar {
+	flex: 4;
+}

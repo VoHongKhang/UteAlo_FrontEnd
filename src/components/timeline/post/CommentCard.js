@@ -1,133 +1,150 @@
-// import React, { useState, useEffect, useCallback } from 'react';
-// import './PostCard.css';
-// import sampleProPic from '../../../assets/appImages/user.png';
-// import heart from '../../../assets/appImages/heart.png';
-// import heartEmpty from '../../../assets/appImages/heartEmpty.png';
-// import { Send } from '@material-ui/icons';
-// import { Box, CircularProgress } from '@material-ui/core';
-// import axios from 'axios';
-// import moment from 'moment';
-// import { Link } from 'react-router-dom';
-// import { BASE_URL } from '../../../context/apiCall';
-// import InputEmoji from 'react-input-emoji';
-// import toast from 'react-hot-toast';
-// import { errorOptions, successOptions } from '../../utils/toastStyle';
-// import usePost from '../../../context/post/PostContext';
-// import useAuth from '../../../context/auth/AuthContext';
-// import DeleteCommentApi from '../../../api/timeline/commentPost/delete';
-// import LikeOrUnlikeApi from '../../../api/timeline/commentPost/likeOrUnlike';
-// import GetCommentPostApi from '../../../api/timeline/commentPost/getCommentPost';
-// import LikeOrUnlikeCommentApi from '../../../api/timeline/commentPost/likeOrUnlikeComment';
+import React, { useState, useCallback ,useEffect } from 'react';
+import './PostCard.css';
+import sampleProPic from '../../../assets/appImages/user.png';
+import axios from 'axios';
+import moment from 'moment';
+import { BASE_URL } from '../../../context/apiCall';
+import useAuth from '../../../context/auth/AuthContext';
+import LikeOrUnlikeCommentApi from '../../../api/timeline/commentPost/likeOrUnlikeComment';
+import DeleteCommentApi from '../../../api/timeline/commentPost/delete';
+import toast from 'react-hot-toast';
 
-// const CommentCard = ({ comment, fetchCommentPost}) => {
+const CommentCard = ({ comment, fetchCommentPost,post}) => {
 
-//     const { user: currentUser } = useAuth();
+    const { user: currentUser } = useAuth();
+
+	// Hàm kiểm tra xem người dùng đã like bài comment chưa
+	const checkUserLikeComment = useCallback(async () => {
+		try {
+			const config = {
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${currentUser.accessToken}`,
+				},
+			};
+
+			const response = await axios.get(`${BASE_URL}/v1/comment/like/checkUser/${comment.commentId}`, config);
+			const responseData = response.data;
+			const resultValue = responseData.result;
+
+			return resultValue;
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	}, [currentUser.accessToken, comment.commentId]);
     
-// 	const [isLiked, setIsLiked] = useState(false);
-// 	const [isLikedComment, setIsLikedComment] = useState(false);
-// 	const [user, setUser] = useState({});
-// 	const [commentLoading, setCommentLoading] = useState(false);
-// 	const [showComment, setShowComment] = useState(false);
-// 	const [content, setContent] = useState('');
-// 	const [photo, setPhoto] = useState('');
-// 	const { getTimelinePosts } = usePost();
-// 	const [comments, setCommentPost] = useState({});
-	
 
-//     // yêu thích và bỏ yêu thích bình luận
-// 	const likeCommentHandler = async (commentId,countLike) => {
+	const [isLikedComment, setIsLikedComment] = useState(false);
+	const [likeComment, setLikeComment] = useState(comment.likes?.length);
+	const [commentlength, setCommentLength] = useState(post?.comments.length);
+
+	useEffect(() => {
+		const fetchData = async () => {
+			let resultValue = null; // Biến tạm để lưu giá trị trả về từ checkUserLikeComment
+			try {
+				resultValue = await checkUserLikeComment();
+			} catch (error) {
+				console.error(error);
+			}
+
+			setIsLikedComment(resultValue); // Gán giá trị từ biến tạm vào isLiked
+		};
+
+		fetchData();
+	}, [checkUserLikeComment]);
+
+    // yêu thích và bỏ yêu thích bình luận
+	const likeCommentHandler = async (commentId,countLike) => {
+		try {
+			await LikeOrUnlikeCommentApi.likeOrUnlikeComment(commentId, currentUser.accessToken,currentUser.userId);
+
+		} catch (err) {
+			console.log(err);
+		}
+
+		setLikeComment(isLikedComment ? isLikedComment - 1 : isLikedComment + 1);
+		setIsLikedComment(!isLikedComment);
 		
-// 		try {
-// 			await LikeOrUnlikeCommentApi.likeOrUnlikeComment(commentId, currentUser.accessToken, currentUser.userId);
-// 		} catch (err) {
-// 			console.log(err);
-// 		}
+		
+	};
 
-// 		if (isLikedComment) {
-// 			countLike = countLike - 1;
-// 		}
-// 		else {
-// 			countLike = countLike + 1;
-// 		}
-// 		setIsLikedComment(!isLikedComment);
-// 	};
+	// xóa bình luận trên bài post
+	const deleteCommentPostHandler = async (commentId, userId) => {
+		const toastId = toast.loading('Đang gửi yêu cầu...');
+		try {
+			if (userId !== currentUser.userId && currentUser.userId !== post.userId) {
+				toast.error('Bạn không có quyền xóa comment này!', { id: toastId });
+				return;
+			}
+			await DeleteCommentApi.deleteComment(commentId, currentUser.accessToken);
 
-//     const showCommentHandler = () => {
-// 		setShowComment(!showComment);
-// 	};
+			const commentDelete = document.querySelector(`.comment_${commentId}`);
+			commentDelete.innerHTML = '';
+			setCommentLength(commentlength - 1);
+			toast.success('Xóa bình luận thành công', { id: toastId });
+		} catch (error) {
+			toast.error(`Gửi yêu thất bại! Lỗi: ${error}`, { id: toastId });
+		}
+	};
 
-//     // xóa bình luận trên bài post
-// 	// const deleteCommentPostHandler = async (commentId, userId) => {
-// 	// 	const toastId = toast.loading('Đang gửi yêu cầu...');
-// 	// 	try {
-// 	// 		if (userId !== currentUser.userId && currentUser.userId !== post.userId) {
-// 	// 			toast.error('Bạn không có quyền xóa comment này!', { id: toastId });
-// 	// 			return;
-// 	// 		}
-// 	// 		await DeleteCommentApi.deleteComment(commentId, currentUser.accessToken);
 
-// 	// 		const commentDelete = document.querySelector(`.comment_${commentId}`);
-// 	// 		commentDelete.innerHTML = '';
-// 	// 		setCommentLength(commentlength - 1);
-// 	// 		toast.success('Xóa thành công comment', { id: toastId });
-// 	// 	} catch (error) {
-// 	// 		toast.error(`Gửi yêu thất bại! Lỗi: ${error}`, { id: toastId });
-// 	// 	}
-// 	// };
+    function formatTime(time) {
+		const postTime = moment(time);
+		const timeDifference = moment().diff(postTime, 'minutes');
 
-//     function formatTime(time) {
-// 		const postTime = moment(time);
-// 		const timeDifference = moment().diff(postTime, 'minutes');
+		let formattedTime;
 
-// 		let formattedTime;
+		if (timeDifference < 60) {
+			formattedTime = `${timeDifference} phút trước`;
+		} else if (timeDifference < 1440) {
+			const hours = Math.floor(timeDifference / 60);
+			formattedTime = `${hours} giờ trước`;
+		} else {
+			formattedTime = postTime.format('DD [tháng] M [lúc] HH:mm');
+		}
 
-// 		if (timeDifference < 60) {
-// 			formattedTime = `${timeDifference} phút trước`;
-// 		} else if (timeDifference < 1440) {
-// 			const hours = Math.floor(timeDifference / 60);
-// 			formattedTime = `${hours} giờ trước`;
-// 		} else {
-// 			formattedTime = postTime.format('DD [tháng] M [lúc] HH:mm');
-// 		}
+		return formattedTime;
+	}
 
-// 		return formattedTime;
-// 	}
+	const likeButtonClass = isLikedComment ? "liked" : "not-liked";
 
-//     return (
-//         <div className={`comment_${comment.commentId}`} key={comment.commentId}>
-//             <div className="postCommentsBox" style={{ display: showComment ? '' : 'none' }}>
-//                 <div>
-//                     <div className="postCommentInfo">
-//                         <div className="postCommentUser">
-//                             <img
-//                                 className="postProfileImg"
-//                                 src={comment.userAvatar || sampleProPic}
-//                                 alt="..."
-//                             />
-//                             <span className="postCommentUserName">{comment.userName}</span>
-//                         </div>
-//                         <div className="postCommentContent">
-//                             <span>{comment.content}</span>
-//                         </div>
-//                     </div>
+    return (
+        <div className={`comment_${comment.commentId}`} key={comment.commentId}>
+            <div className="postCommentsBox" >
+                <div>
+                    <div className="postCommentInfo">
+                        <div className="postCommentUser">
+                            <img
+                                className="postProfileImg"
+                                src={comment.userAvatar || sampleProPic}
+                                alt="..."
+                            />
+                            <span className="postCommentUserName">{comment.userName}</span>
+                        </div>
+                        <div className="postCommentContent">
+                            <span>{comment.content}</span>
+                        </div>
+                    </div>
 
-//                     <div className="postCommentAction">
-//                         <span className="postCommentDate">{formatTime(comment.createTime)}</span>
-//                         <span className="postCommentLike"
-//                         onClick={() => likeCommentHandler(comment.commentId,comment.likes?.length)}
-//                         >{isLikedComment ? "Đã thích" : "Thích"}</span>
-//                         <span
-//                             className="postCommentTextDelete"
-//                             // onClick={() => deleteCommentPostHandler(comment.commentId, comment.userId)}
-//                         >
-//                             Xóa
-//                         </span>
-//                     </div>
-//                 </div>
-//                 <div className="postLikeCommentCounter">{comment.likes?.length}</div>
-//             </div>
-//         </div>
-//     );
-// };
+                    <div className="postCommentAction">
+                        <span className="postCommentDate">{formatTime(comment.createTime)}</span>
+                        <span  className={`postCommentLike ${likeButtonClass}`}
+                        onClick={() => likeCommentHandler(comment.commentId,comment.likes?.length)}
+                        >{isLikedComment ? "Đã thích" : "Thích"}
+						</span>
+                        <span
+                            className="postCommentTextDelete"
+                            onClick={() => deleteCommentPostHandler(comment.commentId, comment.userId)}
+                        >
+                            Xóa
+                        </span>
+                    </div>
+                </div>
+                <div className="postLikeCommentCounter">{likeComment}</div>
+            </div>
+        </div>
+    );
+};
 
-// export default CommentCard;
+export default CommentCard;

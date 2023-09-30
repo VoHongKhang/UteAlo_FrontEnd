@@ -71,15 +71,15 @@ const PostCard = ({ post, fetchPosts }) => {
 		fetchData();
 	}, [checkUserLikePost]);
 
+	const fetchCommentPost = async () => {
+		const res = await GetCommentPostApi.getCommentPost(post.postId);
+		setCommentPost(res);
+	};
 
 	// lấy danh sách bình luận trên bài post
 	useEffect(() => {
-		const fetchCommentPost = async () => {
-			const res = await GetCommentPostApi.getCommentPost(post.postId);
-			setCommentPost(res);
-		};
 		fetchCommentPost();
-	}, [post.postId]);
+	}, []);
 
 	// yêu thích và bỏ yêu thích bài post
 	const likePostHandler = async () => {
@@ -134,9 +134,7 @@ const PostCard = ({ post, fetchPosts }) => {
 		setShowComment(!showComment);
 	};
 
-	console.log("S");
 
-	// viết bình luận
 	const postCommentHandler = async () => {
 		try {
 			if (content === '') {
@@ -151,30 +149,38 @@ const PostCard = ({ post, fetchPosts }) => {
 			};
 			setCommentLoading(true);
 			if (post.postId) {
-				const rest = await axios.post(
+				const response = await axios.post(
 					`${BASE_URL}/v1/post/comment/create`,
 					{ content: content, photo: photo, postId: post.postId },
 					config
 				);
-				console.log(rest.data.result);
-				// Cập nhật danh sách bình luận sau khi gửi thành công
-				const newComment = rest.data.result; // Đảm bảo API trả về thông tin bình luận mới
-				setCommentPost([...comments, newComment]); // Thêm bình luận mới vào danh sách hiện có
-				setCommentLength(commentlength + 1); // Tăng độ dài của danh sách bình luận lên 1
+	
+				// Xử lý kết quả trực tiếp trong khối try
+				if (response.status === 200) {
+					const newComment = response.data.result;
+					// Thêm mới comment vào object comments
+					setCommentPost({ ...comments, [newComment.commentId]: newComment });
+					setCommentLength(commentlength + 1);
+					toast.success('Đăng bình luận thành công!', successOptions);
+				} else {
+					// Xử lý trường hợp API trả về lỗi
+					toast.error(response.message, errorOptions);
+				}
 			}
 			setCommentLoading(false);
-			toast.success('Đăng bình luận thành công!', successOptions);
+			fetchCommentPost();
+			setContent('');
+			setPhoto('');
 		} catch (error) {
 			setCommentLoading(false);
-			toast.error(error.response.data.message, errorOptions);
+			toast.error(error.message, errorOptions);
 		}
-		fetchPosts();
-		setContent('');
-		setPhoto('');
 	};
-
-
-
+	
+	
+	
+	
+	
 	
 
 	// xóa bài post

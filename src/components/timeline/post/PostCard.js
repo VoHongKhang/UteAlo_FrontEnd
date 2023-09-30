@@ -14,13 +14,14 @@ import toast from 'react-hot-toast';
 import { errorOptions, successOptions } from '../../utils/toastStyle';
 import usePost from '../../../context/post/PostContext';
 import useAuth from '../../../context/auth/AuthContext';
-import DeleteCommentApi from '../../../api/timeline/commentPost/delete';
 import LikeOrUnlikeApi from '../../../api/timeline/commentPost/likeOrUnlike';
 import GetCommentPostApi from '../../../api/timeline/commentPost/getCommentPost';
-import LikeOrUnlikeCommentApi from '../../../api/timeline/commentPost/likeOrUnlikeComment';
+import CommentCard from './CommentCard';
 
 const PostCard = ({ post, fetchPosts }) => {
 	const { user: currentUser } = useAuth();
+
+	// Hàm kiểm tra xem người dùng đã like bài post chưa
 	const checkUserLikePost = useCallback(async () => {
 		try {
 			const config = {
@@ -41,11 +42,8 @@ const PostCard = ({ post, fetchPosts }) => {
 		}
 	}, [currentUser.accessToken, post.postId]);
 
-	
-
 	const [like, setLike] = useState(post.likes?.length);
 	const [isLiked, setIsLiked] = useState(false);
-	const [isLikedComment, setIsLikedComment] = useState(false);
 	const [user, setUser] = useState({});
 	const [commentLoading, setCommentLoading] = useState(false);
 	const [showComment, setShowComment] = useState(false);
@@ -54,7 +52,6 @@ const PostCard = ({ post, fetchPosts }) => {
 	const { getTimelinePosts } = usePost();
 	const [comments, setCommentPost] = useState({});
 	const [commentlength, setCommentLength] = useState(post?.comments.length);
-
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -93,47 +90,9 @@ const PostCard = ({ post, fetchPosts }) => {
 		setIsLiked(!isLiked);
 	};
 
-	// yêu thích và bỏ yêu thích bình luận
-	const likeCommentHandler = async (commentId,countLike) => {
-		
-		try {
-			await LikeOrUnlikeCommentApi.likeOrUnlikeComment(commentId, currentUser.accessToken, currentUser.userId);
-		} catch (err) {
-			console.log(err);
-		}
-
-		if (isLikedComment) {
-			countLike = countLike - 1;
-		}
-		else {
-			countLike = countLike + 1;
-		}
-		setIsLikedComment(!isLikedComment);
-	};
-
-	// xóa bình luận trên bài post
-	const deleteCommentPostHandler = async (commentId, userId) => {
-		const toastId = toast.loading('Đang gửi yêu cầu...');
-		try {
-			if (userId !== currentUser.userId && currentUser.userId !== post.userId) {
-				toast.error('Bạn không có quyền xóa comment này!', { id: toastId });
-				return;
-			}
-			await DeleteCommentApi.deleteComment(commentId, currentUser.accessToken);
-
-			const commentDelete = document.querySelector(`.comment_${commentId}`);
-			commentDelete.innerHTML = '';
-			setCommentLength(commentlength - 1);
-			toast.success('Xóa bình luận thành công', { id: toastId });
-		} catch (error) {
-			toast.error(`Gửi yêu thất bại! Lỗi: ${error}`, { id: toastId });
-		}
-	};
-
 	const showCommentHandler = () => {
 		setShowComment(!showComment);
 	};
-
 
 	const postCommentHandler = async () => {
 		try {
@@ -154,7 +113,7 @@ const PostCard = ({ post, fetchPosts }) => {
 					{ content: content, photo: photo, postId: post.postId },
 					config
 				);
-	
+
 				// Xử lý kết quả trực tiếp trong khối try
 				if (response.status === 200) {
 					const newComment = response.data.result;
@@ -176,12 +135,6 @@ const PostCard = ({ post, fetchPosts }) => {
 			toast.error(error.message, errorOptions);
 		}
 	};
-	
-	
-	
-	
-	
-	
 
 	// xóa bài post
 	const deletePostHandler = async () => {
@@ -199,7 +152,6 @@ const PostCard = ({ post, fetchPosts }) => {
 			};
 			setCommentLoading(true);
 			if (post.postId) {
-				console.log(post.userId);
 				console.log(currentUser.userId);
 				await axios.put(`${BASE_URL}/v1/post/delete/${post.postId}`, post.userId, config);
 			}
@@ -217,8 +169,6 @@ const PostCard = ({ post, fetchPosts }) => {
 		getTimelinePosts();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
-
-
 
 	// lấy thông tin của người dùng hiện tại
 	useEffect(() => {
@@ -331,39 +281,14 @@ const PostCard = ({ post, fetchPosts }) => {
 
 				{Object.values(comments).map((comment) => {
 					return (
-						<div className={`comment_${comment.commentId}`} key={comment.commentId}>
-							<div className="postCommentsBox" style={{ display: showComment ? '' : 'none' }}>
-								<div>
-									<div className="postCommentInfo">
-										<div className="postCommentUser">
-											<img
-												className="postProfileImg"
-												src={comment.userAvatar || sampleProPic}
-												alt="..."
-											/>
-											<span className="postCommentUserName">{comment.userName}</span>
-										</div>
-										<div className="postCommentContent">
-											<span>{comment.content}</span>
-										</div>
-									</div>
-
-									<div className="postCommentAction">
-										<span className="postCommentDate">{formatTime(comment.createTime)}</span>
-										<span className="postCommentLike"
-										onClick={() => likeCommentHandler(comment.commentId,comment.likes?.length)}
-										>{isLikedComment ? "Đã thích" : "Thích"}</span>
-										<span
-											className="postCommentTextDelete"
-											onClick={() => deleteCommentPostHandler(comment.commentId, comment.userId)}
-										>
-											Xóa
-										</span>
-									</div>
-								</div>
-								<div className="postLikeCommentCounter">{comment.likes?.length}</div>
-							</div>
-						</div>
+						showComment && (
+							<CommentCard
+								comment={comment}
+								fetchCommentPost={fetchCommentPost}
+								fetchPosts={fetchPosts}
+								key={comment.commentId}
+							/>
+						)
 					);
 				})}
 			</div>

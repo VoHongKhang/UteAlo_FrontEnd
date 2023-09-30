@@ -194,4 +194,9 @@
   cursor: pointer;
 }
 
+.liked {
+  color: blue; /* Màu xanh khi đã thích */
+}
+
+
 

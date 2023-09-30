@@ -4,7 +4,6 @@ import { Card, Menu } from 'antd';
 import ListFriend from './ListFriend';
 import Topbar from '../../timeline/topbar/Topbar';
 import './friendRequest.css';
-
 const FriendRequest = () => {
 	const [type, setType] = useState('friends');
 	const [title, setTitle] = useState('Bạn bè');

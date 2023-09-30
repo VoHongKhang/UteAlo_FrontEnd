@@ -10,8 +10,8 @@ import axios from 'axios';
 import { BASE_URL } from '../../../context/apiCall';
 import ChatBox from '../chatbox/ChatBox';
 import toast from 'react-hot-toast';
-import DeleteFriendRequestApi from '../../../api/profile/friendRequest/delete';
-import AcceptFriendRequestApi from '../../../api/profile/friendRequest/accept';
+import DeleteFriendRequestApi from '../../../api/profile/friendrequest/delete';
+import AcceptFriendRequestApi from '../../../api/profile/friendrequest/accept';
 
 const Rightbar = ({ user }) => {
 	const { theme } = useTheme();

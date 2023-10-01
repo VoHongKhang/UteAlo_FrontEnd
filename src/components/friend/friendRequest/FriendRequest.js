@@ -6,13 +6,10 @@ import Topbar from '../../timeline/topbar/Topbar';
 import './friendRequest.css';
 
 const FriendRequest = () => {
-	const [type, setType] = useState('friends');
+	const [type, setType] = useState('friend');
 	const [title, setTitle] = useState('Bạn bè');
 	const changeType = (key) => {
 		switch (key) {
-			case 'friends':
-				setTitle('Bạn bè');
-				break;
 			case 'request':
 				setTitle('Lời mời kết bạn');
 				break;
@@ -27,7 +24,7 @@ const FriendRequest = () => {
 	};
 	const friendTypeList = [
 		{
-			type: 'friends',
+			type: 'friend',
 			title: 'Bạn bè',
 			Icon: require('@ant-design/icons').UsergroupAddOutlined,
 		},
@@ -41,6 +38,11 @@ const FriendRequest = () => {
 			title: 'Đã gửi lời mời',
 			Icon: require('@ant-design/icons').UserOutlined,
 		},
+		{
+			type:'suggest',
+			title: 'Gợi ý kết bạn',
+			Icon: require('@ant-design/icons').UserSwitchOutlined,
+		}
 	];
 	return (
 		<>
@@ -64,7 +66,7 @@ const FriendRequest = () => {
 				</div>
 
 				<div className="centerbar">
-					<ListFriend title={`${title}`} api={`${type}`} />
+					<ListFriend title={title} type={type} />
 				</div>
 			</div>
 		</>

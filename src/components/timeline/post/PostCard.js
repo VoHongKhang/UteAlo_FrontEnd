@@ -46,12 +46,12 @@ const PostCard = ({ post, fetchPosts }) => {
 	const [isLiked, setIsLiked] = useState(false);
 	const [user, setUser] = useState({});
 	const [commentLoading, setCommentLoading] = useState(false);
-	const [showComment, setShowComment] = useState(false);
 	const [content, setContent] = useState('');
 	const [photo, setPhoto] = useState('');
 	const { getTimelinePosts } = usePost();
 	const [comments, setCommentPost] = useState({});
 	const [commentlength, setCommentLength] = useState(post?.comments.length);
+	const [showAllComments, setShowAllComments] = useState(false);
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -90,8 +90,8 @@ const PostCard = ({ post, fetchPosts }) => {
 		setIsLiked(!isLiked);
 	};
 
-	const showCommentHandler = () => {
-		setShowComment(!showComment);
+	const toggleShowAllComments = () => {
+		setShowAllComments(!showAllComments);
 	};
 
 	const postCommentHandler = async () => {
@@ -252,7 +252,7 @@ const PostCard = ({ post, fetchPosts }) => {
 						<span className="postLikeCounter">{like} người đã thích</span>
 					</div>
 					<div className="postBottomRight">
-						<span className="postCommentText" onClick={showCommentHandler}>
+						<span className="postCommentText" onClick={toggleShowAllComments}>
 							{commentlength} bình luận
 						</span>
 					</div>
@@ -279,18 +279,31 @@ const PostCard = ({ post, fetchPosts }) => {
 					</div>
 				</div>
 
-				{Object.values(comments).map((comment) => {
-					return (
-						showComment && (
+				{showAllComments
+					? Object.values(comments).map((comment) => (
 							<CommentCard
 								comment={comment}
 								fetchCommentPost={fetchCommentPost}
 								fetchPosts={fetchPosts}
 								key={comment.commentId}
 							/>
-						)
-					);
-				})}
+					  ))
+					: Object.values(comments)
+							.slice(0, 1)
+							.map((comment) => (
+								<CommentCard
+									comment={comment}
+									fetchCommentPost={fetchCommentPost}
+									fetchPosts={fetchPosts}
+									key={comment.commentId}
+								/>
+							))}
+
+				{Object.values(comments).length >= 2 && (
+					<div className="showMoreComment" onClick={toggleShowAllComments}>
+						Xem thêm bình luận
+					</div>
+				)}
 			</div>
 		</div>
 	);

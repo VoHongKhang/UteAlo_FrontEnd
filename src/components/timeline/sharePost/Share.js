@@ -131,7 +131,7 @@ const Share = ({ fetchPosts }) => {
             <InputEmoji
               value={content}
               onChange={setContent}
-              placeholder={`What's on your mind ${liveUser?.fullName}?`}
+              placeholder={`Bạn đang nghĩ gì ${liveUser?.fullName} ?`}
             />
           </div>
           <hr className="shareHr" />
@@ -150,7 +150,7 @@ const Share = ({ fetchPosts }) => {
             <div className="shareOptions">
               <label htmlFor="file" className="shareOption">
                 <PermMedia htmlColor="tomato" className="shareIcon" />
-                <span className="shareOptionText">Photo</span>
+                <span className="shareOptionText">Hình ảnh</span>
                 <input
                   style={{ display: 'none' }}
                   type="file"
@@ -167,7 +167,7 @@ const Share = ({ fetchPosts }) => {
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
                   >
-                    <option>Location</option>
+                    <option>Vị trí</option>
                     {Country.getAllCountries().map((item) => (
                       <option key={item.isoCode} value={item.name} id="loc">
                         {item.name}
@@ -183,8 +183,8 @@ const Share = ({ fetchPosts }) => {
                     value={postGroupId}
                     onChange={(e) => setPostGroupId(parseInt(e.target.value))}
                   >
-                    <option value={-1}>Only Me</option>
-                    <option value={0}>Public</option>
+                    <option value={-1}>Chỉ mình tôi</option>
+                    <option value={0}>Công khai</option>
                     {liveUser?.postGroup?.map((item) => (
                       <option key={item.postGroupId} value={item.postGroupId}>
                         {item.postGroupName}
@@ -200,7 +200,7 @@ const Share = ({ fetchPosts }) => {
               type="submit"
               disabled={createLoading}
             >
-              Share
+              Đăng bài
             </button>
           </div>
         </form>

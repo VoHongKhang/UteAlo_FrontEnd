@@ -99,6 +99,10 @@
   margin-right: 8px;
 }
 
+.postCommentText:hover {
+  text-decoration: underline;
+}
+
 .postCommentCont {
   margin-top: 5px;
   min-height: 40px;
@@ -198,5 +202,19 @@
   color: blue; /* Màu xanh khi đã thích */
 }
 
+.showMoreComment {
+  font-size: 15px;
+  margin-left: 12px;
+  margin-top: 16px;
+  color: #656768;
+  font-weight: 550;
+  cursor: pointer;
+}
 
+.showMoreComment:hover {
+  text-decoration: underline;
+}
 
+#postGroupId {
+  width: 90px;
+}

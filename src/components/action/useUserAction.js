@@ -1,7 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
 const useUserAction = (user) => {
 	const [relationship, setRelationship] = useState(user.relationship || 'none');
+	useEffect(() => {
+		setRelationship(user.relationship || 'none');
+	}, [user.relationship]);
 	const [loading, setLoadingState] = useState(false);
 	const setLoading = (key, value) => setLoadingState((prev) => ({ ...prev, [key]: value }));
 
@@ -96,7 +99,6 @@ const useUserAction = (user) => {
 
 		setLoading('cancel', false);
 	};
-
 	return {
 		relationship,
 		loading,

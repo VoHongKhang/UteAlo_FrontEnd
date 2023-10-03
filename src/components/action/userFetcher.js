@@ -1,3 +1,4 @@
+
 import { useCallback, useEffect, useState } from 'react';
 import FriendApi from '../../api/friends/FriendApi';
 
@@ -41,3 +42,4 @@ export const useFetcher = ({ currentUser, api, limit = 20, params = {}, page }) 
 		api,
 	};
 };
+

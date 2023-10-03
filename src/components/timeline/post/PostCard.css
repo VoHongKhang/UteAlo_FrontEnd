@@ -218,3 +218,8 @@
 #postGroupId {
   width: 90px;
 }
+
+.shareOption-one {
+  margin-left: -42px;
+  font-size: 15px;
+}

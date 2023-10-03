@@ -5,11 +5,6 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const UserAvatar = ({ user: initUser, nickname, badgeProps, avtSize = 40, ...avatarProps }) => {
-	// console.log('user', initUser);
-	// console.log('nickname', nickname);
-	// console.log('badgeProps', badgeProps);
-	// console.log('avtSize', avtSize);
-	// console.log('avatarProps', avatarProps);
 
 	const { token } = theme.useToken();
 	const badgeSize = avtSize / 4;
@@ -55,7 +50,7 @@ const UserAvatar = ({ user: initUser, nickname, badgeProps, avtSize = 40, ...ava
 				offset={[0 - badgeSize / 2, avtSize - badgeSize / 2]}
 				{...badgeProps}
 			>
-				<Link to={`/profile/${user?.id}`} passHref draggable onClick={(e) => e.stopPropagation()}>
+				<Link to={`/profile/${user?.id}`} draggable onClick={(e) => e.stopPropagation()}>
 					<Avatar
 						shape="circle"
 						src={profilePic}

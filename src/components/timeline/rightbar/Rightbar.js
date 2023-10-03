@@ -6,13 +6,9 @@ import adImg2 from '../../../assets/appImages/adver4.jpg';
 import useTheme from '../../../context/ThemeContext';
 import './Rightbar.css';
 import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { BASE_URL } from '../../../context/apiCall';
 import ChatBox from '../chatbox/ChatBox';
 import toast from 'react-hot-toast';
-import DeleteFriendRequestApi from '../../../api/profile/friendrequest/delete';
-import AcceptFriendRequestApi from '../../../api/profile/friendrequest/accept';
-
+import GetFriendApi from '../../../api/profile/friend/getFriendApi';
 const Rightbar = ({ user }) => {
 	const { theme } = useTheme();
 	const [listFriend, setListFriend] = useState([]);
@@ -23,54 +19,19 @@ const Rightbar = ({ user }) => {
 	const [isDeny, setIsDeny] = useState(null);
 	//get list friend request
 
-	const getListFriendTop10 = async () => {
-		try {
-			await axios
-				.get(`${BASE_URL}/v1/friend/list/${user.userId}`)
-				.then((res) => {
-					if (res.data.success) {
-						setListFriend(res.data.result);
-					} else {
-						throw new Error(res.data.message);
-					}
-				})
-				.catch((err) => {
-					throw new Error(err.response.data.message);
-				});
-		} catch (error) {
-			console.error(error);
-		}
+	const getListFriendTop = async () => {
+		await GetFriendApi.getFriend({ user: user, limit: 10, page: 0 }).then((res) => {
+			setListFriend(res.result);
+		});
 	};
-
-	const getListFriendRequest = async () => {
-		try {
-			const config = {
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${user.accessToken}`,
-				},
-			};
-
-			await axios
-				.get(`${BASE_URL}/v1/friend/request/list`, config)
-				.then((res) => {
-					if (res.data.success) {
-						setListFriendRequest(res.data.result);
-						return res.data.result;
-					} else {
-						throw new Error(res.data.message);
-					}
-				})
-				.catch((err) => {
-					throw new Error(err.response.data.message);
-				});
-		} catch (error) {
-			console.error(error);
-		}
+	const getListFriendRequests = async () => {
+		await GetFriendApi.getListFriendRequest({ user: user, limit: 10, page: 0 }).then((res) => {
+			setListFriendRequest(res.result);
+		});
 	};
 	useEffect(() => {
-		getListFriendRequest();
-		getListFriendTop10();
+		getListFriendTop();
+		getListFriendRequests();
 	}, []);
 	const messageHandler = (user) => {
 		setSelectedUser(user);
@@ -94,12 +55,11 @@ const Rightbar = ({ user }) => {
 		setIsAccept(item);
 	};
 	const handlerAccepts = async (item) => {
-		console.log('accessToken', user.accessToken);
 		try {
-			await AcceptFriendRequestApi.acceptFriendRequest(user.accessToken, item.userId);
+			await GetFriendApi.acceptFriendRequest(user.accessToken, item.userId);
 			toast.success('Kết bạn thành công', { id: 'success' });
-			getListFriendRequest();
-			getListFriendTop10();
+			getListFriendRequests();
+			getListFriendTop();
 		} catch (error) {
 			toast.error(error.message, { id: 'error' });
 		}
@@ -111,9 +71,9 @@ const Rightbar = ({ user }) => {
 	};
 	const handlerDenys = async (item) => {
 		try {
-			await DeleteFriendRequestApi.deleteFriendRequest(user.accessToken, item.userId);
+			await GetFriendApi.deleteFriendRequest(user.accessToken, item.userId);
 			toast.success('Xóa thành công', { id: 'success' });
-			getListFriendRequest();
+			getListFriendRequests();
 		} catch (error) {
 			toast.error(error.message, { id: 'error' });
 		}

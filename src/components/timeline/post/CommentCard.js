@@ -9,9 +9,11 @@ import LikeOrUnlikeCommentApi from '../../../api/timeline/commentPost/likeOrUnli
 import DeleteCommentApi from '../../../api/timeline/commentPost/delete';
 import toast from 'react-hot-toast';
 
-const CommentCard = ({ comment, fetchCommentPost,post}) => {
+const CommentCard = ({ comment, fetchCommentPost,post, onDelete ,commentLength}) => {
 
     const { user: currentUser } = useAuth();
+
+
 
 	// Hàm kiểm tra xem người dùng đã like bài comment chưa
 	const checkUserLikeComment = useCallback(async () => {
@@ -37,7 +39,7 @@ const CommentCard = ({ comment, fetchCommentPost,post}) => {
 
 	const [isLikedComment, setIsLikedComment] = useState(false);
 	const [likeComment, setLikeComment] = useState(comment.likes?.length);
-	const [commentlength, setCommentLength] = useState(post?.comments.length);
+
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -55,7 +57,7 @@ const CommentCard = ({ comment, fetchCommentPost,post}) => {
 	}, [checkUserLikeComment]);
 
     // yêu thích và bỏ yêu thích bình luận
-	const likeCommentHandler = async (commentId,countLike) => {
+	const likeCommentHandler = async (commentId) => {
 		try {
 			await LikeOrUnlikeCommentApi.likeOrUnlikeComment(commentId, currentUser.accessToken,currentUser.userId);
 
@@ -70,23 +72,48 @@ const CommentCard = ({ comment, fetchCommentPost,post}) => {
 	};
 
 	// xóa bình luận trên bài post
+	// const deleteCommentPostHandler = async (commentId, userId) => {
+	// 	const toastId = toast.loading('Đang gửi yêu cầu...');
+	// 	try {
+	// 		if (userId !== currentUser.userId && currentUser.userId !== post.userId) {
+	// 			toast.error('Bạn không có quyền xóa comment này!', { id: toastId });
+	// 			return;
+	// 		}
+	// 		await DeleteCommentApi.deleteComment(commentId, currentUser.accessToken);
+
+	// 		const commentDelete = document.querySelector(`.comment_${commentId}`);
+	// 		commentDelete.innerHTML = '';
+	// 		setCommentLength(commentlength - 1);
+	// 		toast.success('Xóa bình luận thành công', { id: toastId });
+	// 	} catch (error) {
+	// 		toast.error(`Gửi yêu thất bại! Lỗi: ${error}`, { id: toastId });
+	// 	}
+	// 	fetchCommentPost();
+	// };
 	const deleteCommentPostHandler = async (commentId, userId) => {
 		const toastId = toast.loading('Đang gửi yêu cầu...');
 		try {
-			if (userId !== currentUser.userId && currentUser.userId !== post.userId) {
-				toast.error('Bạn không có quyền xóa comment này!', { id: toastId });
-				return;
-			}
-			await DeleteCommentApi.deleteComment(commentId, currentUser.accessToken);
+		  if (userId !== currentUser.userId && currentUser.userId !== post.userId) {
+			toast.error('Bạn không có quyền xóa comment này!', { id: toastId });
+			return;
+		  }
+		  await DeleteCommentApi.deleteComment(commentId, currentUser.accessToken);
+	  
+		  const commentDelete = document.querySelector(`.comment_${commentId}`);
+		  commentDelete.innerHTML = '';
+		  console.log("commentlength"+commentLength);
+		  
+		  // Gọi hàm callback để cập nhật commentLength trong PostCard
+		  onDelete(commentLength-1);
 
-			const commentDelete = document.querySelector(`.comment_${commentId}`);
-			commentDelete.innerHTML = '';
-			setCommentLength(commentlength - 1);
-			toast.success('Xóa bình luận thành công', { id: toastId });
+	  
+		  toast.success('Xóa bình luận thành công', { id: toastId });
 		} catch (error) {
-			toast.error(`Gửi yêu thất bại! Lỗi: ${error}`, { id: toastId });
+		  toast.error(`Gửi yêu thất bại! Lỗi: ${error}`, { id: toastId });
 		}
-	};
+		fetchCommentPost();
+	  };
+	  
 
 
     function formatTime(time) {
@@ -130,7 +157,7 @@ const CommentCard = ({ comment, fetchCommentPost,post}) => {
                     <div className="postCommentAction">
                         <span className="postCommentDate">{formatTime(comment.createTime)}</span>
                         <span  className={`postCommentLike ${likeButtonClass}`}
-                        onClick={() => likeCommentHandler(comment.commentId,comment.likes?.length)}
+                        onClick={() => likeCommentHandler(comment.commentId)}
                         >{isLikedComment ? "Đã thích" : "Thích"}
 						</span>
                         <span

@@ -38,6 +38,8 @@
   text-align: center;
 }
 
+
+
 .editProfile-btn {
   padding: 12px;
   cursor: pointer;
@@ -106,6 +108,18 @@
   display: flex;
   justify-content: space-between;
   margin-top: 20px;
+}
+
+.profileUserImg {
+  cursor: pointer;
+}
+
+.profileCoverImg {
+  cursor: pointer;
+}
+
+.editBackground-btnBox {
+  margin-top: -24px;
 }
 
 

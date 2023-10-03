@@ -136,6 +136,12 @@ const PostCard = ({ post, fetchPosts }) => {
 		}
 	};
 
+	const updateCommentLength = (newLength) => {
+		setCommentLength(newLength);
+		console.log("newLength"+newLength);
+	  };
+
+	  
 	// xóa bài post
 	const deletePostHandler = async () => {
 		try {
@@ -284,8 +290,10 @@ const PostCard = ({ post, fetchPosts }) => {
 							<CommentCard
 								comment={comment}
 								fetchCommentPost={fetchCommentPost}
-								fetchPosts={fetchPosts}
+								post={post}
 								key={comment.commentId}
+								onDelete={updateCommentLength}
+								commentLength={commentlength} 
 							/>
 					  ))
 					: Object.values(comments)
@@ -294,8 +302,10 @@ const PostCard = ({ post, fetchPosts }) => {
 								<CommentCard
 									comment={comment}
 									fetchCommentPost={fetchCommentPost}
-									fetchPosts={fetchPosts}
+									post={post}
 									key={comment.commentId}
+									onDelete={updateCommentLength}
+									commentLength={commentlength} 
 								/>
 							))}
 

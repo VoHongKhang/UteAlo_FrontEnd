@@ -177,7 +177,7 @@ const Share = ({ fetchPosts }) => {
                 </label>
               </div>
               <div className="shareOption">
-                <label htmlFor="postGroupId" className="shareOption">
+                <label htmlFor="postGroupId" className="shareOption-one">
                   <select
                     id="postGroupId"
                     value={postGroupId}

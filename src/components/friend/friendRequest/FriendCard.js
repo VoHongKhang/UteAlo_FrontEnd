@@ -134,13 +134,13 @@ const FriendCard = ({ user, type }) => {
 					width="100%"
 					height={100}
 					src={user?.background || 'http://via.placeholder.com/200x100?text='}
-					alt={user.name}
+					alt={user.username}
 					style={{ objectFit: 'cover', background: token.colorBgLayout }}
 				/>
 			}
 			actions={[
 				<Tooltip key="profile" title="Trang cá nhân">
-					<Link to={`/profile/${user.id}`} passHref draggable>
+					<Link to={`/profile/${user.id}`} >
 						<Button icon={<HiUser />} />
 					</Link>
 				</Tooltip>,
@@ -164,7 +164,7 @@ const FriendCard = ({ user, type }) => {
 		>
 			<Card.Meta
 				avatar={<UserAvatar user={user} />}
-				title={user.name}
+				title={user.username}
 				description={
 					<Typography.Text strong type={relationshipColor[relationship]}>
 						{relationshipLabel[relationship]}

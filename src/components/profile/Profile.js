@@ -33,7 +33,9 @@ const Profile = () => {
 
 	const [listImage, setListImage] = useState([]);
 
-	// get user details
+	const [listImageFriend, setListImageFriend] = useState([]);
+
+	// Lấy thông tin chi tiết người dùng
 	useEffect(() => {
 		const fetchUsers = async () => {
 			const config = {
@@ -48,15 +50,44 @@ const Profile = () => {
 		fetchUsers();
 	}, [currentUser.userId, currentUser.accessToken]);
 
+	// Lấy danh sách ảnh của người dùng
 	useEffect(() => {
 		const fetchPhotosOfUser = async () => {
-			const res = await axios.get(`${BASE_URL}/v1/post/user/${params.userId}/latest-photos`);
-			setListImage(res.data.content);
+			try {
+				const res = await axios.get(`${BASE_URL}/v1/post/user/${params.userId}/latest-photos`);
+				setListImage(res.data.content);
+			} catch (error) {
+				console.error('Lỗi khi lấy danh sách ảnh:', error);
+			}
 		};
 		fetchPhotosOfUser();
 	}, [params.userId]);
 
-	//const limitedImageUrls = listImage.slice(0, 9); // Lấy 9 ảnh đầu tiên
+
+	// Lấy danh sách ảnh đại diện bạn bè của người dùng
+	useEffect(() => {
+		const fetchFriendOfUser = async () => {
+			try {
+				const config = {
+					headers: {
+						'Content-Type': 'application/json',
+					},
+				};
+				const data = {
+					page : 0,
+					limit : 9,
+				};
+				const res = await axios.post(`${BASE_URL}/v1/friend/list/${params.userId}`, data, config);
+				// Lấy danh sách avatar từ kết quả và đặt vào state
+				const avatars = res.data.result.map(friend => friend.avatar);
+				setListImageFriend(avatars);
+			} catch (error) {
+				console.error('Lỗi khi lấy danh sách bạn bè:', error);
+			}
+		};
+		fetchFriendOfUser();
+	}, [params.userId]);
+
 
 	return (
 		<>
@@ -131,7 +162,15 @@ const Profile = () => {
 									<div className="showMoreFriend">Xem tất cả bạn bè</div>
 								</div>
 								<div className="textCountFriend">{user.friends?.length} bạn bè</div>
+								<div className="userPhotos">
+									{Array.from({ length: 9 }).map((_, index) => (
+										<div key={index} className="photoItem">
+											<img src={listImageFriend[index] || sampleProPic} alt="" />
+										</div>
+									))}
+								</div>
 							</div>
+										
 						</div>
 						<FeedOfUser userId={currentUser.accessToken} />
 					</div>

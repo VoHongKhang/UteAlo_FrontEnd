@@ -4,7 +4,9 @@ import { Card, Menu } from 'antd';
 import ListFriend from './ListFriend';
 import Topbar from '../../timeline/topbar/Topbar';
 import './friendRequest.css';
+import useAuth from '../../../context/auth/AuthContext';
 const FriendRequest = () => {
+	const {user: currentUser} = useAuth();
 	const [type, setType] = useState('friend');
 	const [title, setTitle] = useState('Bạn bè');
 	const changeType = (key) => {
@@ -14,6 +16,9 @@ const FriendRequest = () => {
 				break;
 			case 'sent':
 				setTitle('Đã gửi lời mời');
+				break;
+			case 'suggest':
+				setTitle('Gợi ý kết bạn');
 				break;
 			default:
 				setTitle('Bạn bè');
@@ -65,7 +70,7 @@ const FriendRequest = () => {
 				</div>
 
 				<div className="centerbar">
-					<ListFriend title={title} type={type} />
+					<ListFriend currentUser ={currentUser} title={title} type={type} />
 				</div>
 			</div>
 		</>

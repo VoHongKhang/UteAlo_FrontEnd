@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback,useRef } from 'react';
 import './PostCard.css';
 import sampleProPic from '../../../assets/appImages/user.png';
 import heart from '../../../assets/appImages/heart.png';
@@ -19,8 +19,14 @@ import GetCommentPostApi from '../../../api/timeline/commentPost/getCommentPost'
 import CommentCard from './CommentCard';
 
 const PostCard = ({ post, fetchPosts }) => {
+	const isMounted = useRef(true);
 	const { user: currentUser } = useAuth();
-
+	useEffect(() => {
+		return () => {
+		  // Cleanup: Set isMounted to false when the component unmounts
+		  isMounted.current = false;
+		};
+	  }, []);
 	// Hàm kiểm tra xem người dùng đã like bài post chưa
 	const checkUserLikePost = useCallback(async () => {
 		try {
@@ -55,22 +61,28 @@ const PostCard = ({ post, fetchPosts }) => {
 
 	useEffect(() => {
 		const fetchData = async () => {
-			let resultValue = null; // Biến tạm để lưu giá trị trả về từ checkUserLikePost
 			try {
-				resultValue = await checkUserLikePost();
-			} catch (error) {
+				const resultValue = await checkUserLikePost();
+				if (isMounted.current) {
+				  setIsLiked(resultValue);
+				}
+			  } catch (error) {
 				console.error(error);
-			}
-
-			setIsLiked(resultValue); // Gán giá trị từ biến tạm vào isLiked
+			  }
 		};
 
 		fetchData();
 	}, [checkUserLikePost]);
 
 	const fetchCommentPost = async () => {
-		const res = await GetCommentPostApi.getCommentPost(post.postId);
-		setCommentPost(res);
+		try {
+			const res = await GetCommentPostApi.getCommentPost(post.postId);
+			if (isMounted.current) {
+			  setCommentPost(res);
+			}
+		  } catch (error) {
+			console.error(error);
+		  }
 	};
 
 	// lấy danh sách bình luận trên bài post

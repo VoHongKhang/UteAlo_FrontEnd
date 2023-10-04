@@ -40,10 +40,22 @@
 
 
 
+.editProfileBackground-btn {
+  padding: 12px;
+  cursor: pointer;
+  background: #abadb5;
+  color: white;
+  font-weight: 500;
+  border: none;
+  border-radius: 5px;
+  margin-left: 177px;
+  margin-top: -15px;
+}
+
 .editProfile-btn {
   padding: 12px;
   cursor: pointer;
-  background-color: #5699f0;
+  background: #abadb5;
   color: white;
   font-weight: 500;
   border: none;
@@ -120,6 +132,14 @@
 
 .editBackground-btnBox {
   margin-top: -24px;
+}
+
+.dateOfBirth {
+  margin-top: -28px;
+}
+
+.custom-datepicker {
+  margin-top: 10px;
 }
 
 

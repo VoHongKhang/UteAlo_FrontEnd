@@ -4,7 +4,6 @@ import '../profile/Profile.css';
 import noCover from '../../assets/appImages/noCover.jpg';
 import sampleProPic from '../../assets/appImages/user.png';
 import Topbar from '../timeline/topbar/Topbar';
-import Sidebar from '../timeline/sidebar/Sidebar';
 import useAuth from '../../context/auth/AuthContext';
 import { BASE_URL } from '../../context/apiCall';
 import axios from 'axios';
@@ -25,17 +24,14 @@ const EditProfile = () => {
 	const { theme } = useTheme();
 
 	// all states for user update fields
-	const [fullName, setFullName] = useState(user.fullName);
-	const [about, setAbout] = useState(user.about);
-	const [address, setAddress] = useState(user.address);
-	const [phone, setPhone] = useState(user.phone);
-	const [gender, setGender] = useState(user.gender);
-	const [dateOfBirth, setDateOfBirth] = useState(user.dateOfBirth);
-	const [avatar, setAvatar] = useState(user.avatar);
-	const [background, setBackground] = useState(user.background);
-	
-
-  
+	const [fullName, setFullName] = useState();
+	const [about, setAbout] = useState();
+	const [address, setAddress] = useState();
+	const [phone, setPhone] = useState();
+	const [gender, setGender] = useState();
+	const [dateOfBirth, setDateOfBirth] = useState();
+	const [avatar, setAvatar] = useState();
+	const [background, setBackground] = useState();
 
 	// get user details
 	useEffect(() => {
@@ -51,6 +47,28 @@ const EditProfile = () => {
 		fetchUsers();
 	}, [currentUser.accessToken]);
 
+	useEffect(() => {
+		setFullName(user.fullName);
+		setAbout(user.about);
+		setAddress(user.address);
+		setPhone(user.phone);
+		setGender(user.gender);
+		setDateOfBirth(user.dateOfBirth);
+	}, [user.fullName, user.about, user.address, user.phone, user.gender, user.dateOfBirth]);
+
+
+
+	
+	useEffect(() => {
+		// Chuyển đổi chuỗi ngày giờ thành đối tượng Date và kiểm tra nếu không hợp lệ
+		const dateOfBirthString = user.dateOfBirth; // Mặc định nếu user.dateOfBirth là null hoặc undefined
+		const dateObject = new Date(dateOfBirthString);
+		if (!isNaN(dateObject.getTime())) {
+		  const formattedDate = dateObject.toISOString().split('T')[0];
+		  setDateOfBirth(formattedDate);
+		} 
+	  }, [user.dateOfBirth]);
+	
 
 	const [selectedAvatarUrl, setSelectedAvatarUrl] = useState(user.avatar ? user.avatar : sampleProPic);
 	const [selectedBackgroundUrl, setSelectedBackgroundUrl] = useState(user.background ? user.background : noCover);
@@ -58,15 +76,13 @@ const EditProfile = () => {
 	useEffect(() => {
 		// Kiểm tra nếu user.avatar có giá trị, thì cập nhật selectedAvatarUrl
 		if (user.avatar) {
-		  setSelectedAvatarUrl(user.avatar);
+			setSelectedAvatarUrl(user.avatar);
 		}
 		// Kiểm tra nếu user.background có giá trị, thì cập nhật selectedAvatarUrl
 		if (user.background) {
 			setSelectedBackgroundUrl(user.background);
 		}
-	  }, [user.avatar, user.background]);
-	  
-
+	}, [user.avatar, user.background]);
 
 	// update user profile
 	const updateProfileHandler = (e) => {
@@ -96,8 +112,7 @@ const EditProfile = () => {
 		const file = e.target.files[0];
 		setAvatar(file);
 		setSelectedAvatarUrl(URL.createObjectURL(file)); // Đặt URL hình ảnh avatar đã chọn
-	  };
-	  
+	};
 
 	// update user background
 	const updateBackgroundHandler = async (e) => {
@@ -123,17 +138,17 @@ const EditProfile = () => {
 		setSelectedBackgroundUrl(URL.createObjectURL(file)); // Đặt URL hình nền đã chọn
 	};
 
+
+
 	return (
 		<>
 			<Helmet title="Edit profile | UTEALO" />
 			<Toaster />
 			<Topbar />
 			<div className="profile" style={{ color: theme.foreground, background: theme.background }}>
-				
 				<div className="profileRight">
 					<div className="profileRightTop">
 						<div className="profileCover">
-
 							<form onSubmit={updateBackgroundHandler} className="formAvatar">
 								<label htmlFor="background" className="profileImageLabel">
 									<img className="profileCoverImg" src={selectedBackgroundUrl} alt="..." />
@@ -146,7 +161,7 @@ const EditProfile = () => {
 									/>
 								</label>
 								<div className="editBackground-btnBox">
-									<button type="submit" className="editProfile-btn">
+									<button type="submit" className="editProfileBackground-btn">
 										Update Background
 									</button>
 								</div>
@@ -154,7 +169,7 @@ const EditProfile = () => {
 
 							<form onSubmit={updateAvatarHandler} className="formAvatar">
 								<label htmlFor="avatar" className="profileImageLabel">
-								<img className="profileUserImg" src={selectedAvatarUrl} alt="..." />
+									<img className="profileUserImg" src={selectedAvatarUrl} alt="..." />
 									<input
 										type="file"
 										accept=".png, .jpeg, .jpg"
@@ -169,7 +184,6 @@ const EditProfile = () => {
 									</button>
 								</div>
 							</form>
-              
 						</div>
 						{loading && (
 							<Box display="flex" justifyContent="center" sx={{ my: 2 }}>
@@ -186,7 +200,6 @@ const EditProfile = () => {
 											<input
 												className="editProfile-input"
 												type="text"
-												placeholder={user?.fullName ? user?.fullName : 'Your full name....'}
 												value={fullName}
 												onChange={(e) => setFullName(e.target.value)}
 												required
@@ -202,7 +215,8 @@ const EditProfile = () => {
 											/>
 											<label htmlFor="about">Address</label>
 											<input
-												className="editProfile-input"gender
+												className="editProfile-input"
+												gender
 												type="text"
 												placeholder={user?.address ? user?.address : 'Which address....'}
 												value={address}
@@ -263,7 +277,6 @@ const EditProfile = () => {
 													placeholder="Date of birth...."
 													value={dateOfBirth}
 													onChange={(e) => setDateOfBirth(e.target.value)}
-													required
 												/>
 											</div>
 										</div>

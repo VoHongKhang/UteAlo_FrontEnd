@@ -18,6 +18,7 @@ import LikeOrUnlikeApi from '../../../api/timeline/commentPost/likeOrUnlike';
 import GetCommentPostApi from '../../../api/timeline/commentPost/getCommentPost';
 import CommentCard from './CommentCard';
 import { Modal } from 'antd';
+import { Country } from 'country-state-city';
 
 const PostCard = ({ post, fetchPosts }) => {
 	const isMounted = useRef(true);
@@ -67,6 +68,7 @@ const PostCard = ({ post, fetchPosts }) => {
 	const [editContent, setEditContent] = useState('');
 	const [editLocation, setEditLocation] = useState('');
 	const [editPhotos, setEditPhotos] = useState('');
+	const [editPostGroupId, setEditPostGroupId] = useState('');
 
 	// Model xuất hiện khi nhấn xóa bài post
 	const showDeleteConfirm = (postId) => {
@@ -226,7 +228,8 @@ const PostCard = ({ post, fetchPosts }) => {
 						content: editContent,
 						location: editLocation,
 						photos: editPhotos,
-						updateAt: new Date(), // Cập nhật thời gian
+						updateAt: new Date(),
+						postGroupId: editPostGroupId,
 					},
 					config
 				);
@@ -292,6 +295,8 @@ const PostCard = ({ post, fetchPosts }) => {
 		return formattedTime;
 	}
 
+	console.log(post);
+
 	return (
 		<div className="post">
 			<div className="postWrapper">
@@ -304,8 +309,8 @@ const PostCard = ({ post, fetchPosts }) => {
 							<span className="postUsername">{user.fullName}</span>
 							<span className="postDate">{formatTime(post.postTime)}</span>
 						</div>
-
 						<span className="postLocation">• {post.location || 'Vị trí'}</span>
+						<span className="postGroupName">• {post.postGroupId}</span>
 					</div>
 					<div className="postTopRight">
 						{currentUser.userId === post.userId ? (
@@ -336,28 +341,48 @@ const PostCard = ({ post, fetchPosts }) => {
 									Bạn có chắc chắn muốn xóa bài viết này?
 								</Modal>
 								<Modal
-									title="Chỉnh sửa bài viết"
+									title={<span className="titlEditPost">Chỉnh sửa bài viết</span>}
 									open={isEditModalVisible}
 									onOk={editPostHandler}
 									onCancel={() => setIsEditModalVisible(false)}
 								>
-									<div>
-										<label>Nội dung:</label>
+									<div className="editPost">
+										<label className="labelEditPost">Nội dung:</label>
 										<textarea
 											value={editContent}
 											onChange={(e) => setEditContent(e.target.value)}
 										/>
 									</div>
-									<div>
-										<label>Vị trí:</label>
-										<input
-											type="text"
-											value={editLocation}
-											onChange={(e) => setEditLocation(e.target.value)}
-										/>
+									<div className="editPost">
+										<label className="labelEditPost">Vị trí:</label>
+										<select value={editLocation} onChange={(e) => setEditLocation(e.target.value)}>
+											<option value="">Vị trí</option>
+											{Country.getAllCountries().map((item) => (
+												<option key={item.isoCode} value={item.name}>
+													{item.name}
+												</option>
+											))}
+										</select>
 									</div>
-									<div>
-										<label>Ảnh:</label>
+									<div className="editPost">
+										<label className="labelEditPost">Nhóm:</label>
+										<select
+											id="postGroupId"
+											value={editPostGroupId} 
+											onChange={(e) => setEditPostGroupId(e.target.value)} 
+										>
+											<option value={-1}>Chỉ mình tôi</option>
+											<option value={0}>Công khai</option>
+											{user?.postGroup?.map((item) => (
+												<option key={item.postGroupId} value={item.postGroupId}>
+													{item.postGroupName}
+												</option>
+											))}
+										</select>
+									</div>
+
+									<div className="editPost">
+										<label className="labelEditPost">Ảnh:</label>
 										<input
 											type="text"
 											value={editPhotos}

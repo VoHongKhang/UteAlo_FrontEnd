@@ -4,7 +4,6 @@ import '../profile/Profile.css';
 import noCover from '../../assets/appImages/noCover.jpg';
 import sampleProPic from '../../assets/appImages/user.png';
 import Topbar from '../timeline/topbar/Topbar';
-import Sidebar from '../timeline/sidebar/Sidebar';
 import useAuth from '../../context/auth/AuthContext';
 import { BASE_URL } from '../../context/apiCall';
 import axios from 'axios';

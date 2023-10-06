@@ -31,7 +31,7 @@ const UserAvatar = ({ user: initUser, nickname, badgeProps, avtSize = 40, ...ava
 	if (!user) return <Skeleton.Avatar size={avtSize} shape="circle" active />;
 
 	return (
-		<Tooltip title={nickname || user?.name} placement="top">
+		<Tooltip title={nickname || user?.username} placement="top">
 			<Badge
 				className={styles.badge}
 				count={
@@ -50,11 +50,11 @@ const UserAvatar = ({ user: initUser, nickname, badgeProps, avtSize = 40, ...ava
 				offset={[0 - badgeSize / 2, avtSize - badgeSize / 2]}
 				{...badgeProps}
 			>
-				<Link to={`/profile/${user?.id}`} draggable onClick={(e) => e.stopPropagation()}>
+				<Link to={`/profile/${user?.userId}`} draggable onClick={(e) => e.stopPropagation()}>
 					<Avatar
 						shape="circle"
 						src={profilePic}
-						alt={user?.name}
+						alt={user?.username}
 						icon={<HiUser size={avtSize} />}
 						{...avatarProps}
 						style={{ width: avtSize, height: avtSize, border: 'none', ...avatarProps?.style }}

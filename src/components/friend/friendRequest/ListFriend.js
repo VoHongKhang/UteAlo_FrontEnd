@@ -9,6 +9,14 @@ const ListFriend = ({currentUser, type, title = 'Danh sách bạn bè' }) => {
 	const typingRef = useRef(null);
 	const [loadingMore, setLoadingMore] = useState(false);
 	const [more, setMore] = useState(0);
+	const [data, setData] = useState([]);
+	const loadMore = () => {
+		if (loadingMore) return;
+		setLoadingMore(true);
+		setMore(more + 1);
+		setData(data.concat(friendFetcher.data));
+		setLoadingMore(false);
+	};
 	const handleSearch = (e) => {
 		const value = e.target.value;
 		if (typingRef.current) clearTimeout(typingRef.current);
@@ -22,7 +30,14 @@ const ListFriend = ({currentUser, type, title = 'Danh sách bạn bè' }) => {
 		// call api get friend list
 
 	}, [filter]);
-	const friendFetcher = useFetcher({currentUser: currentUser ,api: type, params: filter ,limit: 9,page: more});
+
+	const friendFetcher = useFetcher({currentUser: currentUser ,api: type, params: filter ,limit: 2,page: more});
+	useEffect(() => {
+		setData(friendFetcher.data);
+	}, [friendFetcher.data]);
+	console.log("Data",friendFetcher.data);
+	console.log("update Data",friendFetcher.updateData);
+	console.log(friendFetcher.hasMore);
 	return (
 		<Card title={title} headStyle={{ padding: '0 16px' }} bodyStyle={{ padding: 8 }}>
 			<Space direction="vertical" style={{ width: '100%' }}>
@@ -76,8 +91,8 @@ const ListFriend = ({currentUser, type, title = 'Danh sách bạn bè' }) => {
 							<div style={{ textAlign: 'center', marginTop: 16 }}>
 								<Button
 									size="small"
-									onClick={friendFetcher.loadMore}
-									// loading={loadingMore}
+									onClick={loadMore}
+									loading={loadingMore}
 									disabled={!friendFetcher.hasMore}
 								>
 									{friendFetcher.hasMore ? 'Xem thêm' : 'Hết rồi'}

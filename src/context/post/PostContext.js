@@ -15,27 +15,40 @@ export const PostProvider = ({ children }) => {
   const [state, dispatch] = useReducer(postReducer, initialPostState);
 
   const { user } = useAuth();
-  // create post req
+
   const createPost = async (location, content, photos, postGroupId) => {
     try {
+
+      console.log("photosssss "+photos);
       dispatch({
         type: "CREATE_POST_REQUEST",
       });
+  
+      const formData = new FormData();
+      formData.append('location', location || '');
+      formData.append('content', content || '') ;
+      formData.append('postGroupId', postGroupId || 0);
+      if (photos) {
+        formData.append('photos', photos);
+      }
       const config = {
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${user.accessToken}`,
+          'Content-Type': 'multipart/form-data',
         },
       };
+  
       const { data } = await axios.post(
         `${BASE_URL}/v1/post/create`,
-        { location:location, content:content, photos:photos, postGroupId:postGroupId },
+        formData,
         config
       );
+  
       dispatch({
         type: "CREATE_POST_SUCCESS",
         payload: data,
       });
+  
       toast.success("Đăng bài thành công", successOptions);
     } catch (error) {
       dispatch({
@@ -45,6 +58,7 @@ export const PostProvider = ({ children }) => {
       toast.error(error.response.data.message, errorOptions);
     }
   };
+  
 
 
   // get posts req

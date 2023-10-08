@@ -1,7 +1,8 @@
 import { Button, Card, Dropdown, Popconfirm, theme, Tooltip, Typography, Image } from 'antd';
 import { HiDotsHorizontal } from 'react-icons/hi';
-import useUserAction from '../../action/useUserAction';
+import userAction from '../../action/useUserAction';
 import { Link } from 'react-router-dom';
+import useAuth from '../../../context/auth/AuthContext';
 import {
 	HiArrowDownOnSquareStack,
 	HiChatBubbleOvalLeft,
@@ -12,12 +13,34 @@ import {
 	HiXMark,
 } from 'react-icons/hi2';
 import UserAvatar from '../../action/UserAvatar';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 const FriendCard = ({ user, type }) => {
+	const { user: currentUser } = useAuth();
+	const [userState, setUserState] = useState(user);
+	const [loading, setLoading] = useState({});
+	const [relationship, setRelationship] = useState(type);
+	const [friendHandler, setFriendHandler] = useState({});
+	const handleFriend = ({ tempt, relationship }) => {
+		setFriendHandler({ tempt, relationship });
+	};
+	useEffect(() => {
+		if (Object.keys(friendHandler).length > 0) {
+			const handleFriend = async (friendHandler) => {
+				setLoading({ ...loading, [friendHandler.tempt]: true });
+				await userAction({ currentUser: currentUser, user: userState, action: friendHandler.tempt });
+				setLoading({ ...loading, [friendHandler.tempt]: false });
+				setRelationship(friendHandler.relationship);
+			};
+			handleFriend(friendHandler);
+		}
+	}, [friendHandler]);
+
+	useEffect(() => {
+		setUserState(user);
+		setRelationship(type);
+	}, [type, user]);
 
 	const { token } = theme.useToken();
-	const openReport = () => {};
-
 	const relationshipLabel = {
 		friend: 'Bạn bè',
 		sent: 'Đã gửi',
@@ -30,97 +53,90 @@ const FriendCard = ({ user, type }) => {
 		friend: 'success',
 		sent: 'secondary',
 		request: 'warning',
-		suggest:'info', 
+		suggest: 'info',
 		you: 'secondary',
 	};
-
-	const dropdownItems = [
+	useEffect(() => {}, [user, type]);
+	const [dropdownItems, setDropdownItems] = useState([]);
+	const friend = [
 		{
-			key: 'report',
-			icon: <HiExclamationTriangle />,
-			label: 'Báo cáo',
-			onClick: openReport,
+			key: 'unfriend',
+			icon: <HiUserMinus />,
+			danger: true,
+			label: (
+				<Popconfirm
+					title="Bạn có chắc muốn hủy kết bạn?"
+					okText="Hủy kết bạn"
+					cancelText="Thoát"
+					onConfirm={() => handleFriend({ tempt: 'unfriend', relationship: 'suggest' })}
+				>
+					Hủy kết bạn
+				</Popconfirm>
+			),
 		},
 	];
-
-	const {
-		relationship,
-		loading,
-		handleRequestFriend,
-		handleCancelRequestFriend,
-		handleAcceptFriend,
-		handleUnfriend,
-		handleChat,
-		handleRejectFriend,
-	} = useUserAction({ ...user, relationship: type });
+	const send = [
+		{
+			key: 'cancel',
+			icon: <HiXMark />,
+			danger: true,
+			label: (
+				<Popconfirm
+					title="Bạn có chắc muốn hủy lời mời kết bạn?"
+					okText="Hủy lời mời"
+					cancelText="Thoát"
+					onConfirm={() => handleFriend({ tempt: 'cancel', relationship: 'suggest' })}
+				>
+					Hủy lời mời
+				</Popconfirm>
+			),
+		},
+	];
+	const request = [
+		{
+			key: 'accept',
+			icon: <HiArrowDownOnSquareStack />,
+			label: 'Chấp nhận lời mời',
+			onClick: () => handleFriend({ tempt: 'accept', relationship: 'suggest' }),
+		},
+		{
+			key: 'decline',
+			icon: <HiExclamationTriangle />,
+			danger: true,
+			label: (
+				<Popconfirm
+					title="Bạn có chắc muốn từ chối lời mời kết bạn?"
+					okText="Từ chối"
+					cancelText="Thoát"
+					onConfirm={() => handleFriend({ tempt: 'decline', relationship: 'suggest' })}
+				>
+					Từ chối
+				</Popconfirm>
+			),
+		},
+	];
+	const suggest = [
+		{
+			key: 'add',
+			icon: <HiUserPlus />,
+			label: 'Kết bạn',
+			onClick: () => handleFriend({ tempt: 'add', relationship: 'suggest' }),
+		},
+	];
 
 	useEffect(() => {
 		switch (relationship) {
 			case 'friend':
-				dropdownItems.unshift({
-					key: 'unfriend',
-					icon: <HiUserMinus />,
-					danger: true,
-					label: (
-						<Popconfirm
-							title="Bạn có chắc muốn hủy kết bạn?"
-							okText="Hủy kết bạn"
-							cancelText="Thoát"
-							onConfirm={handleUnfriend}
-						>
-							Hủy kết bạn
-						</Popconfirm>
-					),
-				});
+				setDropdownItems(friend);
 				break;
 			case 'sent':
-				dropdownItems.unshift({
-					key: 'cancel',
-					icon: <HiXMark />,
-					danger: true,
-					label: (
-						<Popconfirm
-							title="Bạn có chắc muốn hủy lời mời kết bạn?"
-							okText="Hủy lời mời"
-							cancelText="Thoát"
-							onConfirm={handleCancelRequestFriend}
-						>
-							Hủy lời mời
-						</Popconfirm>
-					),
-				});
+				setDropdownItems(send);
 				break;
 			case 'request':
-				dropdownItems.unshift({
-					key: 'decline',
-					icon: <HiXMark />,
-					danger: true,
-					label: (
-						<Popconfirm
-							title="Bạn có chắc muốn từ chối lời mời kết bạn?"
-							okText="Từ chối"
-							cancelText="Thoát"
-							onConfirm={handleRejectFriend}
-						>
-							Từ chối
-						</Popconfirm>
-					),
-				});
-
-				dropdownItems.unshift({
-					key: 'accept',
-					icon: <HiArrowDownOnSquareStack />,
-					label: 'Chấp nhận lời mời',
-					onClick: handleAcceptFriend,
-				});
+				setDropdownItems(request);
 				break;
 			case 'suggest':
-				dropdownItems.unshift({
-					key: 'add',
-					icon: <HiUserPlus />,
-					label: 'Kết bạn',
-					onClick: handleRequestFriend,
-				});
+				setDropdownItems(suggest);
 				break;
 			default:
 				break;
@@ -140,14 +156,14 @@ const FriendCard = ({ user, type }) => {
 			}
 			actions={[
 				<Tooltip key="profile" title="Trang cá nhân">
-					<Link to={`/profile/${user.id}`} >
+					<Link to={`/profile/${user.userId}`}>
 						<Button icon={<HiUser />} />
 					</Link>
 				</Tooltip>,
 				<Tooltip key="message" title="Nhắn tin">
 					<Button
 						icon={<HiChatBubbleOvalLeft />}
-						onClick={handleChat}
+						onClick={() => handleFriend({ tempt: 'chat', relationship: 'friend' })}
 						disabled={false}
 						loading={loading.chat}
 					/>

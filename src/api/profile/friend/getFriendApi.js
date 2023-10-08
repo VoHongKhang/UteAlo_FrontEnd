@@ -80,7 +80,7 @@ const GetFriendApi = {
 				page,
 				limit,
 			};
-			const res = await axios.post(`${BASE_URL}/v1/friend/suggestion/list`, data, config);
+			const res = await axios.post(`${BASE_URL}/v1/friend/requestFrom/list`, data, config);
 			if (res.data.success) {
 				return res.data; // Trả về dữ liệu từ thành công
 			} else {
@@ -90,7 +90,7 @@ const GetFriendApi = {
 			throw new Error(error.message);
 		}
 	},
-	deleteFriendRequest: async (token, userId) => {
+	rejectFriendRequest: async ({token, userId}) => {
 		const config = {
 			headers: {
 				'Content-Type': 'application/json',
@@ -110,7 +110,7 @@ const GetFriendApi = {
 				throw new Error(err.response.data.message);
 			});
 	},
-	acceptFriendRequest: async (token, userId) => {
+	acceptFriendRequest: async ({token, userId}) => {
 		const config = {
 			headers: {
 				'Content-Type': 'application/json',
@@ -119,6 +119,66 @@ const GetFriendApi = {
 		};
 		await axios
 			.put(`${BASE_URL}/v1/friend/request/accept/${userId}`, {}, config)
+			.then((res) => {
+				if (res.data.success) {
+					return res.data.result;
+				} else {
+					throw new Error(res.data.message);
+				}
+			})
+			.catch((err) => {
+				throw new Error(err.response.data.message);
+			});
+	},
+	sendFriendRequest: async ({token, userId}) => {
+		const config = {
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`,
+			},
+		};
+		await axios
+			.post(`${BASE_URL}/v1/friend/request/send/${userId}`, {}, config)
+			.then((res) => {
+				if (res.data.success) {
+					return res.data.result;
+				} else {
+					throw new Error(res.data.message);
+				}
+			})
+			.catch((err) => {
+				throw new Error(err.response.data.message);
+			});
+	},
+	unFriend: async ({token, userId}) => {
+		const config = {
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`,
+			},
+		};
+		await axios
+			.put(`${BASE_URL}/v1/friend/delete/${userId}`, {}, config)
+			.then((res) => {
+				if (res.data.success) {
+					return res.data.result;
+				} else {
+					throw new Error(res.data.message);
+				}
+			})
+			.catch((err) => {
+				throw new Error(err.response.data.message);
+			});
+	},
+	cancelFriendRequest: async ({token, userId}) => {
+		const config = {
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${token}`,
+			},
+		};
+		await axios
+			.put(`${BASE_URL}/v1/friend/request/cancel/${userId}`, {}, config)
 			.then((res) => {
 				if (res.data.success) {
 					return res.data.result;

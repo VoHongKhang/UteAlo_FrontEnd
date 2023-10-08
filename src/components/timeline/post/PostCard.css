@@ -206,7 +206,7 @@
 }
 
 .liked {
-  color: blue; /* Màu xanh khi đã thích */
+  color: blue; 
 }
 
 .showMoreComment {
@@ -223,7 +223,8 @@
 }
 
 #postGroupId {
-  width: 90px;
+  width: 116px;
+  font-size: 14px;
 }
 
 .shareOption-one {
@@ -232,37 +233,78 @@
 }
 
 
-/* CSS cho div bao quanh mỗi input */
 .editPost {
   margin-bottom: 20px;
 }
 
-/* CSS cho label */
+
 .labelEditPost {
   display: block;
   margin-bottom: 5px;
-  color: rgb(0, 0, 0); /* Màu sắc cho label */
+  color: rgb(0, 0, 0); 
   font-size: 16px;
   font-weight: 600;
 }
 
-/* CSS cho select */
+
 .editPost select {
   width: 100%;
   padding: 10px;
-  border: 1px solid rgb(169, 169, 169); /* Màu sắc cho viền */
+  border: 1px solid rgb(169, 169, 169);
   border-radius: 5px;
   font-size: 16px;
-  color: rgb(0, 0, 0); /* Màu sắc cho văn bản */
+  color: rgb(0, 0, 0); 
+  font-size: 14px;
 }
 
-/* CSS cho khi select được focus */
+
 .editPost select:focus {
-  border-color: rgb(0, 128, 255); /* Màu sắc cho viền khi focus */
+  border-color: rgb(0, 128, 255);
   outline: none;
+}
+
+.editPost textarea {
+  border-radius: 5px;
+  padding-top: 12px;
+  padding-left: 10px;
 }
 
 .titlEditPost {
   font-size: 20px;
   font-weight: 600;
+}
+
+.editImgContainer {
+  padding: 0 20px 10px 20px;
+  position: relative;
+}
+
+.editimg {
+  width: 100%;
+  object-fit: cover;
+}
+
+.editCancelImg {
+  position: absolute;
+  top: 0;
+  right: 20px;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.editIcon {
+  font-size: 18px;
+  margin-right: 4px;
+}
+
+.editOption {
+  display: flex;
+  align-items: center;
+  margin-right: 15px;
+  cursor: pointer;
+}
+
+.editOptionText {
+  font-size: 15px;
+  font-weight: bold;
 }

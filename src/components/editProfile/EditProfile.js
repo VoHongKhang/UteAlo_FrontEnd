@@ -114,6 +114,8 @@ const EditProfile = () => {
 		setSelectedAvatarUrl(URL.createObjectURL(file)); // Đặt URL hình ảnh avatar đã chọn
 	};
 
+	
+
 	// update user background
 	const updateBackgroundHandler = async (e) => {
 		e.preventDefault();

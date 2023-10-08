@@ -17,6 +17,7 @@ const Feed = () => {
 	const [visiblePosts, setVisiblePosts] = useState(3); // Số lượng bài viết hiển thị ban đầu
 	const { theme } = useTheme();
 
+	// Lấy danh sách bài post
 	const fetchPosts = async () => {
 		try {
 			const config = {
@@ -36,8 +37,8 @@ const Feed = () => {
 
 	useEffect(() => {
 		fetchPosts();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [currentUser.userId, currentUser.accessToken]);
+		//eslint-disable-next-line
+	}, []);
 
 	// Xử lý nạp thêm bài viết khi cuộn xuống
 	useEffect(() => {

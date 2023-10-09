@@ -23,6 +23,7 @@ const Share = ({ fetchPosts }) => {
 	const { user } = useAuth();
 	const { createPost, createLoading } = usePost();
 
+	// Xử lý ảnh của bài post
 	const postDetails = (e) => {
 		const file = e.target.files[0];
 		setPicLoading(true);
@@ -41,6 +42,7 @@ const Share = ({ fetchPosts }) => {
 		}
 	};
 
+	// Đăng bài post
 	const postSubmitHandler = async (e) => {
 		e.preventDefault();
 		try {

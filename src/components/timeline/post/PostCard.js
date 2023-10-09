@@ -55,8 +55,6 @@ const PostCard = ({ post, fetchPosts }) => {
 	const [isLiked, setIsLiked] = useState(false);
 	const [user, setUser] = useState({});
 	const [commentLoading, setCommentLoading] = useState(false);
-	const [content, setContent] = useState('');
-	const [photo, setPhoto] = useState('');
 	const { getTimelinePosts } = usePost();
 	const [comments, setCommentPost] = useState({});
 	const [commentlength, setCommentLength] = useState(post?.comments.length);
@@ -71,6 +69,10 @@ const PostCard = ({ post, fetchPosts }) => {
 	const [editPhotos, setEditPhotos] = useState('');
 	const [editPhotosUrl, setEditPhotosUrl] = useState('');
 	const [editPostGroupId, setEditPostGroupId] = useState('');
+	// Hình ảnh của bình luận
+	const [photosComment, setPhotosComment] = useState('');
+	const [photosCommetUrl, setPhotosCommetUrl] = useState('');
+	const [content, setContent] = useState('');
 
 	// Model xuất hiện khi nhấn xóa bài post
 	const showDeleteConfirm = (postId) => {
@@ -139,23 +141,26 @@ const PostCard = ({ post, fetchPosts }) => {
 	// Đăng bình luận post
 	const postCommentHandler = async () => {
 		try {
-			if (content === '') {
-				toast.error('Vui lòng nhập nội dung!', errorOptions);
+			if (!content && !photosComment) {
+				toast.error('Vui lòng nhập nội dung hoặc hình ảnh!', errorOptions);
 				return; // Dừng việc thực hiện tiếp theo nếu nội dung rỗng
 			}
-			const config = {
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${currentUser.accessToken}`,
-				},
-			};
 			setCommentLoading(true);
 			if (post.postId) {
-				const response = await axios.post(
-					`${BASE_URL}/v1/post/comment/create`,
-					{ content: content, photo: photo, postId: post.postId },
-					config
-				);
+				const formData = new FormData();
+				formData.append('content', content || '');
+				if (photosComment) {
+					formData.append('photos', photosComment);
+				}
+				const config = {
+					headers: {
+						Authorization: `Bearer ${currentUser.accessToken}`,
+						'Content-Type': 'multipart/form-data',
+					},
+				};
+				formData.append('postId', post.postId || '');
+
+				const response = await axios.post(`${BASE_URL}/v1/post/comment/create`, formData, config);
 
 				// Xử lý kết quả trực tiếp trong khối try
 				if (response.status === 200) {
@@ -172,7 +177,7 @@ const PostCard = ({ post, fetchPosts }) => {
 			setCommentLoading(false);
 			fetchCommentPost();
 			setContent('');
-			setPhoto('');
+			setPhotosComment('');
 		} catch (error) {
 			setCommentLoading(false);
 			toast.error(error.message, errorOptions);
@@ -211,8 +216,6 @@ const PostCard = ({ post, fetchPosts }) => {
 		}
 	};
 
-	console.log('editPhotos' + editPhotos);
-
 	// chỉnh sửa bài post
 	const editPostHandler = async () => {
 		const toastId = toast.loading('Đang gửi yêu cầu...');
@@ -222,22 +225,25 @@ const PostCard = ({ post, fetchPosts }) => {
 			if (post.postId) {
 				const formData = new FormData();
 				formData.append('content', editContent || '');
+				formData.append('location', editLocation || '');
 
-				// Kiểm tra xem 'editPhotos' có phải là kiểu 'string' không
-				if (typeof editPhotos === 'string') {
-					// Chuyển đổi 'editPhotos' từ URL blob thành đối tượng File
-					const file = await convertBlobURLToFile(editPhotos, 'ten_file_moi.png');
+				if (editPhotos) {
+					// Kiểm tra xem 'editPhotos' có phải là kiểu 'string' không
+					if (typeof editPhotos === 'string') {
+						// Chuyển đổi 'editPhotos' từ URL blob thành đối tượng File
+						const file = await convertBlobURLToFile(editPhotos, 'ten_file_moi.png');
 
-					if (file) {
-						// Thêm đối tượng File vào `formData`
-						formData.append('photos', file);
+						if (file) {
+							// Thêm đối tượng File vào `formData`
+							formData.append('photos', file);
+						} else {
+							console.error('Không thể chuyển đổi `editPhotos` thành đối tượng File.');
+						}
+					} else if (editPhotos instanceof File && isImage(editPhotos)) {
+						formData.append('photos', editPhotos);
 					} else {
-						console.error('Không thể chuyển đổi `editPhotos` thành đối tượng File.');
+						console.error('Tệp không phải là hình ảnh hoặc kiểu MIME không hợp lệ.');
 					}
-				} else if (editPhotos instanceof File && isImage(editPhotos)) {
-					formData.append('photos', editPhotos);
-				} else {
-					console.error('Tệp không phải là hình ảnh hoặc kiểu MIME không hợp lệ.');
 				}
 
 				formData.append('postGroupId', editPostGroupId || 0);
@@ -287,17 +293,33 @@ const PostCard = ({ post, fetchPosts }) => {
 		}
 	}
 
+	// Xử lý hình ảnh của bài post
 	const postDetails = (e) => {
 		const file = e.target.files[0];
 		if (file === undefined) {
-			toast.error('Please Select an Image!');
+			toast.error('Vui lòng chọn ảnh!');
 			return;
 		}
 		if (file.type === 'image/jpeg' || file.type === 'image/png') {
 			setEditPhotos(file);
 			setEditPhotosUrl(URL.createObjectURL(file));
 		} else {
-			toast.error('Please select an image with png/jpg type');
+			toast.error('Xin hãy chọn ảnh theo đúng định dạng png/jpg');
+		}
+	};
+
+	// Xử lý hình ảnh của bình luận
+	const commentDetails = (e) => {
+		const file = e.target.files[0];
+		if (file === undefined) {
+			toast.error('Vui lòng chọn ảnh!');
+			return;
+		}
+		if (file.type === 'image/jpeg' || file.type === 'image/png') {
+			setPhotosComment(file);
+			setPhotosCommetUrl(URL.createObjectURL(file));
+		} else {
+			toast.error('Xin hãy chọn ảnh theo đúng định dạng png/jpg');
 		}
 	};
 
@@ -355,8 +377,10 @@ const PostCard = ({ post, fetchPosts }) => {
 							<span className="postUsername">{user.fullName}</span>
 							<span className="postDate">{formatTime(post.postTime)}</span>
 						</div>
-						<span className="postLocation">• {post.location || 'Vị trí'}</span>
-						<span className="postGroupName">• {post.postGroupId}</span>
+						<div className="postLoAndName">
+							<span className="postLocation">• {post.location || 'Vị trí'}</span>
+							<span className="postGroupName">• {post.postGroupName}</span>
+						</div>
 					</div>
 					<div className="postTopRight">
 						{currentUser.userId === post.userId ? (
@@ -497,7 +521,23 @@ const PostCard = ({ post, fetchPosts }) => {
 				<div className="postCommentCont">
 					<div className="postCommentCont-1">
 						<InputEmoji value={content} onChange={setContent} placeholder={`Viết bình luận ....`} />
+						{photosComment && (
+							<div className="shareImgContainer">
+								<img className="shareimg" src={photosCommetUrl} alt="..." />
+								<Cancel className="shareCancelImg" onClick={() => setPhotosComment(null)} />
+							</div>
+						)}
 					</div>
+					<label htmlFor="fileComment" className="shareOption">
+						<PermMedia htmlColor="tomato" className="shareIcon" />
+						<input
+							style={{ display: 'none' }}
+							type="file"
+							id="fileComment"
+							accept=".png, .jpeg, .jpg"
+							onChange={commentDetails}
+						/>
+					</label>
 					<div className="postCommentCont-2">
 						<button
 							className="postCommentBtn"

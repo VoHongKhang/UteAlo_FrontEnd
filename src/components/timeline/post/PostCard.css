@@ -40,11 +40,20 @@
   display: block;
 }
 
-.postLocation {
+.postLoAndName {
   font-size: 12px;
   font-weight: bold;
   color: green;
-  margin-left: 10px;
+  margin-left: 16px;
+}
+
+.postLocation {
+  display: block;
+  font-size: 12px;
+}
+
+.postGroupName {
+  font-size: 12px;
 }
 
 .postPostGroupId {
@@ -71,6 +80,14 @@
   width: 100%;
   max-height: 500px;
   object-fit: contain;
+}
+
+.commentImg {
+  width: 230px;
+  height: 210px;
+  max-height: 500px;
+  object-fit: contain;
+  display: block;
 }
 
 .postBottom {
@@ -178,11 +195,23 @@
   margin-top: -20px;
 }
 
-.postCommentTextDelete {
-  margin-left: 30px;
+.postCommentTextDelete, .postCommentTextUpdate, .postCommentReply {
+  margin-left: 6px;
   cursor: pointer;
   font-weight: bold;
   color: #65676B;
+}
+
+.postCommentTextDelete {
+  margin-bottom: 10px;
+}
+
+.postCommentReply {
+  margin-left: 14px;
+}
+
+.postCommentTextUpdate {
+  margin-top: 10px;
 }
 
 .postCommentUserName {
@@ -307,4 +336,67 @@
 .editOptionText {
   font-size: 15px;
   font-weight: bold;
+}
+
+.shareIcon {
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.shareOption {
+  margin-right: 10px;
+}
+
+.handleToggleCommentOptions {
+  font-size: 20px;
+  font-weight: 600;
+  margin: auto;
+  margin-left: 20px;
+  cursor: pointer;
+}
+
+#comment {
+  display: flex;
+}
+
+.commentOption {
+  display: none;
+  position: absolute;
+  background-color: white;
+  -webkit-box-shadow: 0px 0px 17px -8px rgba(0, 0, 0, 0.67);
+  box-shadow: 0px 0px 17px -8px rgba(0, 0, 0, 0.67);
+  z-index: 1;
+  border-radius: 10px;
+  margin-top: 14px;
+  padding-right: 50px;
+}
+
+
+.commentOption:after {
+  content: "";
+  position: absolute;
+  top: -19px; /* Khoảng cách từ tam giác đến commentOption */
+  left: 20%; /* Ở giữa đỉnh */
+  transform: translateX(-50%); /* Dịch chuyển 50% chiều ngang để căn giữa */
+  border-width: 10px; /* Độ dài của tam giác */
+  border-style: solid;
+  border-color: transparent transparent white transparent;
+}
+
+.comment {
+  margin-top: 24px;
+}
+
+.comment:hover .commentOption {
+  display: block;
+}
+
+.commentOption span {
+  display: block;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.commentOption span:hover {
+  background-color: #f0f0f0;
 }

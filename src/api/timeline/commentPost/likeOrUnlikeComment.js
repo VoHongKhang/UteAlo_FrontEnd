@@ -20,7 +20,7 @@ const LikeOrUnlikeCommentApi = {
                 }
             })
             .catch((err) => {
-                throw new Error(err.response.data.message);
+                throw new Error(err);
             });
     }
 

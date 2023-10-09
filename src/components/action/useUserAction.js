@@ -1,47 +1,32 @@
-import { useEffect, useState } from 'react';
 import { toast } from 'react-hot-toast';
-const useUserAction = (user) => {
-	const [relationship, setRelationship] = useState(user.relationship || 'none');
-	useEffect(() => {
-		setRelationship(user.relationship || 'none');
-	}, [user.relationship]);
-	const [loading, setLoadingState] = useState(false);
-	const setLoading = (key, value) => setLoadingState((prev) => ({ ...prev, [key]: value }));
-
-	const handleRequestFriend = async () => {
+import GetFriendApi from '../../api/profile/friend/getFriendApi.js';
+const userAction = ({currentUser,user,action}) => {
+	const handleRequestFriend = async ({currentUser,user}) => {
+		
 		const toastId = toast.loading('Đang gửi lời mời kết bạn...');
-		setLoading('request', true);
 
 		try {
-			//await requestFriendApi(user._id);
+			await GetFriendApi.sendFriendRequest({ token: currentUser.accessToken, userId: user.userId });
 			toast.success('Gửi lời mời kết bạn thành công!', { id: toastId });
-			setRelationship('sent');
 		} catch (error) {
 			toast.error(error.message || error.toString(), { id: toastId });
 		}
-
-		setLoading('request', false);
 	};
 
-	const handleUnfriend = async () => {
+	const handleUnfriend = async ({currentUser,user}) => {
 		const toastId = toast.loading('Đang hủy kết bạn...');
-		setLoading('unfriend', true);
 
 		try {
-			//await unFriendApi(user._id);
+			await GetFriendApi.unFriend({ token: currentUser.accessToken, userId: user.userId });
 			toast.success('Hủy kết bạn thành công!', { id: toastId });
-			setRelationship('none');
 		} catch (error) {
 			toast.error(error.message || error.toString(), { id: toastId });
 		}
-
-		setLoading('unfriend', false);
 	};
 
-	//const router = useRouter();
-	const handleChat = async () => {
+	const handleChat = async ({currentUser,user}) => {
+		console.log('handleChat', user);
 		const toastId = toast.loading('Đang chuyển hướng đến trang nhắn tin...');
-		setLoading('chat', true);
 
 		try {
 			//const created = await createConversationApi({ members: [{ user: user._id }] });
@@ -52,62 +37,54 @@ const useUserAction = (user) => {
 			toast('Có lỗi xảy ra, vui lòng thử lại sau', { id: toastId });
 		}
 
-		setLoading('chat', false);
 	};
 
-	const handleAcceptFriend = async () => {
+	const handleAcceptFriend = async ({currentUser,user}) => {
 		const toastId = toast.loading('Đang xác nhận lời mời kết bạn...');
-		setLoading('accept', true);
 
 		try {
-			//await acceptFriendApi(user._id);
+			await GetFriendApi.acceptFriendRequest({ token: currentUser.accessToken, userId: user.userId });
 			toast.success('Xác nhận lời mời kết bạn thành công! Bạn bè với nhau rồi đó!', { id: toastId });
-			setRelationship('friend');
 		} catch (error) {
 			toast.error(error.message || error.toString(), { id: toastId });
 		}
-
-		setLoading('accept', false);
 	};
 
-	const handleRejectFriend = async () => {
+	const handleRejectFriend = async ({currentUser,user}) => {
 		const toastId = toast.loading('Đang từ chối lời mời kết bạn...');
-		setLoading('reject', true);
 
 		try {
-			//await rejectFriendApi(user._id);
+			await GetFriendApi.rejectFriendRequest({ token: currentUser.accessToken, userId: user.userId });
 			toast.success('Từ chối lời mời kết bạn thành công!', { id: toastId });
-			setRelationship('none');
 		} catch (error) {
 			toast.error(error.message || error.toString(), { id: toastId });
 		}
-
-		setLoading('reject', false);
 	};
 
-	const handleCancelRequestFriend = async () => {
+	const handleCancelRequestFriend = async ({currentUser,user}) => {
 		const toastId = toast.loading('Đang hủy lời mời kết bạn...');
-		setLoading('cancel', true);
-
 		try {
-			//await requestFriendApi(user._id); // Request friend again to cancel
+			await GetFriendApi.cancelFriendRequest({ token: currentUser.accessToken, userId: user.userId });
 			toast.success('Hủy lời mời kết bạn thành công!', { id: toastId });
-			setRelationship('none');
 		} catch (error) {
 			toast.error(error.message || error.toString(), { id: toastId });
 		}
+	};
 
-		setLoading('cancel', false);
-	};
-	return {
-		relationship,
-		loading,
-		handleRequestFriend,
-		handleUnfriend,
-		handleChat,
-		handleAcceptFriend,
-		handleRejectFriend,
-		handleCancelRequestFriend,
-	};
+	switch (action) {
+		case 'unfriend':
+			return handleUnfriend({currentUser,user});
+		case 'cancel':
+			return handleCancelRequestFriend({currentUser,user});
+		case 'accept':
+			return handleAcceptFriend({currentUser,user});
+		case 'decline':
+			return handleRejectFriend({currentUser,user});
+			case 'add':
+			return handleRequestFriend({currentUser,user});
+		default:
+			return null;
+	}
+	
 };
-export default useUserAction;
+export default userAction;

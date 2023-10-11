@@ -1,62 +1,64 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import FriendApi from '../../api/friends/FriendApi';
 
 export const useFetcher = ({ currentUser, api, limit = 21, params = {}, page }) => {
-	const [data, setData] = useState([]);
-	const [dataEnd, setDataEnd] = useState();
 	const [fetching, setFetching] = useState(false);
-	const [updateData, setUpdateData] = useState([]);
-	useEffect(() => {
-		const getData = async () => {
-			setFetching(true);
-			await FriendApi({ currentUser, api, limit, page }).then((res) => {
-				setFetching(false);
-				if(res.result.length >1) {
-					setData(res.result.splice(0, res.result.length - 1));
-					setDataEnd(res.result[res.result.length - 1]);
-				}
-				else {
-					setData(res.result);
-					setDataEnd(undefined);
-				}
-			});
-		};
-		getData();
-	}, [limit, api, page, currentUser]);
-	const hasMore = dataEnd !== undefined ? true : false;
-	useEffect(() => {
-		if(updateData!==undefined&& data.length>0 && dataEnd!==undefined){
-			setUpdateData([...updateData,...data,dataEnd]);
-		}
-		else if(updateData!==undefined&& data.length>0){
-			setUpdateData([...updateData,...data]);
-		}
-		else if(updateData!==undefined&& dataEnd!==undefined){
-			setUpdateData([...updateData,dataEnd]);
-		}
-		else if(updateData!==undefined){
-			setUpdateData([...updateData]);
-		}
-		else if(data.length>0 && dataEnd!==undefined){
-			setUpdateData([...data,dataEnd]);
-		}
-		else if(data.length>0){
-			setUpdateData([...data]);
-		}
-		else if(dataEnd!==undefined){
-			setUpdateData([dataEnd]);
-		}
-		else{
-			setUpdateData([]);
-		}
-			
-	}, [page,api]);
-	console.log(updateData);
+	const [fulldata, setFullData] = useState([]);
+	const [fitterData, setFitterData] = useState([]);
+	const [data, setData] = useState([]);
 	const [loadingMore, setLoadingMore] = useState(false);
 	const loadMore = () => {
 		if (loadingMore || !hasMore) return;
 		setLoadingMore(true);
 	};
+
+	let hasMore = limit * (page + 1) < fulldata.length;
+	const getData = useCallback(async () => {
+		setFetching(true);
+		try {
+			const res = await FriendApi({ currentUser, api });
+			// cắt res.result theo limit
+			setFullData(res.result);
+			setData(res.result.slice(0, limit));
+		} catch (error) {
+			console.error('Lỗi khi lấy dữ liệu:', error);
+		} finally {
+			setFetching(false);
+		}
+	}, [api, currentUser, limit]);
+
+	useEffect(() => {
+		getData();
+	}, [getData]);
+
+	// xử lý fitter
+	useEffect(() => {
+		if (Object.keys(params).length !== 0) {
+			let content = fulldata?.filter((data) =>
+				data.username.toLocaleLowerCase().includes(params.key.toLocaleLowerCase().trim())
+			);
+			if (content.length > 0) {
+				setFitterData(content);
+				setData(content.slice(0, limit));
+			} else setData([]);
+		}
+	}, [params]);
+	let getPageData = (data, fullData, page, limit) => {
+		if (fullData.length > limit * (page + 1))
+			setData([...data, ...fullData.slice(limit * page, limit * (page + 1))]);
+		else setData([...data, ...fullData.slice(limit * page, fullData.length)]);
+	};
+	useEffect(() => {
+		setLoadingMore(true);
+		if (page > 0) {
+			if (fitterData.length === 0) {
+				getPageData(data, fulldata, page, limit);
+			} else {
+				getPageData(data, fitterData, page, limit);
+			}
+		}
+		setLoadingMore(false);
+	}, [api, currentUser, page]);
 
 	return {
 		data,
@@ -64,7 +66,6 @@ export const useFetcher = ({ currentUser, api, limit = 21, params = {}, page }) 
 		fetching,
 		loadingMore,
 		hasMore,
-		updateData,
 		loadMore,
 		api,
 	};

@@ -1,15 +1,15 @@
 import GetFriendApi from '../profile/friend/getFriendApi';
 
-const FriendApi = async ({ currentUser, api, limit, page }) => {
+const FriendApi = async ({ currentUser, api }) => {
 	switch (api) {
 		case 'request':
-			return await GetFriendApi.getListFriendRequest({ user: currentUser, limit: limit, page: page });
+			return await GetFriendApi.getListFriendRequest({ user: currentUser});
 		case 'sent':
-			return await GetFriendApi.getSendFriendRequest({ user: currentUser, limit: limit, page: page });
+			return await GetFriendApi.getSendFriendRequest({ user: currentUser});
 		case 'suggest':
-			return await GetFriendApi.getSuggestionFriend({ user: currentUser, limit: limit, page: page });
+			return await GetFriendApi.getSuggestionFriend({ user: currentUser });
 		default:
-			return await GetFriendApi.getFriend({ user: currentUser, limit: limit, page: page });
+			return await GetFriendApi.getFriend({ user: currentUser });
 	}
 };
 export default FriendApi;

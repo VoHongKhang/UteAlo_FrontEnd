@@ -94,7 +94,15 @@ function InforFormStudents({ onSubmit ,loading}) {
 				>
 					<Input />
 				</Form.Item>
-				<Form.Item label="Tên lớp" name="groupName">
+				<Form.Item label="Tên lớp" name="groupName"
+				rules={
+					[
+						{
+							required: true,
+							message: 'Vui lòng nhập tên lớp!',
+						},
+					]
+				}>
 					<Select
 						showSearch
 						ptionfilterprop="label"

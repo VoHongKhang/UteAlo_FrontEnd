@@ -1,21 +1,17 @@
-import { Button, Card, Form, Input, List, Select, Space } from 'antd';
+import { Button, Card, Input, List, Space } from 'antd';
 import React, { useRef, useState, useEffect } from 'react';
 import FriendCard from './FriendCard.js';
 import { useFetcher } from '../../action/userFetcher.js';
 
-const ListFriend = ({currentUser, type, title = 'Danh sách bạn bè' }) => {
-	
-	const [filter, setFilter] = useState({ sort: 'desc', gender: '' });
+const ListFriend = ({ currentUser, type, title = 'Danh sách bạn bè' }) => {
+	const [filter, setFilter] = useState();
 	const typingRef = useRef(null);
-	const [loadingMore, setLoadingMore] = useState(false);
 	const [more, setMore] = useState(0);
-	const [data, setData] = useState([]);
+	const friendFetcher = useFetcher({ currentUser: currentUser, api: type, params: filter, limit: 5, page: more });
+
 	const loadMore = () => {
-		if (loadingMore) return;
-		setLoadingMore(true);
+		if (friendFetcher.loadingMore) return;
 		setMore(more + 1);
-		setData(data.concat(friendFetcher.data));
-		setLoadingMore(false);
 	};
 	const handleSearch = (e) => {
 		const value = e.target.value;
@@ -25,55 +21,15 @@ const ListFriend = ({currentUser, type, title = 'Danh sách bạn bè' }) => {
 			setFilter({ ...filter, key: value });
 		}, 300);
 	};
-	useEffect(() => {
-		console.log(filter);
-		// call api get friend list
 
-	}, [filter]);
-
-	const friendFetcher = useFetcher({currentUser: currentUser ,api: type, params: filter ,limit: 2,page: more});
 	useEffect(() => {
-		setData(friendFetcher.data);
-	}, [friendFetcher.data]);
-	console.log("Data",friendFetcher.data);
-	console.log("update Data",friendFetcher.updateData);
-	console.log(friendFetcher.hasMore);
+		setMore(0);
+	}, [type, currentUser,filter]);
+
 	return (
 		<Card title={title} headStyle={{ padding: '0 16px' }} bodyStyle={{ padding: 8 }}>
 			<Space direction="vertical" style={{ width: '100%' }}>
 				<Input.Search placeholder="Tìm kiếm bạn bè" onChange={handleSearch} />
-
-				<Form
-					layout="inline"
-					style={{ float: 'right' }}
-					size="small"
-					initialValues={{ sort: 'desc', gender: '' }}
-					onValuesChange={(_, values) => setFilter({ ...filter, ...values })}
-				>
-					<Form.Item label="Sắp xếp" name="sort">
-						<Select
-							options={[
-								{ label: 'Mới nhất', value: 'desc' },
-								{ label: 'Cũ nhất', value: 'asc' },
-							]}
-							showSearch={false}
-							style={{ width: 120 }}
-						/>
-					</Form.Item>
-
-					<Form.Item label="Giới tính" name="gender">
-						<Select
-							options={[
-								{ label: 'Tất cả', value: '' },
-								{ label: 'Nam', value: 'male' },
-								{ label: 'Nữ', value: 'female' },
-								{ label: 'Khác', value: 'other' },
-							]}
-							showSearch={false}
-							style={{ width: 120 }}
-						/>
-					</Form.Item>
-				</Form>
 
 				<List
 					itemLayout="horizontal"
@@ -92,7 +48,7 @@ const ListFriend = ({currentUser, type, title = 'Danh sách bạn bè' }) => {
 								<Button
 									size="small"
 									onClick={loadMore}
-									loading={loadingMore}
+									loading={friendFetcher.loadingMore}
 									disabled={!friendFetcher.hasMore}
 								>
 									{friendFetcher.hasMore ? 'Xem thêm' : 'Hết rồi'}

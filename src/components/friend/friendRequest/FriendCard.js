@@ -56,7 +56,6 @@ const FriendCard = ({ user, type }) => {
 		suggest: 'info',
 		you: 'secondary',
 	};
-	useEffect(() => {}, [user, type]);
 	const [dropdownItems, setDropdownItems] = useState([]);
 	const friend = [
 		{
@@ -97,7 +96,7 @@ const FriendCard = ({ user, type }) => {
 			key: 'accept',
 			icon: <HiArrowDownOnSquareStack />,
 			label: 'Chấp nhận lời mời',
-			onClick: () => handleFriend({ tempt: 'accept', relationship: 'suggest' }),
+			onClick: () => handleFriend({ tempt: 'accept', relationship: 'friend' }),
 		},
 		{
 			key: 'decline',
@@ -120,7 +119,7 @@ const FriendCard = ({ user, type }) => {
 			key: 'add',
 			icon: <HiUserPlus />,
 			label: 'Kết bạn',
-			onClick: () => handleFriend({ tempt: 'add', relationship: 'suggest' }),
+			onClick: () => handleFriend({ tempt: 'add', relationship: 'sent' }),
 		},
 	];
 

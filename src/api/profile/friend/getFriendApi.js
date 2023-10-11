@@ -3,18 +3,9 @@ import { BASE_URL } from '../../../context/apiCall';
 
 //get 10 friend
 const GetFriendApi = {
-	getFriend: async ({ user, limit, page }) => {
+	getFriend: async ({ user}) => {
 		try {
-			const config = {
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			};
-			const data = {
-				page,
-				limit,
-			};
-			const res = await axios.post(`${BASE_URL}/v1/friend/list/${user.userId}`, data, config);
+			const res = await axios.get(`${BASE_URL}/v1/friend/list/${user.userId}`);
 			if (res.data.success) {
 				return res.data; // Trả về dữ liệu từ thành công
 			} else {
@@ -24,7 +15,7 @@ const GetFriendApi = {
 			throw new Error(err.response.data.message);
 		}
 	},
-	getListFriendRequest: async ({ user, limit, page }) => {
+	getListFriendRequest: async ({ user }) => {
 		try {
 			const config = {
 				headers: {
@@ -32,11 +23,26 @@ const GetFriendApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const data = {
-				page,
-				limit,
+			const res = await axios.get(`${BASE_URL}/v1/friend/request/list`, config);
+			if (res.data.success) {
+				console.log(res.data);
+				return res.data; // Trả về dữ liệu từ thành công
+			} else {
+				throw new Error(res.data.message);
+			}
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	},
+	getSuggestionFriend: async ({ user}) => {
+		try {
+			const config = {
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${user.accessToken}`,
+				},
 			};
-			const res = await axios.post(`${BASE_URL}/v1/friend/request/list`, data, config);
+			const res = await axios.get(`${BASE_URL}/v1/friend/suggestion/list`, config);
 			if (res.data.success) {
 				return res.data; // Trả về dữ liệu từ thành công
 			} else {
@@ -46,7 +52,7 @@ const GetFriendApi = {
 			throw new Error(error.message);
 		}
 	},
-	getSuggestionFriend: async ({ user, limit, page }) => {
+	getSendFriendRequest: async ({ user}) => {
 		try {
 			const config = {
 				headers: {
@@ -54,33 +60,7 @@ const GetFriendApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const data = {
-				page,
-				limit,
-			};
-			const res = await axios.post(`${BASE_URL}/v1/friend/suggestion/list`, data, config);
-			if (res.data.success) {
-				return res.data; // Trả về dữ liệu từ thành công
-			} else {
-				throw new Error(res.data.message);
-			}
-		} catch (error) {
-			throw new Error(error.message);
-		}
-	},
-	getSendFriendRequest: async ({ user, limit, page }) => {
-		try {
-			const config = {
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${user.accessToken}`,
-				},
-			};
-			const data = {
-				page,
-				limit,
-			};
-			const res = await axios.post(`${BASE_URL}/v1/friend/requestFrom/list`, data, config);
+			const res = await axios.get(`${BASE_URL}/v1/friend/requestFrom/list`,config);
 			if (res.data.success) {
 				return res.data; // Trả về dữ liệu từ thành công
 			} else {

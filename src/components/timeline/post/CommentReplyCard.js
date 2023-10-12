@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import './PostCard.css';
 import sampleProPic from '../../../assets/appImages/user.png';
 import axios from 'axios';
@@ -14,17 +14,8 @@ import { errorOptions } from '../../utils/toastStyle';
 import { Send } from '@material-ui/icons';
 import InputEmoji from 'react-input-emoji';
 import { successOptions } from '../../utils/toastStyle';
-import GetCommentReplyApi from '../../../api/timeline/commentPost/getCommentReply';
-import CommentReplyCard from './CommentReplyCard';
 
-const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength }) => {
-	const isMounted = useRef(true);
-	useEffect(() => {
-		return () => {
-			// Cleanup: Set isMounted to false when the component unmounts
-			isMounted.current = false;
-		};
-	}, []);
+const CommentCard = ({ commentReply, fetchCommentReply, comment, onDelete, commentReplyLength }) => {
 	const { user: currentUser } = useAuth();
 
 	// Hàm kiểm tra xem người dùng đã like bài comment chưa
@@ -37,7 +28,7 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength 
 				},
 			};
 
-			const response = await axios.get(`${BASE_URL}/v1/comment/like/checkUser/${comment.commentId}`, config);
+			const response = await axios.get(`${BASE_URL}/v1/comment/like/checkUser/${commentReply.commentId}`, config);
 			const responseData = response.data;
 			const resultValue = responseData.result;
 
@@ -46,7 +37,7 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength 
 			console.error(error);
 			throw error;
 		}
-	}, [currentUser.accessToken, comment.commentId]);
+	}, [currentUser.accessToken, commentReply.commentId]);
 
 	const [isLikedComment, setIsLikedComment] = useState(false);
 	const [likeComment, setLikeComment] = useState(comment.likes?.length || 0);
@@ -66,11 +57,11 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength 
 	const [photosComment, setPhotosComment] = useState('');
 	const [photosCommetUrl, setPhotosCommetUrl] = useState('');
 	const [content, setContent] = useState('');
-	const [commentReplies, setCommentReplies] = useState({});
+	const [comments, setCommentPost] = useState({});
 
 	// Model xuất hiện khi nhấn chỉnh sửa bài post
-	const showDeleteConfirm = (commentId) => {
-		setCommentIdToDelete(commentId);
+	const showDeleteConfirm = (commentReply) => {
+		setCommentIdToDelete(commentReply);
 		setIsModalVisible(true);
 	};
 
@@ -112,7 +103,7 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength 
 	const deleteCommentPostHandler = async (commentId, userId) => {
 		const toastId = toast.loading('Đang gửi yêu cầu...');
 		try {
-			if (userId !== currentUser.userId && currentUser.userId !== post.userId) {
+			if (userId !== currentUser.userId && currentUser.userId !== commentReply.userId) {
 				toast.error('Bạn không có quyền xóa comment này!', { id: toastId });
 				return;
 			}
@@ -122,16 +113,16 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength 
 			commentDelete.innerHTML = '';
 
 			// Gọi hàm callback để cập nhật commentLength trong PostCard
-			onDelete(commentLength - 1);
+			onDelete(commentReplyLength - 1);
 
 			toast.success('Xóa bình luận thành công', { id: toastId });
 		} catch (error) {
 			toast.error(`Gửi yêu thất bại! Lỗi: ${error}`, { id: toastId });
 		}
-		fetchCommentPost();
+		fetchCommentReply();
 	};
 
-	// Phản hồi bình luận
+	// Phản hồi bình luận 
 	const postCommentHandler = async () => {
 		try {
 			if (!content && !photosComment) {
@@ -139,7 +130,7 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength 
 				return; // Dừng việc thực hiện tiếp theo nếu nội dung rỗng
 			}
 			setCommentLoading(true);
-			if (post.postId) {
+			if (comment.commentId) {
 				const formData = new FormData();
 				formData.append('content', content || '');
 				if (photosComment) {
@@ -151,7 +142,7 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength 
 						'Content-Type': 'multipart/form-data',
 					},
 				};
-				formData.append('postId', post.postId || '');
+				formData.append('postId', commentReply.commentId || '');
 
 				const response = await axios.post(`${BASE_URL}/v1/post/comment/create`, formData, config);
 
@@ -159,7 +150,7 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength 
 				if (response.status === 200) {
 					const newComment = response.data.result;
 					// Thêm mới comment vào object comments
-					setCommentReplies({ ...commentReplies, [newComment.commentId]: newComment });
+					setCommentPost({ ...comments, [newComment.commentId]: newComment });
 					//setCommentLength(commentlength + 1);
 					toast.success('Đăng bình luận thành công!', successOptions);
 				} else {
@@ -168,7 +159,7 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength 
 				}
 			}
 			setCommentLoading(false);
-			fetchCommentPost();
+			fetchCommentReply();
 			setContent('');
 			setPhotosComment('');
 		} catch (error) {
@@ -184,7 +175,7 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength 
 			toast.error('Vui lòng chọn ảnh!');
 			return;
 		}
-		if (file.size > 1024 * 1024) {
+        if (file.size > 1024 * 1024) {
 			// 1MB = 1024 * 1024 bytes
 			toast.error('Vui lòng chọn ảnh dưới 1MB', errorOptions);
 			return; // Ngăn việc tiếp tục xử lý nếu kích thước vượt quá 1MB
@@ -197,7 +188,7 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength 
 		}
 	};
 
-	// Xử lý hình ảnh của phản hồi bình luận
+	// Xử lý hình ảnh của phản hồi bình luận 
 	const commentReplyDetails = async (e) => {
 		const file = e.target.files[0];
 		if (file === undefined) {
@@ -216,7 +207,7 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength 
 	const editCommentHandler = async () => {
 		const toastId = toast.loading('Đang gửi yêu cầu...');
 		try {
-			if (comment.commentId) {
+			if (commentReply.commentId) {
 				const formData = new FormData();
 				formData.append('content', editContent || '');
 
@@ -247,7 +238,7 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength 
 				};
 				setIsEditModalVisible(false);
 				const response = await axios.put(
-					`${BASE_URL}/v1/post/comment/update/${comment.commentId}`,
+					`${BASE_URL}/v1/post/comment/update/${commentReply.commentId}`,
 					formData,
 					config
 				);
@@ -257,7 +248,7 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength 
 					toast.success('Chỉnh sửa bài đăng thành công!', { id: toastId });
 
 					// Fetch lại danh sách bình luận sau khi chỉnh sửa
-					fetchCommentPost();
+					fetchCommentReply();
 				} else {
 					// Xử lý trường hợp API trả về lỗi
 					toast.error(response.message, { id: toastId });
@@ -290,24 +281,6 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength 
 		setShowOptions(!showOptions);
 	};
 
-	// lấy danh sách phản hồi bình luận của bình luận trên bài post
-	const fetchCommentReply = async () => {
-		try {
-			const res = await GetCommentReplyApi.getCommentReply(comment.commentId);
-			if (isMounted.current) {
-				setCommentReplies(res);
-			}
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	// lấy danh sách bình luận trên bài post
-	useEffect(() => {
-		fetchCommentReply();
-		//eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [currentUser.userId, currentUser.accessToken]);
-
 	// Xử lý thời gian
 	function formatTime(time) {
 		const postTime = moment(time);
@@ -330,77 +303,68 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength 
 	const likeButtonClass = isLikedComment ? 'liked' : 'not-liked';
 
 	return (
-		<div id="comment" className={`comment_${comment.commentId}`} key={comment.commentId}>
+		<div id="comment" className={`comment_${commentReply.commentId}`} key={commentReply.commentId}>
 			<div className="postCommentsBox">
 				<div>
 					<div className="postCommentInfo">
 						<div className="postCommentUser">
-							<img className="postProfileImg" src={comment.userAvatar || sampleProPic} alt="..." />
-							<span className="postCommentUserName">{comment.userName}</span>
+							<img className="postProfileImg" src={commentReply.userAvatar || sampleProPic} alt="..." />
+							<span className="postCommentUserName">{commentReply.userName}</span>
 						</div>
 						<div className="postCommentContent">
-							<span>{comment.content}</span>
-							{comment.photos && <img className="commentImg" src={comment.photos} alt="..." />}
+							<span>{commentReply.content}</span>
+							{commentReply.photos && <img className="commentImg" src={commentReply.photos} alt="..." />}
 						</div>
 					</div>
 
 					<div className="postCommentAction">
-						<span className="postCommentDate">{formatTime(comment.createTime)}</span>
+						<span className="postCommentDate">{formatTime(commentReply.createTime)}</span>
 						<span
 							className={`postCommentLike ${likeButtonClass}`}
-							onClick={() => likeCommentHandler(comment.commentId)}
+							onClick={() => likeCommentHandler(commentReply.commentId)}
 						>
 							{isLikedComment ? 'Đã thích' : 'Thích'}
 						</span>
-						<span
-							className="postCommentReply"
-							onClick={() => setIsReplyCommentVisible(!isReplyCommentVisible)}
-						>
-							Phản hồi
-						</span>
-
-						{isReplyCommentVisible && (
-							<div className="postCommentCont">
-								<div className="postCommentCont-1">
-									<InputEmoji
-										value={content}
-										onChange={setContent}
-										placeholder={`Viết bình luận ....`}
-									/>
-									{photosComment && (
-										<div className="shareImgContainer">
-											<img className="shareimg" src={photosCommetUrl} alt="..." />
-											<Cancel className="shareCancelImg" onClick={() => setPhotosComment(null)} />
-										</div>
-									)}
-								</div>
-								<label htmlFor="fileComment" className="shareOption">
-									<PermMedia htmlColor="tomato" className="shareIcon" />
-									<input
-										style={{ display: 'none' }}
-										type="file"
-										id="fileComment"
-										accept=".png, .jpeg, .jpg"
-										onChange={commentReplyDetails}
-									/>
-								</label>
-								<div className="postCommentCont-2">
-									<button
-										className="postCommentBtn"
-										onClick={postCommentHandler}
-										disabled={commentLoading ? true : false}
-									>
-										<Send style={{ fontSize: '18px' }} />
-									</button>
-								</div>
+						<span className="postCommentReply" onClick={() => setIsReplyCommentVisible(!isReplyCommentVisible)}>Phản hồi</span>
+						
+						
+						{isReplyCommentVisible && ( <div className="postCommentCont">
+							<div className="postCommentCont-1">
+								<InputEmoji value={content} onChange={setContent} placeholder={`Viết bình luận ....`}/>
+								{photosComment && (
+									<div className="shareImgContainer">
+										<img className="shareimg" src={photosCommetUrl} alt="..." />
+										<Cancel className="shareCancelImg" onClick={() => setPhotosComment(null)} />
+									</div>
+								)}
 							</div>
-						)}
+							<label htmlFor="fileComment" className="shareOption">
+								<PermMedia htmlColor="tomato" className="shareIcon" />
+								<input
+									style={{ display: 'none' }}
+									type="file"
+									id="fileComment"
+									accept=".png, .jpeg, .jpg"
+									onChange={commentReplyDetails}
+								/>
+							</label>
+							<div className="postCommentCont-2">
+								<button
+									className="postCommentBtn"
+									onClick={postCommentHandler}
+									disabled={commentLoading ? true : false}
+								>
+									<Send style={{ fontSize: '18px' }} />
+								</button>
+							</div>
+						</div> )}
+
 
 						<Modal
 							title="Xác nhận xóa"
 							open={isModalVisible}
 							onOk={() => {
-								deleteCommentPostHandler(commentIdToDelete, comment.userId);
+								deleteCommentPostHandler(commentIdToDelete, commentReply.userId);
 								setIsModalVisible(false);
 							}}
 							onCancel={() => setIsModalVisible(false)}
@@ -459,28 +423,15 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength 
 					<div className="commentOption">
 						<span
 							className="postCommentTextUpdate"
-							onClick={() => showEditModal(comment.content, comment.photos)}
+							onClick={() => showEditModal(commentReply.content, commentReply.photos)}
 						>
 							Chỉnh sửa
 						</span>
-						<span className="postCommentTextDelete" onClick={() => showDeleteConfirm(comment.commentId)}>
+						<span className="postCommentTextDelete" onClick={() => showDeleteConfirm(commentReply.commentId)}>
 							Xóa
 						</span>
 					</div>
 				)}
-			</div>
-
-			<div className="commentReply">
-				{Object.values(commentReplies).map((commentReply) => (
-					<CommentReplyCard
-						commentReply={commentReply}
-						fetchCommentReply={fetchCommentReply}
-						comment={comment}
-						key={commentReply.commentId}
-						// onDelete={updateCommentLength}
-						// commentLength={commentlength}
-					/>
-				))}
 			</div>
 		</div>
 	);

@@ -94,11 +94,11 @@ const Feed = () => {
 					visiblePostData.map((p) => <PostCard post={p} key={p.postId} fetchPosts={fetchPosts} />)
 				)}
 
-				{sharePosts.length === 0 ? (
-					<h2 style={{ marginTop: '20px' }}>No posts yet!</h2>
+				{/* {sharePosts.length === 0 ? (
+					<h2 style={{ marginTop: '20px' }}>No share posts yet!</h2>
 				) : (
 					sharePosts.map((p) => <SharePostCard post={p} key={p.postId} fetchSharePosts={fetchSharePosts} />)
-				)}
+				)} */}
 
 				
 			</div>

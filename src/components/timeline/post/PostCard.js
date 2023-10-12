@@ -21,7 +21,6 @@ import CommentCard from './CommentCard';
 import { Modal } from 'antd';
 import { Country } from 'country-state-city';
 
-
 const PostCard = ({ post, fetchPosts }) => {
 	const isMounted = useRef(true);
 	const { user: currentUser } = useAuth();
@@ -301,6 +300,11 @@ const PostCard = ({ post, fetchPosts }) => {
 			toast.error('Vui lòng chọn ảnh!');
 			return;
 		}
+		if (file.size > 1024 * 1024) {
+			// 1MB = 1024 * 1024 bytes
+			toast.error('Vui lòng chọn ảnh dưới 1MB', errorOptions);
+			return; // Ngăn việc tiếp tục xử lý nếu kích thước vượt quá 1MB
+		}
 		if (file.type === 'image/jpeg' || file.type === 'image/png') {
 			setEditPhotos(file);
 			setEditPhotosUrl(URL.createObjectURL(file));
@@ -379,15 +383,12 @@ const PostCard = ({ post, fetchPosts }) => {
 							<span className="postDate">{formatTime(post.postTime)}</span>
 						</div>
 						<div className="postLoAndName">
-							<span className="postLocation">• {post.location || 'Vị trí'}</span>
-							<span className="postGroupName">• {post.postGroupName}</span>
+							{post.location && <span className="postLocation">• {post.location || 'Vị trí'}</span>}
+							{post.postGroupName && <span className="postGroupName">• {post.postGroupName}</span>}
 						</div>
 					</div>
 					<div className="postTopRight">
-						<button
-							style={{ backgroundColor: '#3b82f6', marginRight: '10px' }}
-							className="shareButton"
-						>
+						<button style={{ backgroundColor: '#3b82f6', marginRight: '10px' }} className="shareButton">
 							Chia sẻ
 						</button>
 						{currentUser.userId === post.userId ? (

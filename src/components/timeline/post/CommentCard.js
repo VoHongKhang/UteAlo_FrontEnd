@@ -108,6 +108,7 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength 
 		setIsLikedComment(!isLikedComment);
 	};
 
+
 	// xóa bình luận trên bài post
 	const deleteCommentPostHandler = async (commentId, userId) => {
 		const toastId = toast.loading('Đang gửi yêu cầu...');
@@ -152,8 +153,9 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength 
 					},
 				};
 				formData.append('postId', post.postId || '');
+				formData.append('commentId', comment.commentId || '');
 
-				const response = await axios.post(`${BASE_URL}/v1/post/comment/create`, formData, config);
+				const response = await axios.post(`${BASE_URL}/v1/post/comment/reply`, formData, config);
 
 				// Xử lý kết quả trực tiếp trong khối try
 				if (response.status === 200) {
@@ -327,147 +329,156 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength 
 		return formattedTime;
 	}
 
+
 	const likeButtonClass = isLikedComment ? 'liked' : 'not-liked';
 
 	return (
 		<div id="comment" className={`comment_${comment.commentId}`} key={comment.commentId}>
-			<div className="postCommentsBox">
-				<div>
-					<div className="postCommentInfo">
-						<div className="postCommentUser">
-							<img className="postProfileImg" src={comment.userAvatar || sampleProPic} alt="..." />
-							<span className="postCommentUserName">{comment.userName}</span>
+			<div className="commentParent">
+				<div className="postCommentsBox">
+					<div>
+						<div className="postCommentInfo">
+							<div className="postCommentUser">
+								<img className="postProfileImg" src={comment.userAvatar || sampleProPic} alt="..." />
+								<span className="postCommentUserName">{comment.userName}</span>
+							</div>
+							<div className="postCommentContent">
+								<span>{comment.content}</span>
+								{comment.photos && <img className="commentImg" src={comment.photos} alt="..." />}
+							</div>
 						</div>
-						<div className="postCommentContent">
-							<span>{comment.content}</span>
-							{comment.photos && <img className="commentImg" src={comment.photos} alt="..." />}
-						</div>
-					</div>
 
-					<div className="postCommentAction">
-						<span className="postCommentDate">{formatTime(comment.createTime)}</span>
-						<span
-							className={`postCommentLike ${likeButtonClass}`}
-							onClick={() => likeCommentHandler(comment.commentId)}
-						>
-							{isLikedComment ? 'Đã thích' : 'Thích'}
-						</span>
-						<span
-							className="postCommentReply"
-							onClick={() => setIsReplyCommentVisible(!isReplyCommentVisible)}
-						>
-							Phản hồi
-						</span>
+						<div className="postCommentAction">
+							<span className="postCommentDate">{formatTime(comment.createTime)}</span>
+							<span
+								className={`postCommentLike ${likeButtonClass}`}
+								onClick={() => likeCommentHandler(comment.commentId)}
+							>
+								{isLikedComment ? 'Đã thích' : 'Thích'}
+							</span>
+							<span
+								className="postCommentReply"
+								onClick={() => setIsReplyCommentVisible(!isReplyCommentVisible)}
+							>
+								Phản hồi
+							</span>
 
-						{isReplyCommentVisible && (
-							<div className="postCommentCont">
-								<div className="postCommentCont-1">
-									<InputEmoji
-										value={content}
-										onChange={setContent}
-										placeholder={`Viết bình luận ....`}
-									/>
-									{photosComment && (
+							{isReplyCommentVisible && (
+								<div className="postCommentContReply">
+									<div className="postCommentCont-1">
+										<InputEmoji
+											value={content}
+											onChange={setContent}
+											placeholder={`Viết bình luận ....`}
+										/>
+										{photosComment && (
+											<div className="shareImgContainer">
+												<img className="shareimgReply" src={photosCommetUrl} alt="..." />
+												<Cancel
+													className="shareCancelImg"
+													onClick={() => setPhotosComment(null)}
+												/>
+											</div>
+										)}
+									</div>
+									<label htmlFor="fileCommentReply" className="shareOption">
+										<PermMedia htmlColor="tomato" className="shareIcon" />
+										<input
+											style={{ display: 'none' }}
+											type="file"
+											id="fileCommentReply"
+											accept=".png, .jpeg, .jpg"
+											onChange={commentReplyDetails}
+										/>
+									</label>
+									<div className="postCommentCont-2">
+										<button
+											className="postCommentBtn"
+											onClick={postCommentHandler}
+											disabled={commentLoading ? true : false}
+										>
+											<Send style={{ fontSize: '18px' }} />
+										</button>
+									</div>
+								</div>
+							)}
+
+							<Modal
+								title="Xác nhận xóa"
+								open={isModalVisible}
+								onOk={() => {
+									deleteCommentPostHandler(commentIdToDelete, comment.userId);
+									setIsModalVisible(false);
+								}}
+								onCancel={() => setIsModalVisible(false)}
+							>
+								Bạn có chắc chắn muốn xóa bình luận này?
+							</Modal>
+
+							<Modal
+								title={<span className="titlEditPost">Chỉnh sửa bình luận</span>}
+								open={isEditModalVisible}
+								onOk={editCommentHandler}
+								onCancel={() => setIsEditModalVisible(false)}
+							>
+								<div className="editPost">
+									<label className="labelEditPost">Nội dung:</label>
+									<textarea value={editContent} onChange={(e) => setEditContent(e.target.value)} />
+								</div>
+
+								<div className="editPost">
+									<label className="labelEditPost">Ảnh:</label>
+									{editPhotosUrl ? (
 										<div className="shareImgContainer">
-											<img className="shareimg" src={photosCommetUrl} alt="..." />
-											<Cancel className="shareCancelImg" onClick={() => setPhotosComment(null)} />
+											<img className="shareimg" src={editPhotosUrl} alt="..." />
+											<Cancel className="shareCancelImg" onClick={() => setEditPhotosUrl(null)} />
 										</div>
-									)}
+									) : editPhotos ? (
+										<div className="shareImgContainer">
+											<img className="shareimg" src={editPhotos} alt="..." />
+											<Cancel className="shareCancelImg" onClick={() => setEditPhotos(null)} />
+										</div>
+									) : null}
+
+									<label htmlFor="editFile" className="shareOption">
+										<PermMedia htmlColor="tomato" className="shareIcon" />
+										<span className="shareOptionText">Hình ảnh</span>
+										<input
+											style={{ display: 'none' }}
+											type="file"
+											id="editFile"
+											accept=".png, .jpeg, .jpg"
+											onChange={commentDetails}
+										/>
+									</label>
 								</div>
-								<label htmlFor="fileComment" className="shareOption">
-									<PermMedia htmlColor="tomato" className="shareIcon" />
-									<input
-										style={{ display: 'none' }}
-										type="file"
-										id="fileComment"
-										accept=".png, .jpeg, .jpg"
-										onChange={commentReplyDetails}
-									/>
-								</label>
-								<div className="postCommentCont-2">
-									<button
-										className="postCommentBtn"
-										onClick={postCommentHandler}
-										disabled={commentLoading ? true : false}
-									>
-										<Send style={{ fontSize: '18px' }} />
-									</button>
-								</div>
-							</div>
-						)}
-
-						<Modal
-							title="Xác nhận xóa"
-							open={isModalVisible}
-							onOk={() => {
-								deleteCommentPostHandler(commentIdToDelete, comment.userId);
-								setIsModalVisible(false);
-							}}
-							onCancel={() => setIsModalVisible(false)}
-						>
-							Bạn có chắc chắn muốn xóa bình luận này?
-						</Modal>
-
-						<Modal
-							title={<span className="titlEditPost">Chỉnh sửa bình luận</span>}
-							open={isEditModalVisible}
-							onOk={editCommentHandler}
-							onCancel={() => setIsEditModalVisible(false)}
-						>
-							<div className="editPost">
-								<label className="labelEditPost">Nội dung:</label>
-								<textarea value={editContent} onChange={(e) => setEditContent(e.target.value)} />
-							</div>
-
-							<div className="editPost">
-								<label className="labelEditPost">Ảnh:</label>
-								{editPhotosUrl ? (
-									<div className="shareImgContainer">
-										<img className="shareimg" src={editPhotosUrl} alt="..." />
-										<Cancel className="shareCancelImg" onClick={() => setEditPhotosUrl(null)} />
-									</div>
-								) : editPhotos ? (
-									<div className="shareImgContainer">
-										<img className="shareimg" src={editPhotos} alt="..." />
-										<Cancel className="shareCancelImg" onClick={() => setEditPhotos(null)} />
-									</div>
-								) : null}
-
-								<label htmlFor="editFile" className="shareOption">
-									<PermMedia htmlColor="tomato" className="shareIcon" />
-									<span className="shareOptionText">Hình ảnh</span>
-									<input
-										style={{ display: 'none' }}
-										type="file"
-										id="editFile"
-										accept=".png, .jpeg, .jpg"
-										onChange={commentDetails}
-									/>
-								</label>
-							</div>
-						</Modal>
+							</Modal>
+						</div>
 					</div>
+					<div className="postLikeCommentCounter">{likeComment}</div>
 				</div>
-				<div className="postLikeCommentCounter">{likeComment}</div>
-			</div>
 
-			<div className="comment">
-				<span className="handleToggleCommentOptions" onClick={handleToggleOptions}>
-					...
-				</span>
-				{showOptions && (
-					<div className="commentOption">
-						<span
-							className="postCommentTextUpdate"
-							onClick={() => showEditModal(comment.content, comment.photos)}
-						>
-							Chỉnh sửa
-						</span>
-						<span className="postCommentTextDelete" onClick={() => showDeleteConfirm(comment.commentId)}>
-							Xóa
-						</span>
-					</div>
-				)}
+				<div className="comment">
+					<span className="handleToggleCommentOptions" onClick={handleToggleOptions}>
+						...
+					</span>
+					{showOptions && (
+						<div className="commentOption">
+							<span
+								className="postCommentTextUpdate"
+								onClick={() => showEditModal(comment.content, comment.photos)}
+							>
+								Chỉnh sửa
+							</span>
+							<span
+								className="postCommentTextDelete"
+								onClick={() => showDeleteConfirm(comment.commentId)}
+							>
+								Xóa
+							</span>
+						</div>
+					)}
+				</div>
 			</div>
 
 			<div className="commentReply">
@@ -477,8 +488,8 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength 
 						fetchCommentReply={fetchCommentReply}
 						comment={comment}
 						key={commentReply.commentId}
-						// onDelete={updateCommentLength}
-						// commentLength={commentlength}
+						//onDelete={updateCommentLength}
+						//commentLength={commentlength}
 					/>
 				))}
 			</div>

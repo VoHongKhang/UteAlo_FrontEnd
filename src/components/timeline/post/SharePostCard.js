@@ -22,7 +22,7 @@ import { Modal } from 'antd';
 import { Country } from 'country-state-city';
 
 
-const PostCard = ({ post, fetchPosts }) => {
+const SharePostCard = ({ post, fetchPosts }) => {
 	const isMounted = useRef(true);
 	const { user: currentUser } = useAuth();
 	useEffect(() => {
@@ -591,4 +591,4 @@ const PostCard = ({ post, fetchPosts }) => {
 	);
 };
 
-export default PostCard;
+export default SharePostCard;

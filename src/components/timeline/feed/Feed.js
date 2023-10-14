@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import './Feed.css';
 import { useParams } from 'react-router-dom';
 import PostCard from '../post/PostCard';
+import SharePostCard from '../post/SharePostCard';
 import Share from '../sharePost/Share';
 import { Box, CircularProgress } from '@material-ui/core';
 import useAuth from '../../../context/auth/AuthContext';
@@ -13,6 +14,7 @@ const Feed = () => {
 	const params = useParams();
 	const { user: currentUser } = useAuth();
 	const [posts, setPosts] = useState([]);
+	const [sharePosts, setSharePosts] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [visiblePosts, setVisiblePosts] = useState(3); // Số lượng bài viết hiển thị ban đầu
 	const { theme } = useTheme();
@@ -35,8 +37,27 @@ const Feed = () => {
 		}
 	};
 
+	// Lấy danh sách các bài share post
+	const fetchSharePosts = async () => {
+		try {
+			const config = {
+				headers: {
+					Authorization: `Bearer ${currentUser.accessToken}`,
+				},
+			};
+			setLoading(true);
+
+			const res = await axios.get(`${BASE_URL}/v1/share/${currentUser.userId}/posts`, config);
+			setLoading(false);
+			setSharePosts(res.data.result);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
 	useEffect(() => {
 		fetchPosts();
+		fetchSharePosts();
 		//eslint-disable-next-line
 	}, []);
 
@@ -72,6 +93,14 @@ const Feed = () => {
 				) : (
 					visiblePostData.map((p) => <PostCard post={p} key={p.postId} fetchPosts={fetchPosts} />)
 				)}
+
+				{sharePosts.length === 0 ? (
+					<h2 style={{ marginTop: '20px' }}>No posts yet!</h2>
+				) : (
+					sharePosts.map((p) => <SharePostCard post={p} key={p.postId} fetchSharePosts={fetchSharePosts} />)
+				)}
+
+				
 			</div>
 		</div>
 	);

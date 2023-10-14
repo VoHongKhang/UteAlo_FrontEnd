@@ -16,9 +16,9 @@ import { Send } from '@material-ui/icons';
 import InputEmoji from 'react-input-emoji';
 import { successOptions } from '../../utils/toastStyle';
 
-const CommentCard = ({ commentReply, fetchCommentReply, comment, onDelete, commentReplyLength }) => {
+const CommentCard = ({ commentReply, fetchCommentReply, comment,post, onDelete, commentReplyLength }) => {
 	const { user: currentUser } = useAuth();
-
+	const [commentlength, setCommentLength] = useState(post?.comments.length);
 	// Hàm kiểm tra xem người dùng đã like bài comment chưa
 	const checkUserLikeComment = useCallback(async () => {
 		try {
@@ -155,7 +155,8 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, onDelete, comme
 					const newComment = response.data.result;
 					// Thêm mới comment vào object comments
 					setCommentPost({ ...comments, [newComment.commentId]: newComment });
-					//setCommentLength(commentlength + 1);
+					//commentReplyLength = commentReplyLength + 1;
+					setCommentLength(commentlength + 1);
 					toast.success('Đăng bình luận thành công!', successOptions);
 				} else {
 					// Xử lý trường hợp API trả về lỗi

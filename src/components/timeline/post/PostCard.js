@@ -187,6 +187,7 @@ const PostCard = ({ post, fetchPosts }) => {
 	// cập nhật lại độ dài của bình luận
 	const updateCommentLength = (newLength) => {
 		setCommentLength(newLength);
+		console.log('newLength', newLength);
 	};
 
 	// xóa bài post

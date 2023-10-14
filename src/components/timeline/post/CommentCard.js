@@ -18,6 +18,7 @@ import GetCommentReplyApi from '../../../api/timeline/commentPost/getCommentRepl
 import CommentReplyCard from './CommentReplyCard';
 
 const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength }) => {
+	const [commentlength, setCommentLength] = useState(post?.comments.length);
 	const isMounted = useRef(true);
 	useEffect(() => {
 		return () => {
@@ -131,6 +132,7 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength 
 		}
 		fetchCommentPost();
 	};
+	
 
 	// Phản hồi bình luận
 	const postCommentHandler = async () => {
@@ -162,7 +164,9 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength 
 					const newComment = response.data.result;
 					// Thêm mới comment vào object comments
 					setCommentReplies({ ...commentReplies, [newComment.commentId]: newComment });
-					//setCommentLength(commentlength + 1);
+					setCommentLength(commentlength + 1);
+					commentLength = commentlength + 1;
+					//commentLength = commentLength +1;
 					toast.success('Đăng bình luận thành công!', successOptions);
 				} else {
 					// Xử lý trường hợp API trả về lỗi
@@ -177,6 +181,11 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength 
 			setCommentLoading(false);
 			toast.error(error.message, errorOptions);
 		}
+	};
+
+	// cập nhật lại độ dài của bình luận
+	const updateCommentLength = (newLength) => {
+		setCommentLength(newLength);
 	};
 
 	// Xử lý hình ảnh của bình luận
@@ -487,9 +496,10 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength 
 						commentReply={commentReply}
 						fetchCommentReply={fetchCommentReply}
 						comment={comment}
+						post={post}
 						key={commentReply.commentId}
-						//onDelete={updateCommentLength}
-						//commentLength={commentlength}
+						onDelete={updateCommentLength}
+						commentLength={commentlength}
 					/>
 				))}
 			</div>

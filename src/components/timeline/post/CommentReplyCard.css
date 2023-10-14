@@ -1,0 +1,15 @@
+.commentreplycard {
+    margin-top: 100px;
+    margin-left: 100px;
+}
+
+.postCommentContentUserName {
+    font-weight: 600;
+    margin-right: 6px;
+}
+
+.shareimgReply {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}

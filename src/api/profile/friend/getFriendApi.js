@@ -3,7 +3,7 @@ import { BASE_URL } from '../../../context/apiCall';
 
 //get 10 friend
 const GetFriendApi = {
-	getFriend: async ({ user}) => {
+	getFriend: async (user) => {
 		try {
 			const res = await axios.get(`${BASE_URL}/v1/friend/list/${user.userId}`);
 			if (res.data.success) {
@@ -15,7 +15,19 @@ const GetFriendApi = {
 			throw new Error(err.response.data.message);
 		}
 	},
-	getListFriendRequest: async ({ user }) => {
+	getFriendPageable: async (user) => {
+		try {
+			const res = await axios.get(`${BASE_URL}/v1/friend/list/pageable/${user.userId}`);
+			if (res.data.success) {
+				return res.data; // Trả về dữ liệu từ thành công
+			} else {
+				throw new Error(res.data.message);
+			}
+		} catch (err) {
+			throw new Error(err.response.data.message);
+		}
+	},
+	getListFriendRequest: async (user) => {
 		try {
 			const config = {
 				headers: {
@@ -34,7 +46,26 @@ const GetFriendApi = {
 			throw new Error(error.message);
 		}
 	},
-	getSuggestionFriend: async ({ user}) => {
+	getListFriendRequestPageable: async (user) => {
+		try {
+			const config = {
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${user.accessToken}`,
+				},
+			};
+			const res = await axios.get(`${BASE_URL}/v1/friend/request/list/pageable`, config);
+			if (res.data.success) {
+				console.log(res.data);
+				return res.data; // Trả về dữ liệu từ thành công
+			} else {
+				throw new Error(res.data.message);
+			}
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	},
+	getSuggestionFriend: async ( user) => {
 		try {
 			const config = {
 				headers: {
@@ -52,7 +83,7 @@ const GetFriendApi = {
 			throw new Error(error.message);
 		}
 	},
-	getSendFriendRequest: async ({ user}) => {
+	getSendFriendRequest: async (user) => {
 		try {
 			const config = {
 				headers: {
@@ -60,7 +91,7 @@ const GetFriendApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.get(`${BASE_URL}/v1/friend/requestFrom/list`,config);
+			const res = await axios.get(`${BASE_URL}/v1/friend/requestFrom/list`, config);
 			if (res.data.success) {
 				return res.data; // Trả về dữ liệu từ thành công
 			} else {
@@ -70,7 +101,7 @@ const GetFriendApi = {
 			throw new Error(error.message);
 		}
 	},
-	rejectFriendRequest: async ({token, userId}) => {
+	rejectFriendRequest: async ({ token, userId }) => {
 		const config = {
 			headers: {
 				'Content-Type': 'application/json',
@@ -90,7 +121,7 @@ const GetFriendApi = {
 				throw new Error(err.response.data.message);
 			});
 	},
-	acceptFriendRequest: async ({token, userId}) => {
+	acceptFriendRequest: async ({ token, userId }) => {
 		const config = {
 			headers: {
 				'Content-Type': 'application/json',
@@ -110,7 +141,7 @@ const GetFriendApi = {
 				throw new Error(err.response.data.message);
 			});
 	},
-	sendFriendRequest: async ({token, userId}) => {
+	sendFriendRequest: async ({ token, userId }) => {
 		const config = {
 			headers: {
 				'Content-Type': 'application/json',
@@ -130,7 +161,7 @@ const GetFriendApi = {
 				throw new Error(err.response.data.message);
 			});
 	},
-	unFriend: async ({token, userId}) => {
+	unFriend: async ({ token, userId }) => {
 		const config = {
 			headers: {
 				'Content-Type': 'application/json',
@@ -150,7 +181,7 @@ const GetFriendApi = {
 				throw new Error(err.response.data.message);
 			});
 	},
-	cancelFriendRequest: async ({token, userId}) => {
+	cancelFriendRequest: async ({ token, userId }) => {
 		const config = {
 			headers: {
 				'Content-Type': 'application/json',

@@ -3,6 +3,7 @@ import './PostCard.css';
 import sampleProPic from '../../../assets/appImages/user.png';
 import axios from 'axios';
 import moment from 'moment';
+import { Box, CircularProgress } from '@material-ui/core';
 import { BASE_URL } from '../../../context/apiCall';
 import useAuth from '../../../context/auth/AuthContext';
 import LikeOrUnlikeCommentApi from '../../../api/timeline/commentPost/likeOrUnlikeComment';
@@ -17,7 +18,8 @@ import { successOptions } from '../../utils/toastStyle';
 import GetCommentReplyApi from '../../../api/timeline/commentPost/getCommentReply';
 import CommentReplyCard from './CommentReplyCard';
 
-const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength }) => {
+const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, commentLength }) => {
+	console.log('commentLength', commentLength);
 	const isMounted = useRef(true);
 	useEffect(() => {
 		return () => {
@@ -108,7 +110,6 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength 
 		setIsLikedComment(!isLikedComment);
 	};
 
-
 	// xóa bình luận trên bài post
 	const deleteCommentPostHandler = async (commentId, userId) => {
 		const toastId = toast.loading('Đang gửi yêu cầu...');
@@ -162,7 +163,36 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength 
 					const newComment = response.data.result;
 					// Thêm mới comment vào object comments
 					setCommentReplies({ ...commentReplies, [newComment.commentId]: newComment });
-					//setCommentLength(commentlength + 1);
+					onCreate(commentLength + 1);
+					toast.success('Đăng bình luận thành công!', successOptions);
+				} else {
+					// Xử lý trường hợp API trả về lỗi
+					toast.error(response.message, errorOptions);
+				}
+			}
+			if (post.shareId) {
+				const formData = new FormData();
+				formData.append('content', content || '');
+				if (photosComment) {
+					formData.append('photos', photosComment);
+				}
+				const config = {
+					headers: {
+						Authorization: `Bearer ${currentUser.accessToken}`,
+						'Content-Type': 'multipart/form-data',
+					},
+				};
+				formData.append('shareId', post.shareId || '');
+				formData.append('commentId', comment.commentId || '');
+
+				const response = await axios.post(`${BASE_URL}/v1/share/comment/reply`, formData, config);
+
+				// Xử lý kết quả trực tiếp trong khối try
+				if (response.status === 200) {
+					const newComment = response.data.result;
+					// Thêm mới comment vào object comments
+					setCommentReplies({ ...commentReplies, [newComment.commentId]: newComment });
+					onCreate(commentLength + 1);
 					toast.success('Đăng bình luận thành công!', successOptions);
 				} else {
 					// Xử lý trường hợp API trả về lỗi
@@ -329,7 +359,6 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength 
 		return formattedTime;
 	}
 
-
 	const likeButtonClass = isLikedComment ? 'liked' : 'not-liked';
 
 	return (
@@ -400,6 +429,12 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength 
 											<Send style={{ fontSize: '18px' }} />
 										</button>
 									</div>
+
+									{commentLoading && (
+										<Box display="flex" justifyContent="center" sx={{ my: 2 }}>
+											<CircularProgress color="secondary" />
+										</Box>
+									)}
 								</div>
 							)}
 
@@ -488,8 +523,9 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, commentLength 
 						fetchCommentReply={fetchCommentReply}
 						comment={comment}
 						key={commentReply.commentId}
-						//onDelete={updateCommentLength}
-						//commentLength={commentlength}
+						onDelete={onDelete}
+						onCreate={onCreate}
+						commentReplyLength={commentLength}
 					/>
 				))}
 			</div>

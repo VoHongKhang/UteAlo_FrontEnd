@@ -4,6 +4,7 @@ import './CommentReplyCard.css';
 import sampleProPic from '../../../assets/appImages/user.png';
 import axios from 'axios';
 import moment from 'moment';
+import { Box, CircularProgress } from '@material-ui/core';
 import { BASE_URL } from '../../../context/apiCall';
 import useAuth from '../../../context/auth/AuthContext';
 import LikeOrUnlikeCommentApi from '../../../api/timeline/commentPost/likeOrUnlikeComment';
@@ -16,9 +17,9 @@ import { Send } from '@material-ui/icons';
 import InputEmoji from 'react-input-emoji';
 import { successOptions } from '../../utils/toastStyle';
 
-const CommentCard = ({ commentReply, fetchCommentReply, comment, onDelete, commentReplyLength }) => {
+const CommentCard = ({ commentReply, fetchCommentReply, comment, onDelete, onCreate, commentReplyLength }) => {
 	const { user: currentUser } = useAuth();
-
+	console.log('commentReplyLength', commentReplyLength);
 	// Hàm kiểm tra xem người dùng đã like bài comment chưa
 	const checkUserLikeComment = useCallback(async () => {
 		try {
@@ -123,8 +124,6 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, onDelete, comme
 		fetchCommentReply();
 	};
 
-	console.log("commentReply", commentReply);
-
 	// Phản hồi bình luận
 	const postCommentHandler = async () => {
 		try {
@@ -155,6 +154,7 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, onDelete, comme
 					const newComment = response.data.result;
 					// Thêm mới comment vào object comments
 					setCommentPost({ ...comments, [newComment.commentId]: newComment });
+					onCreate(commentReplyLength + 1);
 					//setCommentLength(commentlength + 1);
 					toast.success('Đăng bình luận thành công!', successOptions);
 				} else {
@@ -381,6 +381,12 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, onDelete, comme
 											<Send style={{ fontSize: '18px' }} />
 										</button>
 									</div>
+
+									{commentLoading && (
+										<Box display="flex" justifyContent="center" sx={{ my: 2 }}>
+											<CircularProgress color="secondary" />
+										</Box>
+									)}
 								</div>
 							)}
 

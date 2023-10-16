@@ -23,6 +23,7 @@ import { Country } from 'country-state-city';
 
 const PostCard = ({ post, fetchPosts }) => {
 	const isMounted = useRef(true);
+	const { sharePost, createLoading } = usePost();
 	const { user: currentUser } = useAuth();
 	useEffect(() => {
 		return () => {
@@ -73,6 +74,8 @@ const PostCard = ({ post, fetchPosts }) => {
 	const [photosComment, setPhotosComment] = useState('');
 	const [photosCommetUrl, setPhotosCommetUrl] = useState('');
 	const [content, setContent] = useState('');
+	// Chia sẻ
+	const [isShareModalVisible, setIsShareModalVisible] = useState(false);
 
 	// Model xuất hiện khi nhấn xóa bài post
 	const showDeleteConfirm = (postId) => {
@@ -86,6 +89,16 @@ const PostCard = ({ post, fetchPosts }) => {
 		setEditLocation(location);
 		setEditPhotos(photos);
 		setIsEditModalVisible(true);
+	};
+
+	// Xử lý khi nhấn nút chia sẻ
+	const openShareModal = () => {
+		setIsShareModalVisible(true);
+	};
+
+	// Đóng modal chia sẻ
+	const closeShareModal = () => {
+		setIsShareModalVisible(false);
 	};
 
 	// Hàm kiểm tra xem người dùng đã like bài post chưa
@@ -184,6 +197,25 @@ const PostCard = ({ post, fetchPosts }) => {
 		}
 	};
 
+	const sharePostHandler = async (e) => {
+		e.preventDefault();
+		setIsShareModalVisible(false);
+		console.log('content',content);
+		try {
+			const newPost = {
+				content: content || '',
+				postId: post.postId,
+			};
+
+			await sharePost(newPost.content, newPost.postId);
+			fetchPosts();
+			setContent('');
+		} catch (error) {
+			console.error(error);
+			toast.error('Có lỗi xảy ra khi tạo bài viết.');
+		}
+	};
+
 	// cập nhật lại độ dài của bình luận
 	const updateCommentLength = (newLength) => {
 		setCommentLength(newLength);
@@ -191,6 +223,7 @@ const PostCard = ({ post, fetchPosts }) => {
 
 	// xóa bài post
 	const deletePostHandler = async () => {
+		const toastId = toast.loading('Đang gửi yêu cầu...');
 		try {
 			const config = {
 				headers: {
@@ -206,7 +239,7 @@ const PostCard = ({ post, fetchPosts }) => {
 			}
 
 			setCommentLoading(false);
-			toast.success('Xóa bài đăng thành công!', successOptions);
+			toast.success('Xóa bài đăng thành công!', { id: toastId });
 
 			// Fetch lại danh sách bài post sau khi xóa
 			fetchPosts();
@@ -388,9 +421,31 @@ const PostCard = ({ post, fetchPosts }) => {
 						</div>
 					</div>
 					<div className="postTopRight">
-						<button style={{ backgroundColor: '#3b82f6', marginRight: '10px' }} className="shareButton">
+						<button
+							style={{ backgroundColor: '#3b82f6', marginRight: '10px' }}
+							className="shareButton"
+							onClick={openShareModal}
+							disabled={createLoading}
+						>
 							Chia sẻ
 						</button>
+						{/* Modal chia sẻ */}
+						<Modal
+							title="Chia sẻ bài viết"
+							open={isShareModalVisible}
+							onOk={closeShareModal} // Đóng modal khi nút "Chia sẻ" được bấm
+							onCancel={closeShareModal}
+							okText="Chia sẻ"
+							okButtonProps={{
+								onClick: sharePostHandler, // Gọi hàm sharePostHandler khi nút "Chia sẻ" được bấm
+							}}
+						>
+							<textarea
+								value={content}
+								onChange={(e) => setContent(e.target.value)}
+								placeholder="Nhập nội dung chia sẻ..."
+							/>
+						</Modal>
 						{currentUser.userId === post.userId ? (
 							<>
 								<button
@@ -500,7 +555,7 @@ const PostCard = ({ post, fetchPosts }) => {
 				</div>
 
 				<div className="postCenter">
-					<span className="postText">{post.content}</span>
+					{post.content && <span className="postText">{post.content}</span>}
 					{post.photos && <img className="postImg" src={post.photos} alt="..." />}
 				</div>
 
@@ -566,6 +621,7 @@ const PostCard = ({ post, fetchPosts }) => {
 								post={post}
 								key={comment.commentId}
 								onDelete={updateCommentLength}
+								onCreate={updateCommentLength}
 								commentLength={commentlength}
 							/>
 					  ))
@@ -578,6 +634,7 @@ const PostCard = ({ post, fetchPosts }) => {
 									post={post}
 									key={comment.commentId}
 									onDelete={updateCommentLength}
+									onCreate={updateCommentLength}
 									commentLength={commentlength}
 								/>
 							))}

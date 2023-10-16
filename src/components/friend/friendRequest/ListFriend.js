@@ -7,7 +7,7 @@ const ListFriend = ({ currentUser, type, title = 'Danh sách bạn bè' }) => {
 	const [filter, setFilter] = useState();
 	const typingRef = useRef(null);
 	const [more, setMore] = useState(0);
-	const friendFetcher = useFetcher({ currentUser: currentUser, api: type, params: filter, limit: 5, page: more });
+	const friendFetcher = useFetcher({ user: currentUser, api: type, params: filter, limit: 5, page: more });
 
 	const loadMore = () => {
 		if (friendFetcher.loadingMore) return;

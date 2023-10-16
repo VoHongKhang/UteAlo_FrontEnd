@@ -3,7 +3,6 @@ import GetFriendApi from '../../api/profile/friend/getFriendApi.js';
 const userAction = ({currentUser,user,action}) => {
 	console.log('action',action);
 	const handleRequestFriend = async ({currentUser,user}) => {
-		
 		const toastId = toast.loading('Đang gửi lời mời kết bạn...');
 
 		try {

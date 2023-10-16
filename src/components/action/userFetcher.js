@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import FriendApi from '../../api/friends/FriendApi';
 
-export const useFetcher = ({ currentUser, api, limit = 21, params = {}, page }) => {
+export const useFetcher = ({ user, api, limit = 21, params = {}, page }) => {
 	const [fetching, setFetching] = useState(false);
 	const [fulldata, setFullData] = useState([]);
 	const [fitterData, setFitterData] = useState([]);
@@ -16,7 +16,7 @@ export const useFetcher = ({ currentUser, api, limit = 21, params = {}, page }) 
 	const getData = useCallback(async () => {
 		setFetching(true);
 		try {
-			const res = await FriendApi({ currentUser, api });
+			const res = await FriendApi({ user, api });
 			// cắt res.result theo limit
 			setFullData(res.result);
 			setData(res.result.slice(0, limit));
@@ -25,7 +25,7 @@ export const useFetcher = ({ currentUser, api, limit = 21, params = {}, page }) 
 		} finally {
 			setFetching(false);
 		}
-	}, [api, currentUser, limit]);
+	}, [api, user, limit]);
 
 	useEffect(() => {
 		getData();
@@ -58,7 +58,7 @@ export const useFetcher = ({ currentUser, api, limit = 21, params = {}, page }) 
 			}
 		}
 		setLoadingMore(false);
-	}, [api, currentUser, page]);
+	}, [api, user, page]);
 
 	return {
 		data,

@@ -60,6 +60,45 @@ export const PostProvider = ({ children }) => {
   };
   
 
+  // Chia sẻ bài post
+  const sharePost = async (content, postId) => {
+    try {
+      dispatch({
+        type: "CREATE_POST_REQUEST",
+      });
+  
+      const formData = new FormData();
+      formData.append('content', content || '') ;
+      formData.append('postId', postId );
+  
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.accessToken}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      };
+  
+      const { data } = await axios.post(
+        `${BASE_URL}/v1/share/create`,
+        formData,
+        config
+      );
+  
+      dispatch({
+        type: "CREATE_POST_SUCCESS",
+        payload: data,
+      });
+  
+      toast.success("Chia sẻ bài thành công", successOptions);
+    } catch (error) {
+      dispatch({
+        type: "CREATE_POST_FAIL",
+        payload: error.response.data.message,
+      });
+      toast.error(error.response.data.message, errorOptions);
+    }
+  };
+
 
   // get posts req
   const getTimelinePosts = async () => {
@@ -94,6 +133,7 @@ export const PostProvider = ({ children }) => {
     createLoading: state.createLoading,
     error: state.error,
     createPost,
+    sharePost,
     getTimelinePosts,
   };
 

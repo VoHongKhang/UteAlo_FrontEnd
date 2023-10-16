@@ -16,13 +16,12 @@ import { errorOptions, successOptions } from '../../utils/toastStyle';
 import usePost from '../../../context/post/PostContext';
 import useAuth from '../../../context/auth/AuthContext';
 import LikeOrUnlikeApi from '../../../api/timeline/commentPost/likeOrUnlike';
-import GetCommentPostApi from '../../../api/timeline/commentPost/getCommentPost';
+import GetCommentSharePostApi from '../../../api/timeline/commentSharePost/getCommentSharePost'
 import CommentCard from './CommentCard';
 import { Modal } from 'antd';
-import { Country } from 'country-state-city';
 
 
-const SharePostCard = ({ post, fetchPosts }) => {
+const SharePostCard = ({ share, fetchSharePosts }) => {
 	const isMounted = useRef(true);
 	const { user: currentUser } = useAuth();
 	useEffect(() => {
@@ -31,7 +30,7 @@ const SharePostCard = ({ post, fetchPosts }) => {
 			isMounted.current = false;
 		};
 	}, []);
-	// Hàm kiểm tra xem người dùng đã like bài post chưa
+	// Hàm kiểm tra xem người dùng đã like bài share chưa
 	const checkUserLikePost = useCallback(async () => {
 		try {
 			const config = {
@@ -41,7 +40,7 @@ const SharePostCard = ({ post, fetchPosts }) => {
 				},
 			};
 
-			const response = await axios.get(`${BASE_URL}/v1/post/like/checkUser/${post.postId}`, config);
+			const response = await axios.get(`${BASE_URL}/v1/post/like/checkUser/${share.shareId}`, config);
 			const responseData = response.data;
 			const resultValue = responseData.result;
 
@@ -50,44 +49,56 @@ const SharePostCard = ({ post, fetchPosts }) => {
 			console.error(error);
 			throw error;
 		}
-	}, [currentUser.accessToken, post.postId]);
+	}, [currentUser.accessToken, share.shareId]);
 
-	const [like, setLike] = useState(post.likes?.length);
+	const [like, setLike] = useState(share.likes?.length);
 	const [isLiked, setIsLiked] = useState(false);
 	const [user, setUser] = useState({});
 	const [commentLoading, setCommentLoading] = useState(false);
 	const { getTimelinePosts } = usePost();
 	const [comments, setCommentPost] = useState({});
-	const [commentlength, setCommentLength] = useState(post?.comments.length);
+	const [commentlength, setCommentLength] = useState(share?.comments.length);
 	const [showAllComments, setShowAllComments] = useState(false);
-	// Xóa bài post
+	// Xóa bài share
 	const [isModalVisible, setIsModalVisible] = useState(false);
 	const [postIdToDelete, setPostIdToDelete] = useState(null);
-	// Chỉnh sửa bài post
+	// Chỉnh sửa bài share
 	const [isEditModalVisible, setIsEditModalVisible] = useState(false);
 	const [editContent, setEditContent] = useState('');
-	const [editLocation, setEditLocation] = useState('');
-	const [editPhotos, setEditPhotos] = useState('');
-	const [editPhotosUrl, setEditPhotosUrl] = useState('');
-	const [editPostGroupId, setEditPostGroupId] = useState('');
 	// Hình ảnh và nội dung của bình luận
 	const [photosComment, setPhotosComment] = useState('');
 	const [photosCommetUrl, setPhotosCommetUrl] = useState('');
 	const [content, setContent] = useState('');
+	const [post, setPost] = useState('');
 
-	// Model xuất hiện khi nhấn xóa bài post
-	const showDeleteConfirm = (postId) => {
-		setPostIdToDelete(postId);
+	// Model xuất hiện khi nhấn xóa bài share
+	const showDeleteConfirm = (shareId) => {
+		setPostIdToDelete(shareId);
 		setIsModalVisible(true);
 	};
 
-	// Model xuất hiện khi nhấn chỉnh sửa bài post
-	const showEditModal = (content, location, photos) => {
+	// Model xuất hiện khi nhấn chỉnh sửa bài share
+	const showEditModal = (content) => {
 		setEditContent(content);
-		setEditLocation(location);
-		setEditPhotos(photos);
 		setIsEditModalVisible(true);
 	};
+
+	// Lấy thông tin của 1 bài post
+	useEffect(() => {
+		const fetchPost = async () => {
+			const config = {
+				headers: {
+					Authorization: `Bearer ${currentUser.accessToken}`,
+				},
+			};
+			if (share.postId) {
+				const res = await axios.get(`${BASE_URL}/v1/post/${share.postId}`, config);
+
+				setPost(res.data.result);
+			}
+		};
+		fetchPost();
+	}, [share.postId, currentUser.accessToken]);
 
 	// Hàm kiểm tra xem người dùng đã like bài post chưa
 	useEffect(() => {
@@ -105,10 +116,10 @@ const SharePostCard = ({ post, fetchPosts }) => {
 		fetchData();
 	}, [checkUserLikePost]);
 
-	// lấy danh sách bình luận trên bài post
-	const fetchCommentPost = async () => {
+	// lấy danh sách bình luận trên bài share post
+	const fetchCommentSharePost = async () => {
 		try {
-			const res = await GetCommentPostApi.getCommentPost(post.postId);
+			const res = await GetCommentSharePostApi.getCommentSharePost(share.shareId);
 			if (isMounted.current) {
 				setCommentPost(res);
 			}
@@ -117,16 +128,17 @@ const SharePostCard = ({ post, fetchPosts }) => {
 		}
 	};
 
+
 	// lấy danh sách bình luận trên bài post
 	useEffect(() => {
-		fetchCommentPost();
+		fetchCommentSharePost();
 		//eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [currentUser.userId, currentUser.accessToken]);
 
 	// yêu thích và bỏ yêu thích bài post
 	const likePostHandler = async () => {
 		try {
-			await LikeOrUnlikeApi.likeOrUnlike(post.postId, currentUser.accessToken, currentUser.userId);
+			await LikeOrUnlikeApi.likeOrUnlike(share.shareId, currentUser.accessToken, currentUser.userId);
 		} catch (err) {
 			console.log(err);
 		}
@@ -139,7 +151,7 @@ const SharePostCard = ({ post, fetchPosts }) => {
 		setShowAllComments(!showAllComments);
 	};
 
-	// Đăng bình luận post
+	// Đăng bình luận share post
 	const postCommentHandler = async () => {
 		try {
 			if (!content && !photosComment) {
@@ -147,7 +159,7 @@ const SharePostCard = ({ post, fetchPosts }) => {
 				return; // Dừng việc thực hiện tiếp theo nếu nội dung rỗng
 			}
 			setCommentLoading(true);
-			if (post.postId) {
+			if (share.shareId) {
 				const formData = new FormData();
 				formData.append('content', content || '');
 				if (photosComment) {
@@ -159,9 +171,9 @@ const SharePostCard = ({ post, fetchPosts }) => {
 						'Content-Type': 'multipart/form-data',
 					},
 				};
-				formData.append('postId', post.postId || '');
+				formData.append('shareId', share.shareId || '');
 
-				const response = await axios.post(`${BASE_URL}/v1/post/comment/create`, formData, config);
+				const response = await axios.post(`${BASE_URL}/v1/share/comment/create`, formData, config);
 
 				// Xử lý kết quả trực tiếp trong khối try
 				if (response.status === 200) {
@@ -176,7 +188,7 @@ const SharePostCard = ({ post, fetchPosts }) => {
 				}
 			}
 			setCommentLoading(false);
-			fetchCommentPost();
+			fetchCommentSharePost();
 			setContent('');
 			setPhotosComment('');
 		} catch (error) {
@@ -190,8 +202,9 @@ const SharePostCard = ({ post, fetchPosts }) => {
 		setCommentLength(newLength);
 	};
 
-	// xóa bài post
+	// xóa bài share
 	const deletePostHandler = async () => {
+		const toastId = toast.loading('Đang gửi yêu cầu...');
 		try {
 			const config = {
 				headers: {
@@ -203,14 +216,13 @@ const SharePostCard = ({ post, fetchPosts }) => {
 			setCommentLoading(true);
 
 			if (postIdToDelete) {
-				await axios.put(`${BASE_URL}/v1/post/delete/${postIdToDelete}`, post.userId, config);
+				await axios.put(`${BASE_URL}/v1/share/delete/${postIdToDelete}`, share.userId, config);
 			}
 
 			setCommentLoading(false);
-			toast.success('Xóa bài đăng thành công!', successOptions);
-
-			// Fetch lại danh sách bài post sau khi xóa
-			fetchPosts();
+			toast.success('Xóa bài chia sẻ thành công!', { id: toastId });
+			// Fetch lại danh sách bài share post sau khi xóa
+			fetchSharePosts();
 		} catch (error) {
 			setCommentLoading(false);
 			toast.error(error.response.data.message, errorOptions);
@@ -223,31 +235,9 @@ const SharePostCard = ({ post, fetchPosts }) => {
 		try {
 			setCommentLoading(true);
 
-			if (post.postId) {
+			if (share.shareId) {
 				const formData = new FormData();
 				formData.append('content', editContent || '');
-				formData.append('location', editLocation || '');
-
-				if (editPhotos) {
-					// Kiểm tra xem 'editPhotos' có phải là kiểu 'string' không
-					if (typeof editPhotos === 'string') {
-						// Chuyển đổi 'editPhotos' từ URL blob thành đối tượng File
-						const file = await convertBlobURLToFile(editPhotos, 'ten_file_moi.png');
-
-						if (file) {
-							// Thêm đối tượng File vào `formData`
-							formData.append('photos', file);
-						} else {
-							console.error('Không thể chuyển đổi `editPhotos` thành đối tượng File.');
-						}
-					} else if (editPhotos instanceof File && isImage(editPhotos)) {
-						formData.append('photos', editPhotos);
-					} else {
-						console.error('Tệp không phải là hình ảnh hoặc kiểu MIME không hợp lệ.');
-					}
-				}
-
-				formData.append('postGroupId', editPostGroupId || 0);
 
 				const config = {
 					headers: {
@@ -256,14 +246,14 @@ const SharePostCard = ({ post, fetchPosts }) => {
 					},
 				};
 				setIsEditModalVisible(false);
-				const response = await axios.put(`${BASE_URL}/v1/post/update/${post.postId}`, formData, config);
+				const response = await axios.put(`${BASE_URL}/v1/share/update/${share.shareId}`, formData, config);
 
 				// Xử lý kết quả trực tiếp trong khối try
 				if (response.status === 200) {
 					toast.success('Chỉnh sửa bài đăng thành công!', { id: toastId });
 
 					// Fetch lại danh sách bài post sau khi chỉnh sửa
-					fetchPosts();
+					fetchSharePosts();
 				} else {
 					// Xử lý trường hợp API trả về lỗi
 					toast.error(response.message, { id: toastId });
@@ -277,37 +267,6 @@ const SharePostCard = ({ post, fetchPosts }) => {
 		}
 	};
 
-	// Hàm kiểm tra kiểu MIME của tệp có phải là kiểu hình ảnh
-	const isImage = (file) => {
-		return file.type.startsWith('image/');
-	};
-
-	// Hàm chuyển đổi URL blob thành đối tượng File
-	async function convertBlobURLToFile(blobURL, fileName) {
-		try {
-			const response = await fetch(blobURL);
-			const blobData = await response.blob();
-			return new File([blobData], fileName || 'file.png', { type: 'image/png' }); // Đặt kiểu MIME ở đây
-		} catch (error) {
-			console.error('Lỗi chuyển đổi:', error);
-			return null;
-		}
-	}
-
-	// Xử lý hình ảnh của bài post
-	const postDetails = (e) => {
-		const file = e.target.files[0];
-		if (file === undefined) {
-			toast.error('Vui lòng chọn ảnh!');
-			return;
-		}
-		if (file.type === 'image/jpeg' || file.type === 'image/png') {
-			setEditPhotos(file);
-			setEditPhotosUrl(URL.createObjectURL(file));
-		} else {
-			toast.error('Xin hãy chọn ảnh theo đúng định dạng png/jpg');
-		}
-	};
 
 	// Xử lý hình ảnh của bình luận
 	const commentDetails = (e) => {
@@ -338,14 +297,14 @@ const SharePostCard = ({ post, fetchPosts }) => {
 					Authorization: `Bearer ${currentUser.accessToken}`,
 				},
 			};
-			if (post.userId) {
-				const res = await axios.get(`${BASE_URL}/v1/user/profile/${post.userId}`, config);
+			if (share.userId) {
+				const res = await axios.get(`${BASE_URL}/v1/user/profile/${share.userId}`, config);
 
 				setUser(res.data.result);
 			}
 		};
 		fetchUsers();
-	}, [post.userId, currentUser.accessToken]);
+	}, [share.userId, currentUser.accessToken]);
 
 	// Format thời gian
 	function formatTime(time) {
@@ -366,6 +325,7 @@ const SharePostCard = ({ post, fetchPosts }) => {
 		return formattedTime;
 	}
 
+
 	return (
 		<div className="post">
 			<div className="postWrapper">
@@ -376,33 +336,26 @@ const SharePostCard = ({ post, fetchPosts }) => {
 						</Link>
 						<div className="postNameAndDate">
 							<span className="postUsername">{user.fullName}</span>
-							<span className="postDate">{formatTime(post.postTime)}</span>
-						</div>
-						<div className="postLoAndName">
-							<span className="postLocation">• {post.location || 'Vị trí'}</span>
-							<span className="postGroupName">• {post.postGroupName}</span>
+							<span className="postDate">{formatTime(share.createAt)}</span>
 						</div>
 					</div>
 					<div className="postTopRight">
-						<button
-							style={{ backgroundColor: '#3b82f6', marginRight: '10px' }}
-							className="shareButton"
-						>
+						<button style={{ backgroundColor: '#3b82f6', marginRight: '10px' }} className="shareButton">
 							Chia sẻ
 						</button>
-						{currentUser.userId === post.userId ? (
+						{currentUser.userId === share.userId ? (
 							<>
 								<button
 									style={{ backgroundColor: '#3b82f6', marginRight: '10px' }}
 									className="shareButton"
-									onClick={() => showEditModal(post.content, post.location, post.photos)}
+									onClick={() => showEditModal(share.content)}
 								>
 									Chỉnh sửa
 								</button>
 								<button
 									style={{ backgroundColor: '#3b82f6' }}
 									className="shareButton"
-									onClick={() => showDeleteConfirm(post.postId)}
+									onClick={() => showDeleteConfirm(share.shareId)}
 								>
 									Xóa
 								</button>
@@ -418,7 +371,7 @@ const SharePostCard = ({ post, fetchPosts }) => {
 									Bạn có chắc chắn muốn xóa bài viết này?
 								</Modal>
 								<Modal
-									title={<span className="titlEditPost">Chỉnh sửa bài viết</span>}
+									title={<span className="titlEditPost">Chỉnh sửa bài chia sẻ</span>}
 									open={isEditModalVisible}
 									onOk={editPostHandler}
 									onCancel={() => setIsEditModalVisible(false)}
@@ -430,66 +383,6 @@ const SharePostCard = ({ post, fetchPosts }) => {
 											onChange={(e) => setEditContent(e.target.value)}
 										/>
 									</div>
-									<div className="editPost">
-										<label className="labelEditPost">Vị trí:</label>
-										<select value={editLocation} onChange={(e) => setEditLocation(e.target.value)}>
-											<option value={editLocation}>{editLocation}</option>
-											{Country.getAllCountries().map((item) => (
-												<option key={item.isoCode} value={item.name}>
-													{item.name}
-												</option>
-											))}
-										</select>
-									</div>
-									<div className="editPost">
-										<label className="labelEditPost">Nhóm:</label>
-										<select
-											id="postGroupId"
-											value={editPostGroupId}
-											onChange={(e) => setEditPostGroupId(e.target.value)}
-										>
-											<option value={-1}>Chỉ mình tôi</option>
-											<option value={0}>Công khai</option>
-											{user?.postGroup?.map((item) => (
-												<option key={item.postGroupId} value={item.postGroupId}>
-													{item.postGroupName}
-												</option>
-											))}
-										</select>
-									</div>
-
-									<div className="editPost">
-										<label className="labelEditPost">Ảnh:</label>
-										{editPhotosUrl ? (
-											<div className="shareImgContainer">
-												<img className="shareimg" src={editPhotosUrl} alt="..." />
-												<Cancel
-													className="shareCancelImg"
-													onClick={() => setEditPhotosUrl(null)}
-												/>
-											</div>
-										) : editPhotos ? (
-											<div className="shareImgContainer">
-												<img className="shareimg" src={editPhotos} alt="..." />
-												<Cancel
-													className="shareCancelImg"
-													onClick={() => setEditPhotos(null)}
-												/>
-											</div>
-										) : null}
-
-										<label htmlFor="editFile" className="shareOption">
-											<PermMedia htmlColor="tomato" className="shareIcon" />
-											<span className="shareOptionText">Hình ảnh</span>
-											<input
-												style={{ display: 'none' }}
-												type="file"
-												id="editFile"
-												accept=".png, .jpeg, .jpg"
-												onChange={postDetails}
-											/>
-										</label>
-									</div>
 								</Modal>
 							</>
 						) : (
@@ -499,8 +392,39 @@ const SharePostCard = ({ post, fetchPosts }) => {
 				</div>
 
 				<div className="postCenter">
-					<span className="postText">{post.content}</span>
-					{post.photos && <img className="postImg" src={post.photos} alt="..." />}
+					{share.content && <span className="postText">{share.content}</span>}
+					
+					<div className="post">
+						<div className="postWrapper">
+							<div className="postTop">
+								<div className="postTopLeft">
+									<Link to={`/profile/${user.userId}`}>
+										<img className="postProfileImg" src={user.avatar || sampleProPic} alt="..." />
+									</Link>
+									<div className="postNameAndDate">
+										<span className="postUsername">{user.fullName}</span>
+										<span className="postDate">{formatTime(post.postTime)}</span>
+									</div>
+									<div className="postLoAndName">
+										{post.location && (
+											<span className="postLocation">• {post.location || 'Vị trí'}</span>
+										)}
+										{post.postGroupName && (
+											<span className="postGroupName">• {post.postGroupName}</span>
+										)}
+									</div>
+								</div>
+								
+							</div>
+
+							<div className="postCenter">
+								{post.content && <span className="postText">{post.content}</span>}
+								{post.photos && <img className="postImg" src={post.photos} alt="..." />}
+							</div>			
+		
+						</div>
+					</div>
+
 				</div>
 
 				<div className="postBottom">
@@ -561,8 +485,8 @@ const SharePostCard = ({ post, fetchPosts }) => {
 					? Object.values(comments).map((comment) => (
 							<CommentCard
 								comment={comment}
-								fetchCommentPost={fetchCommentPost}
-								post={post}
+								fetchCommentPost={fetchCommentSharePost}
+								post={share}
 								key={comment.commentId}
 								onDelete={updateCommentLength}
 								commentLength={commentlength}
@@ -573,8 +497,8 @@ const SharePostCard = ({ post, fetchPosts }) => {
 							.map((comment) => (
 								<CommentCard
 									comment={comment}
-									fetchCommentPost={fetchCommentPost}
-									post={post}
+									fetchCommentPost={fetchCommentSharePost}
+									post={share}
 									key={comment.commentId}
 									onDelete={updateCommentLength}
 									commentLength={commentlength}
@@ -587,7 +511,7 @@ const SharePostCard = ({ post, fetchPosts }) => {
 					</div>
 				)}
 			</div>
-		</div>
+		</div> 
 	);
 };
 

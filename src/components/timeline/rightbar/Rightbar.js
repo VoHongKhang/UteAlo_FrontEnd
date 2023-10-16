@@ -20,12 +20,12 @@ const Rightbar = ({ user }) => {
 	//get list friend request
 
 	const getListFriendTop = async () => {
-		await GetFriendApi.getFriend({ user: user, limit: 10, page: 0 }).then((res) => {
+		await GetFriendApi.getFriendPageable(user).then((res) => {
 			setListFriend(res.result);
 		});
 	};
 	const getListFriendRequests = async () => {
-		await GetFriendApi.getListFriendRequest({ user: user, limit: 10, page: 0 }).then((res) => {
+		await GetFriendApi.getListFriendRequestPageable(user).then((res) => {
 			setListFriendRequest(res.result);
 		});
 	};
@@ -56,7 +56,7 @@ const Rightbar = ({ user }) => {
 	};
 	const handlerAccepts = async (item) => {
 		try {
-			await GetFriendApi.acceptFriendRequest(user.accessToken, item.userId);
+			await GetFriendApi.acceptFriendRequest({ token: user.accessToken, userId: item.userId });
 			toast.success('Kết bạn thành công', { id: 'success' });
 			getListFriendRequests();
 			getListFriendTop();
@@ -71,7 +71,7 @@ const Rightbar = ({ user }) => {
 	};
 	const handlerDenys = async (item) => {
 		try {
-			await GetFriendApi.deleteFriendRequest(user.accessToken, item.userId);
+			await GetFriendApi.rejectFriendRequest({ token: user.accessToken, userId: item.userId });
 			toast.success('Xóa thành công', { id: 'success' });
 			getListFriendRequests();
 		} catch (error) {

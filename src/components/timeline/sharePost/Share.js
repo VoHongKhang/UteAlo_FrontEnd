@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './Share.css';
-import { PermMedia, Room, Cancel } from '@material-ui/icons';
+import { AttachFile, PermMedia, Room, Cancel } from '@material-ui/icons';
 import { Box, CircularProgress } from '@material-ui/core';
 import toast, { Toaster } from 'react-hot-toast';
 import InputEmoji from 'react-input-emoji';
@@ -15,7 +15,9 @@ const Share = ({ fetchPosts }) => {
 	const [location, setLocation] = useState('');
 	const [content, setContent] = useState('');
 	const [photos, setPhotos] = useState(null);
+	const [files, setFiles] = useState(null);
 	const [photosUrl, setPhotosUrl] = useState();
+	const [filesUrl, setFilesUrl] = useState();
 	const [postGroupId, setPostGroupId] = useState('');
 	const [picLoading, setPicLoading] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
@@ -42,23 +44,38 @@ const Share = ({ fetchPosts }) => {
 		}
 	};
 
+	// Xử lý file của bài post
+	const postFileDetails = (e) => {
+		const file = e.target.files[0];
+		if (file === undefined) {
+			toast.error('Vui lòng chọn một tệp!');
+			return;
+		}
+
+		// Bỏ đi kiểm tra định dạng tệp
+		setFiles(file);
+		setFilesUrl(URL.createObjectURL(file));
+	};
+
 	// Đăng bài post
 	const postSubmitHandler = async (e) => {
 		e.preventDefault();
+
 		try {
 			const newPost = {
 				location: location || '',
 				content: content || '',
 				photos: photos || '',
+				files: files || '',
 				postGroupId: postGroupId || 0,
 			};
 
-			if (!newPost.content && !newPost.photos) {
+			if (!newPost.content && !newPost.photos && !newPost.files) {
 				toast.error('Vui lòng nhập nội dung hoặc chọn ảnh!');
 				return;
 			}
 			// Gọi hàm createPost để tạo bài viết mới
-			await createPost(newPost.location, newPost.content, newPost.photos, newPost.postGroupId);
+			await createPost(newPost.location, newPost.content, newPost.photos, newPost.files, newPost.postGroupId);
 
 			// Sau khi createPost hoàn thành, gọi fetchPosts để cập nhật danh sách bài viết
 			fetchPosts();
@@ -66,6 +83,7 @@ const Share = ({ fetchPosts }) => {
 			setLocation('');
 			setContent('');
 			setPhotos(null);
+			setFiles(null);
 			setPostGroupId('');
 		} catch (error) {
 			console.error(error);
@@ -120,6 +138,14 @@ const Share = ({ fetchPosts }) => {
 							<Cancel className="shareCancelImg" onClick={() => setPhotos(null)} />
 						</div>
 					)}
+					{files && (
+						<div className="postFile">
+							<a href={filesUrl} target="_blank" rel="noopener noreferrer">
+								{filesUrl.substr(filesUrl.lastIndexOf('/') + 1)}
+							</a>
+							<Cancel className="shareCancelFile" onClick={() => setFiles(null)} />
+						</div>
+					)}
 
 					<div className="shareBottom">
 						<div className="shareOptions">
@@ -134,6 +160,18 @@ const Share = ({ fetchPosts }) => {
 									onChange={postDetails}
 								/>
 							</label>
+							<label htmlFor="files" className="shareOption">
+								<AttachFile htmlColor="tomato" className="shareIcon" />
+								<span className="shareOptionText">Tệp</span>
+								<input
+									style={{ display: 'none' }}
+									type="file"
+									id="files"
+									accept=".docx, .txt, .pdf"
+									onChange={postFileDetails}
+								/>
+							</label>
+
 							<div className="shareOption">
 								<label htmlFor="loc" className="shareOption">
 									<Room htmlColor="green" className="shareIcon" />

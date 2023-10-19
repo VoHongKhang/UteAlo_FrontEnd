@@ -15,7 +15,7 @@ import toast from 'react-hot-toast';
 import { errorOptions, successOptions } from '../../utils/toastStyle';
 import usePost from '../../../context/post/PostContext';
 import useAuth from '../../../context/auth/AuthContext';
-import LikeOrUnlikeApi from '../../../api/timeline/commentPost/likeOrUnlike';
+import LikeOrUnlikeApi from '../../../api/timeline/commentSharePost/likeOrUnilkeShare';
 import GetCommentSharePostApi from '../../../api/timeline/commentSharePost/getCommentSharePost'
 import CommentCard from './CommentCard';
 import { Modal } from 'antd';
@@ -31,7 +31,7 @@ const SharePostCard = ({ share, fetchSharePosts }) => {
 		};
 	}, []);
 	// Hàm kiểm tra xem người dùng đã like bài share chưa
-	const checkUserLikePost = useCallback(async () => {
+	const checkUserLikeShare = useCallback(async () => {
 		try {
 			const config = {
 				headers: {
@@ -40,7 +40,7 @@ const SharePostCard = ({ share, fetchSharePosts }) => {
 				},
 			};
 
-			const response = await axios.get(`${BASE_URL}/v1/post/like/checkUser/${share.shareId}`, config);
+			const response = await axios.get(`${BASE_URL}/v1/share/like/checkUser/${share.shareId}`, config);
 			const responseData = response.data;
 			const resultValue = responseData.result;
 
@@ -104,7 +104,7 @@ const SharePostCard = ({ share, fetchSharePosts }) => {
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
-				const resultValue = await checkUserLikePost();
+				const resultValue = await checkUserLikeShare();
 				if (isMounted.current) {
 					setIsLiked(resultValue);
 				}
@@ -114,7 +114,7 @@ const SharePostCard = ({ share, fetchSharePosts }) => {
 		};
 
 		fetchData();
-	}, [checkUserLikePost]);
+	}, [checkUserLikeShare]);
 
 	// lấy danh sách bình luận trên bài share post
 	const fetchCommentSharePost = async () => {
@@ -305,6 +305,7 @@ const SharePostCard = ({ share, fetchSharePosts }) => {
 		};
 		fetchUsers();
 	}, [share.userId, currentUser.accessToken]);
+
 
 	// Format thời gian
 	function formatTime(time) {
@@ -501,6 +502,7 @@ const SharePostCard = ({ share, fetchSharePosts }) => {
 									post={share}
 									key={comment.commentId}
 									onDelete={updateCommentLength}
+									onCreate={updateCommentLength}
 									commentLength={commentlength}
 								/>
 							))}

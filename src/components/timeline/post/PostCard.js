@@ -5,7 +5,7 @@ import heart from '../../../assets/appImages/heart.png';
 import heartEmpty from '../../../assets/appImages/heartEmpty.png';
 import { Send } from '@material-ui/icons';
 import { Box, CircularProgress } from '@material-ui/core';
-import { PermMedia, Cancel } from '@material-ui/icons';
+import { AttachFile, PermMedia, Cancel } from '@material-ui/icons';
 import axios from 'axios';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
@@ -18,7 +18,7 @@ import useAuth from '../../../context/auth/AuthContext';
 import LikeOrUnlikeApi from '../../../api/timeline/commentPost/likeOrUnlike';
 import GetCommentPostApi from '../../../api/timeline/commentPost/getCommentPost';
 import CommentCard from './CommentCard';
-import { Modal } from 'antd';
+import { Modal, Image, theme } from 'antd';
 import { Country } from 'country-state-city';
 
 const PostCard = ({ post, fetchPosts }) => {
@@ -68,7 +68,9 @@ const PostCard = ({ post, fetchPosts }) => {
 	const [editContent, setEditContent] = useState('');
 	const [editLocation, setEditLocation] = useState('');
 	const [editPhotos, setEditPhotos] = useState('');
+	const [editFiles, setEditFiles] = useState('');
 	const [editPhotosUrl, setEditPhotosUrl] = useState('');
+	const [editFilesUrl, setEditFilesUrl] = useState('');
 	const [editPostGroupId, setEditPostGroupId] = useState('');
 	// Hình ảnh và nội dung của bình luận
 	const [photosComment, setPhotosComment] = useState('');
@@ -84,10 +86,12 @@ const PostCard = ({ post, fetchPosts }) => {
 	};
 
 	// Model xuất hiện khi nhấn chỉnh sửa bài post
-	const showEditModal = (content, location, photos) => {
+	const showEditModal = (content, location, photos, postGroupId, files) => {
 		setEditContent(content);
 		setEditLocation(location);
 		setEditPhotos(photos);
+		setEditPostGroupId(postGroupId);
+		setEditFiles(files);
 		setIsEditModalVisible(true);
 	};
 
@@ -200,7 +204,7 @@ const PostCard = ({ post, fetchPosts }) => {
 	const sharePostHandler = async (e) => {
 		e.preventDefault();
 		setIsShareModalVisible(false);
-		console.log('content',content);
+		console.log('content', content);
 		try {
 			const newPost = {
 				content: content || '',
@@ -279,6 +283,10 @@ const PostCard = ({ post, fetchPosts }) => {
 					}
 				}
 
+				if (editFiles) {
+					formData.append('files', editFiles || '');
+				}
+				
 				formData.append('postGroupId', editPostGroupId || 0);
 
 				const config = {
@@ -346,6 +354,18 @@ const PostCard = ({ post, fetchPosts }) => {
 		}
 	};
 
+	// Xử lý file của bài post
+	const postFileDetails = (e) => {
+		const file = e.target.files[0];
+		if (file === undefined) {
+			toast.error('Vui lòng chọn một tệp!');
+			return;
+		}
+
+		setEditFiles(file);
+		setEditFilesUrl(URL.createObjectURL(file));
+	};
+
 	// Xử lý hình ảnh của bình luận
 	const commentDetails = (e) => {
 		const file = e.target.files[0];
@@ -403,6 +423,8 @@ const PostCard = ({ post, fetchPosts }) => {
 		return formattedTime;
 	}
 
+	const { token } = theme.useToken();
+
 	return (
 		<div className="post">
 			<div className="postWrapper">
@@ -451,7 +473,15 @@ const PostCard = ({ post, fetchPosts }) => {
 								<button
 									style={{ backgroundColor: '#3b82f6', marginRight: '10px' }}
 									className="shareButton"
-									onClick={() => showEditModal(post.content, post.location, post.photos)}
+									onClick={() =>
+										showEditModal(
+											post.content,
+											post.location,
+											post.photos,
+											post.postGroupId,
+											post.files
+										)
+									}
 								>
 									Chỉnh sửa
 								</button>
@@ -545,6 +575,44 @@ const PostCard = ({ post, fetchPosts }) => {
 												onChange={postDetails}
 											/>
 										</label>
+										<div className="editFilesPost">
+											<label className="labelEditPost">Tệp:</label>
+											{editFilesUrl ? (
+												<div className="postFile">
+													<a href={editFilesUrl} target="_blank" rel="noopener noreferrer">
+														{editFilesUrl.substr(editFilesUrl.lastIndexOf('/') + 1)}
+													</a>
+													<Cancel
+														classname="editCancelFiles"
+														onClick={() => setEditFilesUrl(null)}
+													/>
+												</div>
+											) : editFiles ? (
+												<div className="postFile">
+													{editFiles && typeof editFiles === 'string' && (
+														<a href={editFiles} target="_blank" rel="noopener noreferrer">
+															{editFiles.substr(editFiles.lastIndexOf('/') + 1)}
+														</a>
+													)}
+													<Cancel
+														className="editCancelFiles"
+														onClick={() => setEditFiles(null)}
+													/>
+												</div>
+											) : null}
+
+											<label htmlFor="editFiles" className="shareOption">
+												<AttachFile htmlColor="tomato" className="shareIcon" />
+												<span className="shareOptionText">Tệp</span>
+												<input
+													style={{ display: 'none' }}
+													type="file"
+													id="editFiles"
+													accept=".docx, .txt, .pdf"
+													onChange={postFileDetails}
+												/>
+											</label>
+										</div>
 									</div>
 								</Modal>
 							</>
@@ -556,6 +624,40 @@ const PostCard = ({ post, fetchPosts }) => {
 
 				<div className="postCenter">
 					{post.content && <span className="postText">{post.content}</span>}
+					{post.files && post.files.toLowerCase().endsWith('.txt') && (
+						<div className="postFile">
+							<a href={post.files} target="_blank" rel="noopener noreferrer">
+								{post.files.substr(post.files.lastIndexOf('/') + 1)}
+							</a>
+						</div>
+					)}
+					{post.files && post.files.toLowerCase().endsWith('.docx') && (
+						<div className="postFile">
+							<a href={post.files} target="_blank" rel="noopener noreferrer">
+								{post.files.substr(post.files.lastIndexOf('/') + 1)}
+							</a>
+						</div>
+					)}
+					{post.files && post.files.toLowerCase().endsWith('.pdf') && (
+						<div className="postFile">
+							<a href={post.files} target="_blank" rel="noopener noreferrer">
+								{post.files.substr(post.files.lastIndexOf('/') + 1)}
+							</a>
+						</div>
+					)}
+					{/* 
+					{post.photos && (
+						<Image
+							hoverable
+							cover
+							width="100%"
+							height={100}
+							src="http://via.placeholder.com/200x100?text="
+							alt={post.content}
+							style={{ objectFit: 'cover', background: token.colorBgLayout }}
+						/>
+					)} */}
+
 					{post.photos && <img className="postImg" src={post.photos} alt="..." />}
 				</div>
 

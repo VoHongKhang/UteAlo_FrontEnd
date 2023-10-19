@@ -16,10 +16,10 @@ import { Send } from '@material-ui/icons';
 import InputEmoji from 'react-input-emoji';
 import { successOptions } from '../../utils/toastStyle';
 import GetCommentReplyApi from '../../../api/timeline/commentPost/getCommentReply';
+import GetCommentReplyShareApi from '../../../api/timeline/commentSharePost/getCommentReplyShare';
 import CommentReplyCard from './CommentReplyCard';
 
 const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, commentLength }) => {
-	console.log('commentLength', commentLength);
 	const isMounted = useRef(true);
 	useEffect(() => {
 		return () => {
@@ -141,7 +141,7 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 				return; // Dừng việc thực hiện tiếp theo nếu nội dung rỗng
 			}
 			setCommentLoading(true);
-			if (post.postId) {
+			if (post.postId && !post.shareId) {
 				const formData = new FormData();
 				formData.append('content', content || '');
 				if (photosComment) {
@@ -170,7 +170,7 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 					toast.error(response.message, errorOptions);
 				}
 			}
-			if (post.shareId) {
+			if (post.shareId && post.postId) {
 				const formData = new FormData();
 				formData.append('content', content || '');
 				if (photosComment) {
@@ -208,6 +208,7 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 			toast.error(error.message, errorOptions);
 		}
 	};
+
 
 	// Xử lý hình ảnh của bình luận
 	const commentDetails = async (e) => {
@@ -325,9 +326,17 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 	// lấy danh sách phản hồi bình luận của bình luận trên bài post
 	const fetchCommentReply = async () => {
 		try {
-			const res = await GetCommentReplyApi.getCommentReply(comment.commentId);
-			if (isMounted.current) {
-				setCommentReplies(res);
+			if (post.postId && !post.shareId) {
+				const res = await GetCommentReplyApi.getCommentReply(comment.commentId);
+				if (isMounted.current) {
+					setCommentReplies(res);
+				}
+			}
+			if(post.shareId && post.postId) {
+				const res = await GetCommentReplyShareApi.getCommentReply(comment.commentId);
+				if (isMounted.current) {
+					setCommentReplies(res);
+				}
 			}
 		} catch (error) {
 			console.error(error);
@@ -521,7 +530,8 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 					<CommentReplyCard
 						commentReply={commentReply}
 						fetchCommentReply={fetchCommentReply}
-						comment={comment}
+						comment={commentReply}
+						post={post}
 						key={commentReply.commentId}
 						onDelete={onDelete}
 						onCreate={onCreate}

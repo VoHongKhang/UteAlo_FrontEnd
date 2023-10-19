@@ -17,7 +17,7 @@ import { Send } from '@material-ui/icons';
 import InputEmoji from 'react-input-emoji';
 import { successOptions } from '../../utils/toastStyle';
 
-const CommentCard = ({ commentReply, fetchCommentReply, comment, onDelete, onCreate, commentReplyLength }) => {
+const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete, onCreate, commentReplyLength }) => {
 	const { user: currentUser } = useAuth();
 	console.log('commentReplyLength', commentReplyLength);
 	// Hàm kiểm tra xem người dùng đã like bài comment chưa
@@ -132,7 +132,7 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, onDelete, onCre
 				return; // Dừng việc thực hiện tiếp theo nếu nội dung rỗng
 			}
 			setCommentLoading(true);
-			if (comment.commentId) {
+			if (post.postId && !post.shareId) {
 				const formData = new FormData();
 				formData.append('content', content || '');
 				if (photosComment) {
@@ -148,6 +148,36 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, onDelete, onCre
 				formData.append('commentId', commentReply.commentId || '');
 
 				const response = await axios.post(`${BASE_URL}/v1/post/comment/reply`, formData, config);
+
+				// Xử lý kết quả trực tiếp trong khối try
+				if (response.status === 200) {
+					const newComment = response.data.result;
+					// Thêm mới comment vào object comments
+					setCommentPost({ ...comments, [newComment.commentId]: newComment });
+					onCreate(commentReplyLength + 1);
+					//setCommentLength(commentlength + 1);
+					toast.success('Đăng bình luận thành công!', successOptions);
+				} else {
+					// Xử lý trường hợp API trả về lỗi
+					toast.error(response.message, errorOptions);
+				}
+			}
+			if (post.postId && post.shareId) {
+				const formData = new FormData();
+				formData.append('content', content || '');
+				if (photosComment) {
+					formData.append('photos', photosComment);
+				}
+				const config = {
+					headers: {
+						Authorization: `Bearer ${currentUser.accessToken}`,
+						'Content-Type': 'multipart/form-data',
+					},
+				};
+				formData.append('shareId', post.shareId || '');
+				formData.append('commentId', commentReply.commentId || '');
+
+				const response = await axios.post(`${BASE_URL}/v1/share/comment/reply`, formData, config);
 
 				// Xử lý kết quả trực tiếp trong khối try
 				if (response.status === 200) {

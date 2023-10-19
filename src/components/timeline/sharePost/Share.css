@@ -116,3 +116,7 @@ select {
 .react-input-emoji--input {
   word-break: break-all;
 }
+
+.postFile {
+  margin-bottom: 16px;
+}

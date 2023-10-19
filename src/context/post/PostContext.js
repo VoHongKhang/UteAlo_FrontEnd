@@ -6,7 +6,6 @@ import axios from "axios";
 import { BASE_URL } from "../apiCall";
 import {
   errorOptions,
-  successOptions,
 } from "../../components/utils/toastStyle";
 
 const PostContext = createContext(initialPostState);
@@ -16,7 +15,8 @@ export const PostProvider = ({ children }) => {
 
   const { user } = useAuth();
 
-  const createPost = async (location, content, photos, postGroupId) => {
+  const createPost = async (location, content, photos,files, postGroupId) => {
+    const toastId = toast.loading('Đang gửi yêu cầu...');
     try {
 
       console.log("photosssss "+photos);
@@ -28,6 +28,9 @@ export const PostProvider = ({ children }) => {
       formData.append('location', location || '');
       formData.append('content', content || '') ;
       formData.append('postGroupId', postGroupId || 0);
+      if (files) {
+        formData.append('files', files);
+      }
       if (photos) {
         formData.append('photos', photos);
       }
@@ -49,7 +52,7 @@ export const PostProvider = ({ children }) => {
         payload: data,
       });
   
-      toast.success("Đăng bài thành công", successOptions);
+      toast.success("Đăng bài thành công", { id: toastId });
     } catch (error) {
       dispatch({
         type: "CREATE_POST_FAIL",
@@ -62,6 +65,7 @@ export const PostProvider = ({ children }) => {
 
   // Chia sẻ bài post
   const sharePost = async (content, postId) => {
+    const toastId = toast.loading('Đang gửi yêu cầu...');
     try {
       dispatch({
         type: "CREATE_POST_REQUEST",
@@ -89,7 +93,7 @@ export const PostProvider = ({ children }) => {
         payload: data,
       });
   
-      toast.success("Chia sẻ bài thành công", successOptions);
+      toast.success("Chia sẻ bài thành công", { id: toastId });
     } catch (error) {
       dispatch({
         type: "CREATE_POST_FAIL",

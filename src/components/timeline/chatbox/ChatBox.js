@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
 import './ChatBox.css';
 import noAvatar from '../../../assets/appImages/user.png';
-import {  Add, Minimize, Close, Phone, Camera, Photo, SportsCricketRounded } from '@material-ui/icons';
+import { Add, Minimize, Close, Phone, Camera, Photo, SportsCricketRounded } from '@material-ui/icons';
 import { Input, Button, Space } from 'antd';
-function ChatBox({ user,onCloseChatBox}) {
+import { useHistory } from 'react-router-dom';
+function ChatBox({ user, onCloseChatBox }) {
+	const history = useHistory();
 	const [message, setMessage] = useState('');
 	const [messages, setMessages] = useState([]);
-
+	const handleAvatar = () => {
+		history.push(`/profile/${user.userId}`);
+	};
 	const handleSendMessage = () => {
 		if (message.trim() === '') {
 			return; // Tránh gửi tin nhắn trống
@@ -22,16 +26,21 @@ function ChatBox({ user,onCloseChatBox}) {
 		setMessages([...messages, newMessage]);
 		setMessage('');
 	};
-  const closeChatBox = () => {
-    onCloseChatBox(null);
-  }
+	const closeChatBox = () => {
+		onCloseChatBox(null);
+	};
 
 	return (
 		<div className={`chatbox ${user.userId}`}>
 			<Space direction="vertical" size={12}>
 				<div className="chat-header">
 					<div className="chat-header_left">
-						<img src={user.avatar||noAvatar} alt="..." className="chat-header-avatar" />
+						<img
+							src={user.avatar || noAvatar}
+							alt="..."
+							className="chat-header-avatar"
+							onClick={handleAvatar}
+						/>
 						<div className="chat-header-user">
 							<div className="chat-header-username">{user.username}</div>
 							<div className="chat-header-timestamp">2 giờ trước</div>
@@ -41,7 +50,7 @@ function ChatBox({ user,onCloseChatBox}) {
 						<Camera />
 						<Phone />
 						<Minimize />
-						<Close onClick={closeChatBox}/>
+						<Close onClick={closeChatBox} />
 					</div>
 				</div>
 			</Space>
@@ -56,10 +65,9 @@ function ChatBox({ user,onCloseChatBox}) {
 			</div>
 			<div className="chat-input">
 				<div className="icon-message">
-        <Add />
+					<Add />
 					<Photo />
 					<SportsCricketRounded />
-					
 				</div>
 				<Input
 					className="input-message"

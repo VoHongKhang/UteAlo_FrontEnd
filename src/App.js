@@ -13,6 +13,7 @@ import AuthEmail from './components/auth/AuthEmail/AuthEmail';
 import ResetPassord from './components/auth/ResetPassword/ResetPassword';
 import FriendRequest from './components/friend/friendRequest/FriendRequest';
 import Meessage from './components/messages/Message';
+import Groups from './components/groups/group';
 function App() {
 	RefreshToken();
 	return (
@@ -35,9 +36,11 @@ function App() {
 					<Route excat path="/friends/request">
 						<FriendRequest />
 					</Route>
-
 					<Route excat path="/register">
 						<Register />
+					</Route>
+					<Route excat path="/groups">
+						<Groups />
 					</Route>
 					<ProtectedRoute excat path="/profile/:userId" component={Profile}></ProtectedRoute>
 					<ProtectedRoute excat path="/update/:userId" component={EditProfile}></ProtectedRoute>

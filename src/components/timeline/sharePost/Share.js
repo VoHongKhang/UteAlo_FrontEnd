@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './Share.css';
-import { AttachFile, PermMedia, Room, Cancel } from '@material-ui/icons';
+import { AttachFile, PermMedia, Room, Cancel, Group, Public } from '@material-ui/icons';
 import { Box, CircularProgress } from '@material-ui/core';
 import toast, { Toaster } from 'react-hot-toast';
 import InputEmoji from 'react-input-emoji';
@@ -19,6 +19,7 @@ const Share = ({ fetchPosts }) => {
 	const [photosUrl, setPhotosUrl] = useState();
 	const [filesUrl, setFilesUrl] = useState();
 	const [postGroupId, setPostGroupId] = useState('');
+	const [privacyLevel, setPrivacyLevel] = useState('PUBLIC');
 	const [picLoading, setPicLoading] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
 	const [liveUser, setLiveUser] = useState(null);
@@ -67,6 +68,7 @@ const Share = ({ fetchPosts }) => {
 				content: content || '',
 				photos: photos || '',
 				files: files || '',
+				privacyLevel: privacyLevel || 'PUBLIC',
 				postGroupId: postGroupId || 0,
 			};
 
@@ -75,7 +77,7 @@ const Share = ({ fetchPosts }) => {
 				return;
 			}
 			// Gọi hàm createPost để tạo bài viết mới
-			await createPost(newPost.location, newPost.content, newPost.photos, newPost.files, newPost.postGroupId);
+			await createPost(newPost.location, newPost.content, newPost.photos, newPost.files,newPost.privacyLevel, newPost.postGroupId);
 
 			// Sau khi createPost hoàn thành, gọi fetchPosts để cập nhật danh sách bài viết
 			fetchPosts();
@@ -90,6 +92,10 @@ const Share = ({ fetchPosts }) => {
 			toast.error('Có lỗi xảy ra khi tạo bài viết.');
 		}
 	};
+
+	useEffect(() => {
+		console.log('privacyLevel: ', privacyLevel);
+	}, [privacyLevel]);
 
 	useEffect(() => {
 		const fetchUsers = async () => {
@@ -112,6 +118,8 @@ const Share = ({ fetchPosts }) => {
 	}, [user.userId, user.accessToken]);
 
 	if (isLoading) return <div>Loading...</div>;
+
+
 
 	return (
 		<>
@@ -161,7 +169,7 @@ const Share = ({ fetchPosts }) => {
 								/>
 							</label>
 							<label htmlFor="files" className="shareOption">
-								<AttachFile htmlColor="tomato" className="shareIcon" />
+								<AttachFile htmlColor="brown" className="shareIcon" />
 								<span className="shareOptionText">Tệp</span>
 								<input
 									style={{ display: 'none' }}
@@ -185,22 +193,36 @@ const Share = ({ fetchPosts }) => {
 									</select>
 								</label>
 							</div>
-							<div className="shareOption">
-								<label htmlFor="postGroupId" className="shareOption-one">
+							<div className="shareOption" id="shareGroup">
+								<label htmlFor="postGroupId" className="shareOption-one" style={{ display: 'flex' }}>
+									<Group htmlColor="yellow" className="shareIcon" />
 									<select
 										id="postGroupId"
 										value={postGroupId}
 										onChange={(e) => setPostGroupId(parseInt(e.target.value))}
 									>
-										<option value={-1}>Chỉ mình tôi</option>
-										<option value={0}>Công khai</option>
+										<option value={0}>Cá nhân</option>
 										{liveUser?.postGroup?.map((item) => (
 											<option key={item.postGroupId} value={item.postGroupId}>
 												{item.postGroupName}
 											</option>
 										))}
 									</select>
-									<span style={{ marginRight: '5px' }}>&#9660;</span>
+								</label>
+							</div>
+
+							<div className="shareOption" id="sharePublic">
+								<label htmlFor="privacyLevel" className="shareOption-one" style={{ display: 'flex' }}>
+									<Public htmlColor="black" className="shareIcon" />
+									<select
+										id="privacyLevel"
+										value={privacyLevel}
+										onChange={(e) => setPrivacyLevel(e.target.value)}
+									>
+										<option value="PUBLIC">Công khai</option>
+										<option value="PRIVATE">Chỉ mình tôi</option>
+										<option value="FRIENDS">Bạn bè</option>
+									</select>
 								</label>
 							</div>
 						</div>

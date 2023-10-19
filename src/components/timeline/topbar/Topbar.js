@@ -86,7 +86,7 @@ const Topbar = ({ searchHandler, setSearchKey, searchKey, menuHandler }) => {
 					>
 						<Home className="button-center-home " titleAccess="Trang chủ" />
 					</div>
-					<div className="button-center" onClick={(e) => buttonCenterHandler(e.target,'/group')}>
+					<div className="button-center" onClick={(e) => buttonCenterHandler(e.target,'/groups')}>
 						<Group className="button-center-groups" titleAccess="Nhóm" />
 					</div>
 					<div

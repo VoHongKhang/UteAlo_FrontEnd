@@ -69,6 +69,7 @@ const PostCard = ({ post, fetchPosts }) => {
 	const [editLocation, setEditLocation] = useState('');
 	const [editPhotos, setEditPhotos] = useState('');
 	const [editFiles, setEditFiles] = useState('');
+	const [editPrivacyLevel, setEditPrivacyLevel] = useState('PUBLIC');
 	const [editPhotosUrl, setEditPhotosUrl] = useState('');
 	const [editFilesUrl, setEditFilesUrl] = useState('');
 	const [editPostGroupId, setEditPostGroupId] = useState('');
@@ -86,12 +87,13 @@ const PostCard = ({ post, fetchPosts }) => {
 	};
 
 	// Model xuất hiện khi nhấn chỉnh sửa bài post
-	const showEditModal = (content, location, photos, postGroupId, files) => {
+	const showEditModal = (content, location, photos, postGroupId, files, privacyLevel) => {
 		setEditContent(content);
 		setEditLocation(location);
 		setEditPhotos(photos);
 		setEditPostGroupId(postGroupId);
 		setEditFiles(files);
+		setEditPrivacyLevel(privacyLevel);
 		setIsEditModalVisible(true);
 	};
 
@@ -286,7 +288,7 @@ const PostCard = ({ post, fetchPosts }) => {
 				if (editFiles) {
 					formData.append('files', editFiles || '');
 				}
-				
+
 				formData.append('postGroupId', editPostGroupId || 0);
 
 				const config = {
@@ -438,8 +440,9 @@ const PostCard = ({ post, fetchPosts }) => {
 							<span className="postDate">{formatTime(post.postTime)}</span>
 						</div>
 						<div className="postLoAndName">
-							{post.location && <span className="postLocation">• {post.location || 'Vị trí'}</span>}
+							{post.location && <span className="postLocation">• {post.location}</span>}
 							{post.postGroupName && <span className="postGroupName">• {post.postGroupName}</span>}
+							{post.privacyLevel && <span className="postGroupName">• {post.privacyLevel}</span>}
 						</div>
 					</div>
 					<div className="postTopRight">
@@ -534,13 +537,25 @@ const PostCard = ({ post, fetchPosts }) => {
 											value={editPostGroupId}
 											onChange={(e) => setEditPostGroupId(e.target.value)}
 										>
-											<option value={-1}>Chỉ mình tôi</option>
-											<option value={0}>Công khai</option>
+											<option value={0}>Cá nhân</option>
 											{user?.postGroup?.map((item) => (
 												<option key={item.postGroupId} value={item.postGroupId}>
 													{item.postGroupName}
 												</option>
 											))}
+										</select>
+									</div>
+
+									<div className="editPost">
+										<label className="labelEditPost">Quyền riêng tư:</label>
+										<select
+											id="postGroupId"
+											value={editPrivacyLevel}
+											onChange={(e) => setEditPrivacyLevel(e.target.value)}
+										>
+											<option value="PUBLIC">Công khai</option>
+											<option value="PRIVATE">Chỉ mình tôi</option>
+											<option value="FRIENDS">Bạn bè</option>
 										</select>
 									</div>
 

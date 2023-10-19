@@ -15,11 +15,9 @@ export const PostProvider = ({ children }) => {
 
   const { user } = useAuth();
 
-  const createPost = async (location, content, photos,files, postGroupId) => {
+  const createPost = async (location, content, photos,files,privacyLevel, postGroupId) => {
     const toastId = toast.loading('Đang gửi yêu cầu...');
     try {
-
-      console.log("photosssss "+photos);
       dispatch({
         type: "CREATE_POST_REQUEST",
       });
@@ -28,6 +26,7 @@ export const PostProvider = ({ children }) => {
       formData.append('location', location || '');
       formData.append('content', content || '') ;
       formData.append('postGroupId', postGroupId || 0);
+      formData.append('privacyLevel', privacyLevel || 'PUBLIC');
       if (files) {
         formData.append('files', files);
       }

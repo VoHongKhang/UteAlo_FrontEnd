@@ -120,3 +120,11 @@ select {
 .postFile {
   margin-bottom: 16px;
 }
+
+#sharePublic {
+  margin-left: 36px;
+}
+
+#shareGroup {
+  margin-left: -14px;
+}

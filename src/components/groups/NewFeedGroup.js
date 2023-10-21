@@ -6,13 +6,9 @@ import useTheme from '../../context/ThemeContext';
 import axios from 'axios';
 import { BASE_URL } from '../../context/apiCall';
 import sampleProPic from '../../assets/appImages/user.png';
-import Moment from 'react-moment';
-import { Link, useParams } from 'react-router-dom';
-import { Avatar, Button, Menu } from '@material-ui/core';
 import noCover from '../../assets/appImages/noCover.jpg';
-import { Add, Search, Public, People, MoreHoriz } from '@material-ui/icons';
+import { Search, Public, People, MoreHoriz, Visibility, Room } from '@material-ui/icons';
 const NewFeedGroup = ({ user }) => {
-	const params = useParams();
 	const { user: currentUser } = useAuth();
 	const [posts, setPosts] = useState([]);
 	const [sharePosts, setSharePosts] = useState([]);
@@ -79,6 +75,8 @@ const NewFeedGroup = ({ user }) => {
 
 	const visiblePostData = posts.slice(0, visiblePosts);
 
+	const listImage = [noCover, noCover, noCover, noCover];
+
 	return (
 		<div className="menu--post">
 			<div className="header--group">
@@ -140,7 +138,55 @@ const NewFeedGroup = ({ user }) => {
 						)}
 					</div>
 				</div>
-				<div className="rightbar--group"></div>
+				<div className="rightbar--group">
+					<div className="group--infor">
+						<div className="group--infor-introduce">Giới thiệu</div>
+						<div className="group--infor-bio">
+							<span>
+								DIỄN ĐÀN CHÍNH THỨC CỦA KHOA CÔNG NGHỆ THÔNG TIN - ĐH SƯ PHẠM KỸ THUẬT TP.HCM Đây là cầu
+								nối giữa Ban Chủ Nhiệm, Giảng viên trong Khoa Công Nghệ Thông Tin với sinh viên trong
+								Khoa, giữa các doanh nghiệp với sinh viên và giữa sinh viên công nghệ thông tin Trường
+								ĐH Sư phạm Kỹ thuật Tp.HCM với nhau !
+							</span>
+						</div>
+						<div className="group--infor-public">
+							<Public htmlColor="#65676B" className="group--public-icon" />
+							<span className="group--public">Công khai</span>
+						</div>
+						<div className="group--infor-public-text">
+							<span>Bất kỳ ai cũng có thể nhìn thấy mọi người trong nhóm và những gì họ đăng.</span>
+						</div>
+						<div className="group--infor-show">
+							<Visibility htmlColor="#65676B" className="group--show-icon" />
+							<span className="group--show">Hiển thị</span>
+						</div>
+						<div className="group--infor-show-text">
+							<span>Ai cũng có thể tìm thấy nhóm này.</span>
+						</div>
+
+						<div className="group--infor-location">
+							<Room htmlColor="#65676B" className="group--location-icon" />
+							<span className="group--location">Thành Phố Hồ Chí Minh</span>
+						</div>
+
+						<div className="group--infor-more">Tìm hiểu thêm</div>
+					</div>
+
+					<div className="group--file">
+						<div className="group--file-text">
+							<div className="group--file-text-title">File phương tiện</div>
+							<div className="group--file-text-more">Xem tất cả file</div>
+						</div>
+
+						<div className="file--photos">
+							{Array.from({ length: 4 }).map((_, index) => (
+								<div key={index} className="photoItem">
+									<img src={listImage[index] || sampleProPic} alt="" />
+								</div>
+							))}
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 	);

@@ -16,10 +16,9 @@ import { errorOptions, successOptions } from '../../utils/toastStyle';
 import usePost from '../../../context/post/PostContext';
 import useAuth from '../../../context/auth/AuthContext';
 import LikeOrUnlikeApi from '../../../api/timeline/commentSharePost/likeOrUnilkeShare';
-import GetCommentSharePostApi from '../../../api/timeline/commentSharePost/getCommentSharePost'
+import GetCommentSharePostApi from '../../../api/timeline/commentSharePost/getCommentSharePost';
 import CommentCard from './CommentCard';
 import { Modal } from 'antd';
-
 
 const SharePostCard = ({ share, fetchSharePosts }) => {
 	const isMounted = useRef(true);
@@ -70,6 +69,13 @@ const SharePostCard = ({ share, fetchSharePosts }) => {
 	const [photosCommetUrl, setPhotosCommetUrl] = useState('');
 	const [content, setContent] = useState('');
 	const [post, setPost] = useState('');
+	// Xử lý phần dấu 3 chấm
+	const [showOptions, setShowOptions] = useState(false);
+
+	// Xử lý phần dấu 3 chấm
+	const handleToggleOptions = () => {
+		setShowOptions(!showOptions);
+	};
 
 	// Model xuất hiện khi nhấn xóa bài share
 	const showDeleteConfirm = (shareId) => {
@@ -127,7 +133,6 @@ const SharePostCard = ({ share, fetchSharePosts }) => {
 			console.error(error);
 		}
 	};
-
 
 	// lấy danh sách bình luận trên bài post
 	useEffect(() => {
@@ -267,7 +272,6 @@ const SharePostCard = ({ share, fetchSharePosts }) => {
 		}
 	};
 
-
 	// Xử lý hình ảnh của bình luận
 	const commentDetails = (e) => {
 		const file = e.target.files[0];
@@ -306,7 +310,6 @@ const SharePostCard = ({ share, fetchSharePosts }) => {
 		fetchUsers();
 	}, [share.userId, currentUser.accessToken]);
 
-
 	// Format thời gian
 	function formatTime(time) {
 		const postTime = moment(time);
@@ -326,7 +329,6 @@ const SharePostCard = ({ share, fetchSharePosts }) => {
 		return formattedTime;
 	}
 
-
 	return (
 		<div className="post">
 			<div className="postWrapper">
@@ -340,61 +342,60 @@ const SharePostCard = ({ share, fetchSharePosts }) => {
 							<span className="postDate">{formatTime(share.createAt)}</span>
 						</div>
 					</div>
-					<div className="postTopRight">
-						<button style={{ backgroundColor: '#3b82f6', marginRight: '10px' }} className="shareButton">
-							Chia sẻ
-						</button>
-						{currentUser.userId === share.userId ? (
-							<>
-								<button
-									style={{ backgroundColor: '#3b82f6', marginRight: '10px' }}
-									className="shareButton"
-									onClick={() => showEditModal(share.content)}
-								>
-									Chỉnh sửa
-								</button>
-								<button
-									style={{ backgroundColor: '#3b82f6' }}
-									className="shareButton"
-									onClick={() => showDeleteConfirm(share.shareId)}
-								>
-									Xóa
-								</button>
-								<Modal
-									title="Xác nhận xóa"
-									open={isModalVisible}
-									onOk={() => {
-										deletePostHandler();
-										setIsModalVisible(false);
-									}}
-									onCancel={() => setIsModalVisible(false)}
-								>
-									Bạn có chắc chắn muốn xóa bài viết này?
-								</Modal>
-								<Modal
-									title={<span className="titlEditPost">Chỉnh sửa bài chia sẻ</span>}
-									open={isEditModalVisible}
-									onOk={editPostHandler}
-									onCancel={() => setIsEditModalVisible(false)}
-								>
-									<div className="editPost">
-										<label className="labelEditPost">Nội dung:</label>
-										<textarea
-											value={editContent}
-											onChange={(e) => setEditContent(e.target.value)}
-										/>
-									</div>
-								</Modal>
-							</>
-						) : (
-							<></>
+					<div className="comment" id="postTopRight">
+						<span className="handleToggleCommentOptions" onClick={handleToggleOptions}>
+							...
+						</span>
+						{showOptions && (
+							<div className="commentOption">
+								<span className="postCommentTextUpdate">Chia sẻ</span>
+								{currentUser.userId === share.userId && (
+									<>
+										<span
+											className="postCommentTextUpdate"
+											onClick={() => showEditModal(share.content)}
+										>
+											Chỉnh sửa
+										</span>
+										<span
+											className="postCommentTextDelete"
+											onClick={() => showDeleteConfirm(share.shareId)}
+										>
+											Xóa
+										</span>
+									</>
+								)}
+							</div>
 						)}
 					</div>
 				</div>
-
+				{/* Modal xóa bài viết */}
+				<Modal
+					title="Xác nhận xóa"
+					open={isModalVisible}
+					onOk={() => {
+						deletePostHandler();
+						setIsModalVisible(false);
+					}}
+					onCancel={() => setIsModalVisible(false)}
+				>
+					Bạn có chắc chắn muốn xóa bài viết này?
+				</Modal>
+				{/* Modal chỉnh sửa bài viết */}
+				<Modal
+					title={<span className="titlEditPost">Chỉnh sửa bài chia sẻ</span>}
+					open={isEditModalVisible}
+					onOk={editPostHandler}
+					onCancel={() => setIsEditModalVisible(false)}
+				>
+					<div className="editPost">
+						<label className="labelEditPost">Nội dung:</label>
+						<textarea value={editContent} onChange={(e) => setEditContent(e.target.value)} />
+					</div>
+				</Modal>
 				<div className="postCenter">
 					{share.content && <span className="postText">{share.content}</span>}
-					
+
 					<div className="post">
 						<div className="postWrapper">
 							<div className="postTop">
@@ -415,17 +416,14 @@ const SharePostCard = ({ share, fetchSharePosts }) => {
 										)}
 									</div>
 								</div>
-								
 							</div>
 
 							<div className="postCenter">
 								{post.content && <span className="postText">{post.content}</span>}
 								{post.photos && <img className="postImg" src={post.photos} alt="..." />}
-							</div>			
-		
+							</div>
 						</div>
 					</div>
-
 				</div>
 
 				<div className="postBottom">
@@ -513,7 +511,7 @@ const SharePostCard = ({ share, fetchSharePosts }) => {
 					</div>
 				)}
 			</div>
-		</div> 
+		</div>
 	);
 };
 

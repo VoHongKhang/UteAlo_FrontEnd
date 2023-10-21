@@ -79,6 +79,13 @@ const PostCard = ({ post, fetchPosts }) => {
 	const [content, setContent] = useState('');
 	// Chia sẻ
 	const [isShareModalVisible, setIsShareModalVisible] = useState(false);
+	// Xử lý phần dấu 3 chấm
+	const [showOptions, setShowOptions] = useState(false);
+
+	// Xử lý phần dấu 3 chấm
+	const handleToggleOptions = () => {
+		setShowOptions(!showOptions);
+	};
 
 	// Model xuất hiện khi nhấn xóa bài post
 	const showDeleteConfirm = (postId) => {
@@ -153,6 +160,7 @@ const PostCard = ({ post, fetchPosts }) => {
 		setIsLiked(!isLiked);
 	};
 
+	// Xử lý xem thêm bình luận
 	const toggleShowAllComments = () => {
 		setShowAllComments(!showAllComments);
 	};
@@ -289,6 +297,7 @@ const PostCard = ({ post, fetchPosts }) => {
 					formData.append('files', editFiles || '');
 				}
 
+				formData.append('privacyLevel', editPrivacyLevel || 'PUBLIC');
 				formData.append('postGroupId', editPostGroupId || 0);
 
 				const config = {
@@ -445,198 +454,187 @@ const PostCard = ({ post, fetchPosts }) => {
 							{post.privacyLevel && <span className="postGroupName">• {post.privacyLevel}</span>}
 						</div>
 					</div>
-					<div className="postTopRight">
-						<button
-							style={{ backgroundColor: '#3b82f6', marginRight: '10px' }}
-							className="shareButton"
-							onClick={openShareModal}
-							disabled={createLoading}
-						>
-							Chia sẻ
-						</button>
-						{/* Modal chia sẻ */}
-						<Modal
-							title="Chia sẻ bài viết"
-							open={isShareModalVisible}
-							onOk={closeShareModal} // Đóng modal khi nút "Chia sẻ" được bấm
-							onCancel={closeShareModal}
-							okText="Chia sẻ"
-							okButtonProps={{
-								onClick: sharePostHandler, // Gọi hàm sharePostHandler khi nút "Chia sẻ" được bấm
-							}}
-						>
-							<textarea
-								value={content}
-								onChange={(e) => setContent(e.target.value)}
-								placeholder="Nhập nội dung chia sẻ..."
-							/>
-						</Modal>
-						{currentUser.userId === post.userId ? (
-							<>
-								<button
-									style={{ backgroundColor: '#3b82f6', marginRight: '10px' }}
-									className="shareButton"
-									onClick={() =>
-										showEditModal(
-											post.content,
-											post.location,
-											post.photos,
-											post.postGroupId,
-											post.files
-										)
-									}
+
+					<div className="comment" id="postTopRight">
+						<span className="handleToggleCommentOptions" onClick={handleToggleOptions}>
+							...
+						</span>
+						{showOptions && (
+							<div className="commentOption">
+								<span
+									className="postCommentTextUpdate"
+									onClick={openShareModal}
+									disabled={createLoading}
 								>
-									Chỉnh sửa
-								</button>
-								<button
-									style={{ backgroundColor: '#3b82f6' }}
-									className="shareButton"
-									onClick={() => showDeleteConfirm(post.postId)}
-								>
-									Xóa
-								</button>
-								<Modal
-									title="Xác nhận xóa"
-									open={isModalVisible}
-									onOk={() => {
-										deletePostHandler();
-										setIsModalVisible(false);
-									}}
-									onCancel={() => setIsModalVisible(false)}
-								>
-									Bạn có chắc chắn muốn xóa bài viết này?
-								</Modal>
-								<Modal
-									title={<span className="titlEditPost">Chỉnh sửa bài viết</span>}
-									open={isEditModalVisible}
-									onOk={editPostHandler}
-									onCancel={() => setIsEditModalVisible(false)}
-								>
-									<div className="editPost">
-										<label className="labelEditPost">Nội dung:</label>
-										<textarea
-											value={editContent}
-											onChange={(e) => setEditContent(e.target.value)}
-										/>
-									</div>
-									<div className="editPost">
-										<label className="labelEditPost">Vị trí:</label>
-										<select value={editLocation} onChange={(e) => setEditLocation(e.target.value)}>
-											<option value={editLocation}>{editLocation}</option>
-											{Country.getAllCountries().map((item) => (
-												<option key={item.isoCode} value={item.name}>
-													{item.name}
-												</option>
-											))}
-										</select>
-									</div>
-									<div className="editPost">
-										<label className="labelEditPost">Nhóm:</label>
-										<select
-											id="postGroupId"
-											value={editPostGroupId}
-											onChange={(e) => setEditPostGroupId(e.target.value)}
+									Chia sẻ
+								</span>
+								{currentUser.userId === post.userId && (
+									<>
+										<span
+											className="postCommentTextUpdate"
+											onClick={() =>
+												showEditModal(
+													post.content,
+													post.location,
+													post.photos,
+													post.postGroupId,
+													post.files
+												)
+											}
 										>
-											<option value={0}>Cá nhân</option>
-											{user?.postGroup?.map((item) => (
-												<option key={item.postGroupId} value={item.postGroupId}>
-													{item.postGroupName}
-												</option>
-											))}
-										</select>
-									</div>
-
-									<div className="editPost">
-										<label className="labelEditPost">Quyền riêng tư:</label>
-										<select
-											id="postGroupId"
-											value={editPrivacyLevel}
-											onChange={(e) => setEditPrivacyLevel(e.target.value)}
+											Chỉnh sửa
+										</span>
+										<span
+											className="postCommentTextDelete"
+											onClick={() => showDeleteConfirm(post.postId)}
 										>
-											<option value="PUBLIC">Công khai</option>
-											<option value="PRIVATE">Chỉ mình tôi</option>
-											<option value="FRIENDS">Bạn bè</option>
-										</select>
-									</div>
-
-									<div className="editPost">
-										<label className="labelEditPost">Ảnh:</label>
-										{editPhotosUrl ? (
-											<div className="shareImgContainer">
-												<img className="shareimg" src={editPhotosUrl} alt="..." />
-												<Cancel
-													className="shareCancelImg"
-													onClick={() => setEditPhotosUrl(null)}
-												/>
-											</div>
-										) : editPhotos ? (
-											<div className="shareImgContainer">
-												<img className="shareimg" src={editPhotos} alt="..." />
-												<Cancel
-													className="shareCancelImg"
-													onClick={() => setEditPhotos(null)}
-												/>
-											</div>
-										) : null}
-
-										<label htmlFor="editFile" className="shareOption">
-											<PermMedia htmlColor="tomato" className="shareIcon" />
-											<span className="shareOptionText">Hình ảnh</span>
-											<input
-												style={{ display: 'none' }}
-												type="file"
-												id="editFile"
-												accept=".png, .jpeg, .jpg"
-												onChange={postDetails}
-											/>
-										</label>
-										<div className="editFilesPost">
-											<label className="labelEditPost">Tệp:</label>
-											{editFilesUrl ? (
-												<div className="postFile">
-													<a href={editFilesUrl} target="_blank" rel="noopener noreferrer">
-														{editFilesUrl.substr(editFilesUrl.lastIndexOf('/') + 1)}
-													</a>
-													<Cancel
-														classname="editCancelFiles"
-														onClick={() => setEditFilesUrl(null)}
-													/>
-												</div>
-											) : editFiles ? (
-												<div className="postFile">
-													{editFiles && typeof editFiles === 'string' && (
-														<a href={editFiles} target="_blank" rel="noopener noreferrer">
-															{editFiles.substr(editFiles.lastIndexOf('/') + 1)}
-														</a>
-													)}
-													<Cancel
-														className="editCancelFiles"
-														onClick={() => setEditFiles(null)}
-													/>
-												</div>
-											) : null}
-
-											<label htmlFor="editFiles" className="shareOption">
-												<AttachFile htmlColor="tomato" className="shareIcon" />
-												<span className="shareOptionText">Tệp</span>
-												<input
-													style={{ display: 'none' }}
-													type="file"
-													id="editFiles"
-													accept=".docx, .txt, .pdf"
-													onChange={postFileDetails}
-												/>
-											</label>
-										</div>
-									</div>
-								</Modal>
-							</>
-						) : (
-							<></>
+											Xóa
+										</span>
+									</>
+								)}
+							</div>
 						)}
 					</div>
 				</div>
+				{/* Modal chia sẻ bài viết */}
+				<Modal
+					title="Chia sẻ bài viết"
+					open={isShareModalVisible}
+					onOk={closeShareModal} // Đóng modal khi nút "Chia sẻ" được bấm
+					onCancel={closeShareModal}
+					okText="Chia sẻ"
+					okButtonProps={{
+						onClick: sharePostHandler, // Gọi hàm sharePostHandler khi nút "Chia sẻ" được bấm
+					}}
+				>
+					<textarea
+						value={content}
+						onChange={(e) => setContent(e.target.value)}
+						placeholder="Nhập nội dung chia sẻ..."
+					/>
+				</Modal>
+				{/* Modal xóa bài viết */}
+				<Modal
+					title="Xác nhận xóa"
+					open={isModalVisible}
+					onOk={() => {
+						deletePostHandler();
+						setIsModalVisible(false);
+					}}
+					onCancel={() => setIsModalVisible(false)}
+				>
+					Bạn có chắc chắn muốn xóa bài viết này?
+				</Modal>
+				{/* Modal chỉnh sửa bài viết */}
+				<Modal
+					title={<span className="titlEditPost">Chỉnh sửa bài viết</span>}
+					open={isEditModalVisible}
+					onOk={editPostHandler}
+					onCancel={() => setIsEditModalVisible(false)}
+				>
+					<div className="editPost">
+						<label className="labelEditPost">Nội dung:</label>
+						<textarea value={editContent} onChange={(e) => setEditContent(e.target.value)} />
+					</div>
+					<div className="editPost">
+						<label className="labelEditPost">Vị trí:</label>
+						<select value={editLocation} onChange={(e) => setEditLocation(e.target.value)}>
+							<option value={editLocation}>{editLocation}</option>
+							{Country.getAllCountries().map((item) => (
+								<option key={item.isoCode} value={item.name}>
+									{item.name}
+								</option>
+							))}
+						</select>
+					</div>
+					<div className="editPost">
+						<label className="labelEditPost">Nhóm:</label>
+						<select
+							id="postGroupId"
+							value={editPostGroupId}
+							onChange={(e) => setEditPostGroupId(e.target.value)}
+						>
+							<option value={0}>Cá nhân</option>
+							{user?.postGroup?.map((item) => (
+								<option key={item.postGroupId} value={item.postGroupId}>
+									{item.postGroupName}
+								</option>
+							))}
+						</select>
+					</div>
 
+					<div className="editPost">
+						<label className="labelEditPost">Quyền riêng tư:</label>
+						<select
+							id="postGroupId"
+							value={editPrivacyLevel}
+							onChange={(e) => setEditPrivacyLevel(e.target.value)}
+						>
+							<option value="PUBLIC">Công khai</option>
+							<option value="PRIVATE">Chỉ mình tôi</option>
+							<option value="FRIENDS">Bạn bè</option>
+						</select>
+					</div>
+
+					<div className="editPost">
+						<label className="labelEditPost">Ảnh:</label>
+						{editPhotosUrl ? (
+							<div className="shareImgContainer">
+								<img className="shareimg" src={editPhotosUrl} alt="..." />
+								<Cancel className="shareCancelImg" onClick={() => setEditPhotosUrl(null)} />
+							</div>
+						) : editPhotos ? (
+							<div className="shareImgContainer">
+								<img className="shareimg" src={editPhotos} alt="..." />
+								<Cancel className="shareCancelImg" onClick={() => setEditPhotos(null)} />
+							</div>
+						) : null}
+
+						<label htmlFor="editFile" className="shareOption">
+							<PermMedia htmlColor="tomato" className="shareIcon" />
+							<span className="shareOptionText">Hình ảnh</span>
+							<input
+								style={{ display: 'none' }}
+								type="file"
+								id="editFile"
+								accept=".png, .jpeg, .jpg"
+								onChange={postDetails}
+							/>
+						</label>
+						<div className="editFilesPost">
+							<label className="labelEditPost">Tệp:</label>
+							{editFilesUrl ? (
+								<div className="postFile">
+									<a href={editFilesUrl} target="_blank" rel="noopener noreferrer">
+										{editFilesUrl.substr(editFilesUrl.lastIndexOf('/') + 1)}
+									</a>
+									<Cancel classname="editCancelFiles" onClick={() => setEditFilesUrl(null)} />
+								</div>
+							) : editFiles ? (
+								<div className="postFile">
+									{editFiles && typeof editFiles === 'string' && (
+										<a href={editFiles} target="_blank" rel="noopener noreferrer">
+											{editFiles.substr(editFiles.lastIndexOf('/') + 1)}
+										</a>
+									)}
+									<Cancel className="editCancelFiles" onClick={() => setEditFiles(null)} />
+								</div>
+							) : null}
+
+							<label htmlFor="editFiles" className="shareOption">
+								<AttachFile htmlColor="tomato" className="shareIcon" />
+								<span className="shareOptionText">Tệp</span>
+								<input
+									style={{ display: 'none' }}
+									type="file"
+									id="editFiles"
+									accept=".docx, .txt, .pdf"
+									onChange={postFileDetails}
+								/>
+							</label>
+						</div>
+					</div>
+				</Modal>
 				<div className="postCenter">
 					{post.content && <span className="postText">{post.content}</span>}
 					{post.files && post.files.toLowerCase().endsWith('.txt') && (
@@ -758,7 +756,7 @@ const PostCard = ({ post, fetchPosts }) => {
 
 				{Object.values(comments).length >= 2 && (
 					<div className="showMoreComment" onClick={toggleShowAllComments}>
-						{showAllComments?'Ẩn bình luận':'Xem thêm bình luận'}
+						{showAllComments ? 'Ẩn bình luận' : 'Xem thêm bình luận'}
 					</div>
 				)}
 			</div>

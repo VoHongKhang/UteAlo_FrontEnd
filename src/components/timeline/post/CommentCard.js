@@ -69,6 +69,12 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 	const [photosCommetUrl, setPhotosCommetUrl] = useState('');
 	const [content, setContent] = useState('');
 	const [commentReplies, setCommentReplies] = useState({});
+	const [showAllComments, setShowAllComments] = useState(false);
+
+	// Xử lý xem thêm bình luận
+	const toggleShowAllComments = () => {
+		setShowAllComments(!showAllComments);
+	};
 
 	// Model xuất hiện khi nhấn chỉnh sửa bài post
 	const showDeleteConfirm = (commentId) => {
@@ -209,7 +215,6 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 		}
 	};
 
-
 	// Xử lý hình ảnh của bình luận
 	const commentDetails = async (e) => {
 		const file = e.target.files[0];
@@ -332,7 +337,7 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 					setCommentReplies(res);
 				}
 			}
-			if(post.shareId && post.postId) {
+			if (post.shareId && post.postId) {
 				const res = await GetCommentReplyShareApi.getCommentReply(comment.commentId);
 				if (isMounted.current) {
 					setCommentReplies(res);
@@ -526,18 +531,39 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 			</div>
 
 			<div className="commentReply">
-				{Object.values(commentReplies).map((commentReply) => (
-					<CommentReplyCard
-						commentReply={commentReply}
-						fetchCommentReply={fetchCommentReply}
-						comment={commentReply}
-						post={post}
-						key={commentReply.commentId}
-						onDelete={onDelete}
-						onCreate={onCreate}
-						commentReplyLength={commentLength}
-					/>
-				))}
+				{showAllComments
+					? Object.values(commentReplies).map((commentReply) => (
+							<CommentReplyCard
+								commentReply={commentReply}
+								fetchCommentReply={fetchCommentReply}
+								comment={commentReply}
+								post={post}
+								key={commentReply.commentId}
+								onDelete={onDelete}
+								onCreate={onCreate}
+								commentReplyLength={commentLength}
+							/>
+					  ))
+					: Object.values(commentReplies)
+							.slice(0, 1)
+							.map((commentReply) => (
+								<CommentReplyCard
+									commentReply={commentReply}
+									fetchCommentReply={fetchCommentReply}
+									comment={commentReply}
+									post={post}
+									key={commentReply.commentId}
+									onDelete={onDelete}
+									onCreate={onCreate}
+									commentReplyLength={commentLength}
+								/>
+							))}
+
+				{Object.values(commentReplies).length >= 2 && (
+					<div className="showMoreComment" onClick={toggleShowAllComments}>
+						{showAllComments ? 'Ẩn trả lời bình luận' : 'Xem thêm trả lời bình luận'}
+					</div>
+				)}
 			</div>
 		</div>
 	);

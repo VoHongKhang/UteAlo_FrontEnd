@@ -10,7 +10,7 @@ import Moment from 'react-moment';
 import { Link, useParams } from 'react-router-dom';
 import { Avatar, Button, Menu } from '@material-ui/core';
 import noCover from '../../assets/appImages/noCover.jpg';
-import { Add, Search } from '@material-ui/icons';
+import { Add, Search, Public, People, MoreHoriz } from '@material-ui/icons';
 const NewFeedGroup = ({ user }) => {
 	const params = useParams();
 	const { user: currentUser } = useAuth();
@@ -89,25 +89,44 @@ const NewFeedGroup = ({ user }) => {
 				</div>
 				<div className="group--contanier--top">
 					<div className="group--detail">
-						<span className="group--name">Đam mê bóng đá</span>
-						<span className="group--member">10 thành viên</span>
+						<span className="group--name">DIỄN ĐÀN SINH VIÊN CÔNG NGHỆ THÔNG TIN</span>
+						<div className="group--name-info">
+							<Public htmlColor="#65676B" className="group--public-icon" />
+							<span className="group--public">Nhóm Công khai</span>
+							<People htmlColor="#65676B" className="group--member-icon" />
+							<span className="group--member">10 thành viên</span>
+						</div>
 					</div>
 					<div className="group--header--button">
-						<Button variant="contained" color="primary" className="group--button-add">
-							<Add /> <p>Mời</p>
-						</Button>
+						<button variant="contained" className="group--button-joined">
+							<p> Đã tham gia </p>
+						</button>
+						<button variant="contained" className="group--button-add">
+							<p> + Mời</p>
+						</button>
+						<button variant="contained" className="group--button-more">
+							<p> ▼ </p>
+						</button>
 					</div>
 				</div>
 				<hr />
 				<div className="list--feature--group">
 					<ul className="list-feature">
 						<li>Thảo luận</li>
+						<li>Đáng chú ý</li>
+						<li>Phòng họp mặt</li>
+						<li>Mọi người</li>
+						<li>Sự kiện</li>
 						<li>File phương tiện</li>
-						<li>Mọi người </li>
+						<li>File</li>
 					</ul>
 					<div className="container--search--group">
-						<Search />
-						<span>...</span>
+						<div className="container--search--group-icon">
+							<Search />
+						</div>
+						<div className="container--search--group-more">
+							<MoreHoriz />
+						</div>
 					</div>
 				</div>
 			</div>

@@ -13,7 +13,7 @@ import AuthEmail from './components/auth/AuthEmail/AuthEmail';
 import ResetPassord from './components/auth/ResetPassword/ResetPassword';
 import FriendRequest from './components/friend/friendRequest/FriendRequest';
 import Meessage from './components/messages/Message';
-import Groups from './components/groups/group';
+import Groups from './components/groups/Group';
 function App() {
 	RefreshToken();
 	return (

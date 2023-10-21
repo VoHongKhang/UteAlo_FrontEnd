@@ -758,7 +758,7 @@ const PostCard = ({ post, fetchPosts }) => {
 
 				{Object.values(comments).length >= 2 && (
 					<div className="showMoreComment" onClick={toggleShowAllComments}>
-						Xem thêm bình luận
+						{showAllComments?'Ẩn bình luận':'Xem thêm bình luận'}
 					</div>
 				)}
 			</div>

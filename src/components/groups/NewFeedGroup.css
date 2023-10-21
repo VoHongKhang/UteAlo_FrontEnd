@@ -1,0 +1,74 @@
+.feed {
+	flex: 5.5;
+}
+
+.feedWrapper {
+	padding: 20px;
+}
+.groupCover {
+	height: 320px;
+	position: relative;
+}
+.groupCoverImg {
+	height: 100%;
+	width: 100%;
+	display: block;
+	text-align: center;
+	margin: auto;
+	object-fit: cover;
+	border-bottom-left-radius: 10px;
+	border-bottom-right-radius: 10px;
+}
+.header--group {
+	border-bottom: solid #ccc 1px;
+	background: radial-gradient(black, transparent);
+}
+.group--contanier--top {
+	display: flex;
+	min-height: 85px;
+	align-items: center;
+	margin-left: 32%;
+	justify-content: space-between;
+	margin-right: 12px;
+}
+.group--detail {
+}
+.group--name {
+	font-size: 16px;
+	font-weight: 600;
+	margin-bottom: 10px;
+}
+.list--feature--group {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin: 0px 12px;
+}
+.list-feature {
+}
+.list-feature li {
+	display: inline-block;
+	margin-right: 10px;
+	font-size: 14px;
+	font-weight: 500;
+	color: #333;
+	cursor: pointer;
+}
+.list-feature li:hover {
+	background-color: #fff;
+	color: #000;
+}
+.group--header--button {
+}
+.group--button-add {
+}
+.groupUserImg {
+	width: 150px;
+	height: 150px;
+	position: absolute;
+	bottom: -25%;
+	left: 15%;
+}
+.menu--post {
+	flex: 5.5 1;
+}

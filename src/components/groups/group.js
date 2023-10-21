@@ -7,7 +7,7 @@ import Topbar from '../timeline/topbar/Topbar';
 import { Helmet } from 'react-helmet';
 import { Toaster } from 'react-hot-toast';
 import useAuth from '../../context/auth/AuthContext';
-import Feed from './Feed';
+import NewFeedGroup from './NewFeedGroup';
 import Sidebar from './Sidebar';
 const Groups = () => {
 	const { user: currentUser } = useAuth();
@@ -17,8 +17,8 @@ const Groups = () => {
 			<Toaster />
 			<Topbar />
 			<div className="homeContainer">
-				<Sidebar  />
-				<Feed />
+				<Sidebar user={currentUser} />
+				<NewFeedGroup user={currentUser}/>
 			</div>
 		</>
 	);

@@ -4,51 +4,41 @@ import useTheme from '../../context/ThemeContext';
 import './Sidebar.css';
 import { useHistory } from 'react-router-dom';
 import { Add, Search } from '@material-ui/icons';
+import PostGroupApi from '../../api/postGroups/PostGroupApi';
+import { useState } from 'react';
+import { useEffect } from 'react';
+import noAvatar from '../../assets/appImages/user.png';
 
-const Sidebar = () => {
+const Sidebar = ({ user }) => {
 	const { theme } = useTheme();
 	const history = useHistory();
-	const openReport = () => {
-		// openModal(<ReportModal />);
-	};
-
-	//Đăng xuất
-	const logoutHandler = () => {
-		localStorage.removeItem('userInfo');
-		history.go('/login');
-	};
+	const [listGroupOfMe, setListGroupOfMe] = useState([]);
+	const [listGroupJoin, setListGroupJoin] = useState([]);
+	const discoverHandler = () => {};
+	const ownerGroupHandler = () => {};
 
 	const listAccountAction = [
 		{
-			title: 'Bảng feed của bạn',
-			icon: 'https://s.net.vn/7mBE',
+			postGroupName: 'Bảng feed của bạn',
+			avatarGroup: 'https://s.net.vn/7mBE',
 		},
 		{
-			title: 'Khám phá',
-			icon: 'https://s.net.vn/7mBE',
-			onClick: logoutHandler,
+			postGroupName: 'Khám phá',
+			avatarGroup: 'https://s.net.vn/7mBE',
+			onClick: discoverHandler,
 		},
 		{
-			title: 'Nhóm của bạn',
-			icon: 'https://s.net.vn/7mBE',
-			onClick: logoutHandler,
+			postGroupName: 'Nhóm của bạn',
+			avatarGroup: 'https://s.net.vn/7mBE',
+			onClick: ownerGroupHandler,
 		},
 	];
-	const listGroupOfMe = [];
-
-	const listShortCutAction = [
-		{
-			title: 'Cài đặt',
-			icon: 'https://s.net.vn/7mBE',
-			href: '/settings',
-		},
-		{
-			title: 'Trợ giúp',
-			icon: 'https://s.net.vn/7mBE',
-			href: '/help',
-		},
-	];
-
+	useEffect(async () => {
+		const res = await PostGroupApi.listOwnerGroup(user);
+		setListGroupOfMe(res.result);
+		const resList = await PostGroupApi.listJoinGroup(user);
+		setListGroupJoin(resList.result);
+	}, [user]);
 	const lists = [
 		{
 			data: listAccountAction,
@@ -56,7 +46,7 @@ const Sidebar = () => {
 
 		{
 			title: 'Nhóm bạn đã tham gia',
-			data: listShortCutAction,
+			data: listGroupJoin,
 		},
 		{
 			title: 'Nhóm do bạn quản lý',
@@ -105,7 +95,7 @@ const Sidebar = () => {
 											onClick={item.onClick}
 										>
 											<Space align="center" style={{ width: '100%' }}>
-												<img src={item.icon} alt="avatar_group" className="image--group" />
+												<img src={item.avatarGroup} alt="avatar_group" className="image--group" />
 												<Typography.Text strong>{item.title}</Typography.Text>
 											</Space>
 										</Button>
@@ -118,9 +108,9 @@ const Sidebar = () => {
 										onClick={item.onClick}
 									>
 										<Space align="center" style={{ width: '100%' }}>
-											<img src={item.icon} alt="avatar_group" className="image--group" />
+											<img src={item?.avatarGroup ?item?.avatarGroup: noAvatar} alt="avatar_group" className="image--group" />
 
-											<Typography.Text strong>{item.title}</Typography.Text>
+											<Typography.Text strong>{item.postGroupName}</Typography.Text>
 										</Space>
 									</Button>
 								)}

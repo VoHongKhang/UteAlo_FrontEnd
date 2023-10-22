@@ -1,0 +1,206 @@
+.link--create-group {
+	font-size: 12px;
+	margin-left: 12px;
+}
+.avatar--user--creategroup {
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+	object-fit: cover;
+}
+.group--user-name {
+	display: flex;
+	padding: 12px;
+}
+.user--create--group {
+	display: flex;
+	flex-direction: column;
+	padding-left: 12px;
+	justify-content: space-evenly;
+}
+.name--user--create--group {
+	font-size: 15px;
+	font-weight: 600;
+}
+.user--create--group span {
+	font-size: 12px;
+	font-weight: 400;
+}
+.create--group--sidebar {
+	background: #ccc;
+	flex: 2;
+	height: 100vh;
+	overflow: hidden;
+}
+.container--create-group {
+	display: flex;
+	flex-direction: column;
+	padding: 12px;
+	border-bottom: 1px solid #ccc;
+	flex: 5.5;
+	cursor: not-allowed;
+}
+.topbar--create-group-left img {
+	cursor: pointer;
+	width: 40px;
+	height: 40px;
+}
+.input--create--group--name {
+	padding: 12px;
+	font-size: 16px;
+}
+.create--group-sidebar--container {
+	display: flex;
+	flex-direction: column;
+	padding: 12px;
+	box-sizing: border-box;
+	height: 100%;
+}
+.topbar--create-group-left {
+	display: flex;
+	align-items: center;
+	margin: 12px;
+}
+.select--group--role {
+	display: flex;
+	align-items: center;
+	height: 51px;
+}
+.close--button {
+	background: #fff;
+	height: 35px !important;
+	width: 35px !important;
+	border-radius: 50%;
+	cursor: pointer;
+	margin-right: 12px;
+}
+.close--button:hover {
+	background: #cdd;
+	color: #fff;
+}
+.select--group--role--item {
+	display: flex;
+	flex-direction: column;
+}
+.detail--select {
+	white-space: pre-wrap;
+	font-size: 12px;
+	margin-bottom: 12px;
+	margin-top: -12px;
+	display: block;
+}
+.ant-select-selection-item {
+	display: inline-flex !important;
+	align-items: center;
+	justify-content: space-between;
+	padding: 20px;
+}
+.select-list--friend {
+	display: flex;
+	flex-direction: column;
+
+	box-sizing: border-box;
+}
+.select-list--friend .ant-select-selector {
+	min-height: 51px;
+}
+.select-list--friend .ant-select-selection-overflow-item .ant-select-selection-overflow-item-suffix {
+	padding: 12px;
+}
+.ant-select-item-option-content {
+	display: flex;
+	align-items: center;
+}
+.ant-select-item-option-content p {
+	margin-left: 12px;
+}
+.ant-select-item-option-content img {
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	object-fit: cover;
+}
+.button--create-group {
+	width: 100%;
+	height: 50px;
+	position: absolute;
+	bottom: 0;
+}
+.create-group-right {
+	flex: 5.5;
+	position: relative;
+}
+.create--group--sidebar--header h2 {
+	font-size: 20px;
+	padding: 12px;
+}
+.ant-select-selection-item-content img {
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	object-fit: cover;
+}
+.ant-select-selection-overflow-item {
+	width: 100%;
+}
+.ant-select-selection-item-content {
+	display: inline-flex !important;
+	align-items: center;
+	padding: 2px;
+}
+.formData--create--group {
+	height: 58%;
+	position: relative;
+	overflow-y: scroll;
+}
+.create--group-sidebar--container form {
+	height: 100%;
+}
+.topbar--create-group-right {
+	display: flex;
+	justify-content: end;
+	align-items: center;
+	margin-right: 30px;
+	margin-top: 12px;
+}
+.topbar--create-group-right .button-right {
+	background: #fff;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	padding: 5px 10px;
+	cursor: pointer;
+	margin: 0px 8px;
+}
+.topbar--create-group-right a {
+	margin-left: 8px;
+}
+.container--create-group .container--group,
+.container--create-group .header--group {
+	z-index: -2;
+}
+.container--create-group {
+	position: absolute;
+	left: 0;
+	margin: 70px 30px 30px 30px;
+	border-radius: 10px;
+	border: solid 1px #ccc;
+	box-sizing: border-box;
+	right: 0;
+	bottom: 0;
+	top: 0;
+	overflow: scroll;
+}
+.create-group-right::after {
+	content: '';
+	position: absolute;
+	left: 30px;
+	border-radius: 10px;
+	border: solid 1px #ccc;
+	opacity: 0.5;
+	box-sizing: border-box;
+	background: #242526;
+	right: 30px;
+	bottom: 30px;
+	top: 70px;
+	z-index: -1;
+}

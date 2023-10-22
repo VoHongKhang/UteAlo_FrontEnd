@@ -1,11 +1,15 @@
-.sidebar__group {
+.sidebar--group{
 	flex: 2;
-	height: calc(100vh - 50px);
-	overflow-y: scroll;
+	height: calc(100vh - 56px);
 	position: sticky;
-	top: 100px;
-	padding-top: 100px;
-	border-right: #ccc 2px solid;
+	top: 56px;
+}
+.sidebar__group{
+	overflow-y: scroll;
+    position: sticky;
+    height: calc(100vh - 217px);
+    width: 100%;
+    overflow-x: hidden;
 }
 .topbarImg {
 	width: 40px;
@@ -24,26 +28,26 @@
 }
 
 .topSidebar {
-	position: fixed;
-	min-height: 100px;
 	background-color: #fff;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	z-index: 1;
-	min-width: 26%;
 	border-bottom: solid 1px #ccc;
 }
 
 .topSidebar--setting {
 	display: flex;
-	width: 380px;
+	align-items: center;
+	justify-content: space-between;
 }
 
 .topSidebar--setting-icon {
 	margin: auto;
 }
-
+.topSidebar .ant-space-item{
+	width: 100%;
+}
 
 .icon-setting {
 	width: 36px;

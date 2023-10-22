@@ -16,7 +16,9 @@ const Sidebar = ({ user }) => {
 	const [listGroupJoin, setListGroupJoin] = useState([]);
 	const discoverHandler = () => {};
 	const ownerGroupHandler = () => {};
-
+	const handlerCreateGroup = () =>{
+		history.push("/groups/create")
+	}
 	const listAccountAction = [
 		{
 			postGroupName: 'Bảng feed của bạn',
@@ -55,7 +57,7 @@ const Sidebar = ({ user }) => {
 	];
 
 	return (
-		<>
+		<div className='sidebar--group'>
 			<Space className="topSidebar" direction="vertical">
 				<div className="topSidebar--setting">
 					<div className="group--infor-introduce">Nhóm</div>
@@ -79,7 +81,7 @@ const Sidebar = ({ user }) => {
 					<input type="text" placeholder="Tìm kiếm nhóm" className="input__search" />
 				</div>
 				<div className="topSidebar__createGroup">
-					<Button type="primary" block className="topSidebar__button">
+					<Button type="primary" block className="topSidebar__button" onClick={handlerCreateGroup}>
 						<span className="icon--plus">+</span>
 						<span className="createGroup--text">Tạo nhóm mới</span>
 					</Button>
@@ -88,7 +90,7 @@ const Sidebar = ({ user }) => {
 			<Space
 				className="sidebar__group"
 				direction="vertical"
-				style={{ overflow: 'auto', color: theme.foreground, background: theme.background, width: '90%' }}
+				style={{ color: theme.foreground, background: theme.background }}
 			>
 				{lists.map((list, index) => (
 					<List
@@ -144,7 +146,7 @@ const Sidebar = ({ user }) => {
 					/>
 				))}
 			</Space>
-		</>
+		</div>
 	);
 };
 export default Sidebar;

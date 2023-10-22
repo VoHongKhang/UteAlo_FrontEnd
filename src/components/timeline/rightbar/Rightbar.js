@@ -4,6 +4,7 @@ import adverSymbol from '../../../assets/appImages/adverSym.jpg';
 import adImg from '../../../assets/appImages/adver.jpg';
 import adImg2 from '../../../assets/appImages/adver4.jpg';
 import useTheme from '../../../context/ThemeContext';
+import noAvatar from '../../../assets/appImages/user.png';
 import './Rightbar.css';
 import { useEffect, useState } from 'react';
 import ChatBox from '../chatbox/ChatBox';
@@ -110,7 +111,7 @@ const Rightbar = ({ user }) => {
 								{list.title === 'Yêu cầu kết bạn' ? (
 									<Space align="center" style={{ width: '100%' }}>
 										<Link to={`/profile/${item.userId}`}>
-											<img src={item.avatar} alt="..." className="topbarImg" />
+											<img src={item?.avatar ? item?.avatar : noAvatar} alt="..." className="topbarImg" />
 										</Link>
 										<Typography.Text className="username_fq" strong>
 											{item.username}
@@ -141,7 +142,7 @@ const Rightbar = ({ user }) => {
 											style={{ width: '100%', cursor: 'pointer' }}
 											onClick={() => messageHandler(item)}
 										>
-											<img src={item.avatar} alt="..." className="topbarImg" />
+											<img src={item?.avatar ? item?.avatar : noAvatar} alt="..." className="topbarImg" />
 											<Typography.Text strong>{item.username}</Typography.Text>
 										</Space>
 									</Button>

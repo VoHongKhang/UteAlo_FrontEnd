@@ -1,10 +1,24 @@
+.container--group {
+	background-color: #e9eaf4;
+}
+
 .feed {
-	flex: 5.5;
+	flex: 5.22;
+	margin-left: 20px;
 }
 
 .feedWrapper {
 	padding: 20px;
 }
+
+.post {
+	background: #FFFFFF;
+}
+
+.share {
+	background: #FFFFFF;
+}
+
 .groupCover {
 	height: 320px;
 	position: relative;
@@ -175,6 +189,7 @@
 
 .rightbar--group {
 	flex:4;
+	margin-top: -31px;
 }
 
 .group--infor {
@@ -216,6 +231,14 @@
     margin-left: 6px;
 }
 
+.group--public-text {
+	display: flex;
+    justify-content: center;
+    align-items: center;
+	margin-left: 4px;
+	margin-right: 20px;
+}
+
 .group--infor-public-text, .group--infor-show-text {
 	margin-left: 40px;
 	margin-top: 10px;
@@ -248,6 +271,7 @@
 	box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.1), 0px -3px 5px rgba(0, 0, 0, 0.1), 3px 0px 5px rgba(0, 0, 0, 0.1),
 		-3px 0px 5px rgba(0, 0, 0, 0.1);
 	border-radius: 10px;
+	margin-bottom: 20px;
 }
 
 .group--file-text {
@@ -271,23 +295,24 @@
 .file--photos {
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
-	grid-template-rows: repeat(2, 1fr); /* Sử dụng 3 hàng */
+	grid-template-rows: repeat(2, 1fr); /* Sử dụng 2 hàng */
 	margin-top: 4px;
 	gap: 8px; /* Khoảng cách giữa các ảnh */
-	width: 100%;
+	width: 96%;
 	height: 88%; /* Chiều cao tự động thay vì cố định 88% */
 	padding: 8px 8px;
+	margin: auto;
+	margin-top: 4px;
 }
 
-.photoItem {
+.filePhotoItem {
 	width: 100%;
 	height: 100%;
 	overflow: hidden;
 }
 
-.photoItem img {
-	width: 96%;
-	height: 96%;
-	/* border-radius: 50%; */
-	/* object-fit: cover;  Đảm bảo ảnh vừa với khu vực hiển thị */
+.filePhotoItem img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
 }

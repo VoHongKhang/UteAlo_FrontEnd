@@ -3,7 +3,7 @@
 	height: calc(100vh - 50px);
 	overflow-y: scroll;
 	position: sticky;
-	top: 50px;
+	top: 100px;
 	padding-top: 100px;
 	border-right: #ccc 2px solid;
 }
@@ -14,6 +14,15 @@
 	object-fit: cover;
 	cursor: pointer;
 }
+.group--infor-introduce {
+	font-size: 22px;
+	font-weight: 600;
+	padding-top: 15px;
+	padding-left: 15px;
+	margin: auto;
+	margin-left: 6px;
+}
+
 .topSidebar {
 	position: fixed;
 	min-height: 100px;
@@ -25,15 +34,36 @@
 	min-width: 26%;
 	border-bottom: solid 1px #ccc;
 }
+
+.topSidebar--setting {
+	display: flex;
+	width: 380px;
+}
+
+.topSidebar--setting-icon {
+	margin: auto;
+}
+
+
+.icon-setting {
+	width: 36px;
+    height: 36px;
+	border-radius: 50%;
+    background: #E4E6EB;
+	margin: auto;
+	margin-top: 13px;
+	display: flex;
+	margin-right: 10px;
+}
+
 .topSidebar__search {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background: #fff;
-	border-radius: 10px;
-	min-width: 300px;
+	border-radius: 30px;
+	min-width: 350px;
 	min-height: 35px;
-	border: solid 1px #ccc;
+	background: #f0f2f5;
 }
 .icon__search {
 	min-width: 30px;
@@ -47,12 +77,43 @@
 	border: none;
 	border-radius: 10px;
 	outline: none;
+	border-radius: 20px;
+	background: #f0f2f5;
 }
 .topSidebar__button {
 	display: flex;
+	display: flex;
+
 }
+
 .topSidebar__createGroup {
+	margin-bottom: 14px;
+    margin-top: 12px;
+    width: 340px;
+    height: 40px;
 }
+
+.icon--plus {
+	color: #0064d1;
+	font-size: 22px;
+	margin-left: 100px;
+	margin-top: -3px;
+}
+
+.createGroup--text {
+	color: #0064d1;
+	margin: auto;
+    font-size: 15px;
+	margin-right: 88px;
+    margin-top: 2px;
+	font-weight: 600;
+}
+
+.topSidebar__button {
+	background: #ebf5ff;
+    height: 36px;
+}
+
 ::-webkit-scrollbar {
 	width: 5px;
 }

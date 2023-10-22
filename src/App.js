@@ -14,6 +14,7 @@ import ResetPassord from './components/auth/ResetPassword/ResetPassword';
 import FriendRequest from './components/friend/friendRequest/FriendRequest';
 import Meessage from './components/messages/Message';
 import Groups from './components/groups/Group';
+import CreateGroup from './components/groups/createGroup/CreateGroup';
 function App() {
 	RefreshToken();
 	return (
@@ -39,9 +40,13 @@ function App() {
 					<Route excat path="/register">
 						<Register />
 					</Route>
+					<Route excat path="/groups/create">
+						<CreateGroup />
+					</Route>
 					<Route excat path="/groups">
 						<Groups />
 					</Route>
+					
 					<ProtectedRoute excat path="/profile/:userId" component={Profile}></ProtectedRoute>
 					<ProtectedRoute excat path="/update/:userId" component={EditProfile}></ProtectedRoute>
 					<ProtectedRoute excat path="/" component={Timeline}></ProtectedRoute>

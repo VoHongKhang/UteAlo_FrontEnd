@@ -8,7 +8,12 @@ import { BASE_URL } from '../../context/apiCall';
 import sampleProPic from '../../assets/appImages/user.png';
 import noCover from '../../assets/appImages/noCover.jpg';
 import { Search, Public, People, MoreHoriz, Visibility, Room } from '@material-ui/icons';
+import { useParams } from 'react-router-dom';
+import Share from '../timeline/sharePost/Share';
+import { Box, CircularProgress } from '@material-ui/core';
+
 const NewFeedGroup = ({ user }) => {
+	const params = useParams();
 	const { user: currentUser } = useAuth();
 	const [posts, setPosts] = useState([]);
 	const [sharePosts, setSharePosts] = useState([]);
@@ -77,6 +82,32 @@ const NewFeedGroup = ({ user }) => {
 
 	const listImage = [noCover, noCover, noCover, noCover];
 
+	// Hàm border-radius 4 gốc cho 4 ảnh
+	function getImageStyles(index) {
+		let borderStyles = '';
+
+		switch (index) {
+			case 0:
+				borderStyles = '8px 0 0 0';
+				break;
+			case 1:
+				borderStyles = '0 8px 0 0';
+				break;
+			case 2:
+				borderStyles = '0 0 0 8px';
+				break;
+			case 3:
+				borderStyles = '0 0 8px 0';
+				break;
+			default:
+				borderStyles = '0';
+		}
+
+		return {
+			borderRadius: borderStyles,
+		};
+	}
+
 	return (
 		<div className="menu--post">
 			<div className="header--group">
@@ -90,7 +121,7 @@ const NewFeedGroup = ({ user }) => {
 						<span className="group--name">DIỄN ĐÀN SINH VIÊN CÔNG NGHỆ THÔNG TIN</span>
 						<div className="group--name-info">
 							<Public htmlColor="#65676B" className="group--public-icon" />
-							<span className="group--public">Nhóm Công khai</span>
+							<span className="group--public-text">Nhóm Công khai</span>
 							<People htmlColor="#65676B" className="group--member-icon" />
 							<span className="group--member">10 thành viên</span>
 						</div>
@@ -129,8 +160,14 @@ const NewFeedGroup = ({ user }) => {
 				</div>
 			</div>
 			<div className="container--group">
-				<div className="feed" style={{ color: theme.foreground, background: theme.background }}>
+				<div className="feed">
 					<div className="feedWrapper">
+						{(!params.userId || params.userId === currentUser.userId) && <Share fetchPosts={fetchPosts} />}
+						{loading && (
+							<Box display="flex" justifyContent="center" sx={{ my: 2 }}>
+								<CircularProgress color="secondary" />
+							</Box>
+						)}
 						{visiblePostData.length === 0 ? (
 							<h2 style={{ marginTop: '20px' }}>No posts yet!</h2>
 						) : (
@@ -180,7 +217,7 @@ const NewFeedGroup = ({ user }) => {
 
 						<div className="file--photos">
 							{Array.from({ length: 4 }).map((_, index) => (
-								<div key={index} className="photoItem">
+								<div key={index} className="filePhotoItem" style={getImageStyles(index)}>
 									<img src={listImage[index] || sampleProPic} alt="" />
 								</div>
 							))}

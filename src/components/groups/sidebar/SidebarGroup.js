@@ -1,24 +1,22 @@
 import { Button, Divider, List, Space, Typography } from 'antd';
 import { Link } from 'react-router-dom';
-import useTheme from '../../context/ThemeContext';
-import './Sidebar.css';
-import { useHistory } from 'react-router-dom';
+import useTheme from '../../../context/ThemeContext';
+import './SidebarGroup.css';
+import { useNavigate } from 'react-router-dom';
 import { Search, Settings, RssFeed, Explore, People } from '@material-ui/icons';
-import PostGroupApi from '../../api/postGroups/PostGroupApi';
-import { useState } from 'react';
-import { useEffect } from 'react';
-import noAvatar from '../../assets/appImages/user.png';
+import PostGroupApi from '../../../api/postGroups/PostGroupApi';
+import { useEffect, useState } from 'react';
 
-const Sidebar = ({ user }) => {
+const SidebarGroup = ({ user, onPostGroupIdChange }) => {
 	const { theme } = useTheme();
-	const history = useHistory();
+	const navigate = useNavigate();
 	const [listGroupOfMe, setListGroupOfMe] = useState([]);
 	const [listGroupJoin, setListGroupJoin] = useState([]);
 	const discoverHandler = () => {};
 	const ownerGroupHandler = () => {};
-	const handlerCreateGroup = () =>{
-		history.push("/groups/create")
-	}
+	const handlerCreateGroup = () => {
+		navigate('/groups/create');
+	};
 	const listAccountAction = [
 		{
 			postGroupName: 'Bảng feed của bạn',
@@ -35,11 +33,14 @@ const Sidebar = ({ user }) => {
 			onClick: ownerGroupHandler,
 		},
 	];
-	useEffect(async () => {
-		const res = await PostGroupApi.listOwnerGroup(user);
-		setListGroupOfMe(res.result);
-		const resList = await PostGroupApi.listJoinGroup(user);
-		setListGroupJoin(resList.result);
+	useEffect(() => {
+		async function fetchData() {
+			const res = await PostGroupApi.listOwnerGroup(user);
+			setListGroupOfMe(res.result);
+			const resList = await PostGroupApi.listJoinGroup(user);
+			setListGroupJoin(resList.result);
+		}
+		fetchData();
 	}, [user]);
 	const lists = [
 		{
@@ -55,9 +56,11 @@ const Sidebar = ({ user }) => {
 			data: listGroupOfMe,
 		},
 	];
-
+	const handlerClickGroup = (item) => {
+		onPostGroupIdChange(item);
+	};
 	return (
-		<div className='sidebar--group'>
+		<div className="sidebar--group">
 			<Space className="topSidebar" direction="vertical">
 				<div className="topSidebar--setting">
 					<div className="group--infor-introduce">Nhóm</div>
@@ -129,12 +132,14 @@ const Sidebar = ({ user }) => {
 										type="text"
 										block
 										style={{ height: 'auto', padding: '8px' }}
-										onClick={item.onClick}
+										onClick={() => {
+											handlerClickGroup(item);
+										}}
 									>
 										<Space align="center" style={{ width: '100%', marginLeft: '10px' }}>
 											<div className="icon-setting">{item.avatarGroup}</div>
 											<div style={{ marginTop: '14px' }}>
-												<Typography.Text strong >
+												<Typography.Text strong>
 													<div style={{ fontSize: '15px' }}>{item.postGroupName}</div>
 												</Typography.Text>
 											</div>
@@ -149,4 +154,4 @@ const Sidebar = ({ user }) => {
 		</div>
 	);
 };
-export default Sidebar;
+export default SidebarGroup;

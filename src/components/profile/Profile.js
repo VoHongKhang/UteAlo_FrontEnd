@@ -9,7 +9,6 @@ import axios from 'axios';
 import { BASE_URL } from '../../context/apiCall';
 import FeedOfUser from '../timeline/feed/FeedOfUser';
 import Topbar from '../timeline/topbar/Topbar';
-import Moment from 'react-moment';
 import { Avatar } from '@material-ui/core';
 import { Edit } from '@material-ui/icons';
 import { Helmet } from 'react-helmet';
@@ -17,11 +16,11 @@ import toast, { Toaster } from 'react-hot-toast';
 import useAuth from '../../context/auth/AuthContext';
 import useTheme from '../../context/ThemeContext';
 import { Space, Button, Modal } from 'antd';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import userAction from '../../components/action/useUserAction';
 const Profile = () => {
 	const [user, setUser] = useState({});
-	const history = useHistory();
+	const navigate = useNavigate();
 	let listMessage = [
 		'Retrieving user profile successfully and access update denied',
 		'Retrieving user profile successfully and access update',
@@ -239,7 +238,7 @@ const Profile = () => {
 								Joined on:{' '}
 								{(
 									<em>
-										<Moment format="YYYY/MM/DD">{user?.createdAt}</Moment>
+										{user?.createdAt}
 									</em>
 								) || '----'}
 							</small>
@@ -249,7 +248,7 @@ const Profile = () => {
 								<Button type="default" onClick={handleButtonFriend}>
 									{status}
 								</Button>
-								<Button type="primary" onClick={() => history.push(`/message/${params.userId}`)}>
+								<Button type="primary" onClick={() =>navigate(`/message/${currentUser.userId}`)}>
 									Message
 								</Button>
 							</Space>

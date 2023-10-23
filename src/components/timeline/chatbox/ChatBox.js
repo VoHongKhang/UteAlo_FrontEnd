@@ -3,13 +3,13 @@ import './ChatBox.css';
 import noAvatar from '../../../assets/appImages/user.png';
 import { Add, Minimize, Close, Phone, Camera, Photo, SportsCricketRounded } from '@material-ui/icons';
 import { Input, Button, Space } from 'antd';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 function ChatBox({ user, onCloseChatBox }) {
-	const history = useHistory();
 	const [message, setMessage] = useState('');
 	const [messages, setMessages] = useState([]);
+	const navigate = useNavigate();
 	const handleAvatar = () => {
-		history.push(`/profile/${user.userId}`);
+		navigate(`/profile/${user.userId}`);
 	};
 	const handleSendMessage = () => {
 		if (message.trim() === '') {

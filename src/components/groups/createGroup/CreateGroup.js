@@ -5,9 +5,9 @@ import toast, { Toaster } from 'react-hot-toast';
 import useAuth from '../../../context/auth/AuthContext';
 import useTheme from '../../../context/ThemeContext';
 import noAvatar from '../../../assets/appImages/user.png';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { BASE_URL } from '../../../context/apiCall';
-import { Notifications, Message, Public, LocalActivityOutlined, Lock } from '@material-ui/icons';
+import { Notifications, Message, Public, Lock } from '@material-ui/icons';
 import './CreateGroup.css';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -22,22 +22,17 @@ const CreateGroup = () => {
 	const [listFriends, setListFriends] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [role, setRole] = useState('Quyền riêng tư nhóm');
-	const history = useHistory();
+	const navigate = useNavigate();
 	const handderMessageClick = () => {
-		history.push(`/message/${currentUser.userId}}`);
+		navigate(`/message/${currentUser.userId}`);
 	};
 	const handderNotificationClick = () => {
-		history.push(`notification/${currentUser.userId}`);
+		navigate(`/notification/${currentUser.userId}`);
 	};
 	const [form] = Form.useForm();
 	const handlerSelectFriend = async () => {
 		try {
 			setLoading(true);
-			const config = {
-				headers: {
-					Authorization: `Bearer ${currentUser.accessToken}`,
-				},
-			};
 			const response = await GetFriendApi.getFriend(currentUser);
 			setListFriends(response.result);
 			setLoading(false);
@@ -58,9 +53,8 @@ const CreateGroup = () => {
 		fetchUsers();
 	}, [currentUser]);
 	const handlerClose = () => {
-		history.push(`/groups`);
+		navigate(`/groups`);
 	};
-	const selectRole = document.querySelector('.select--group--role');
 	const listDetailRole = [
 		'Bất kỳ ai cũng có thể nhìn thấy mọi người trong nhóm và những gì họ đăng.',
 		'Chỉ thành viên mới nhìn thấy mọi người trong nhóm và những gì họ đăng.',
@@ -75,7 +69,7 @@ const CreateGroup = () => {
 	};
 	const handlefinishForm = async () => {
 		const toastId = toast.loading('Đang gửi yêu cầu...');
-		const message = "Tạo nhóm thất bại !!!";
+		const message = 'Tạo nhóm thất bại !!!';
 		let dataGroup = {
 			postGroupName: nameGroup,
 			public: role === 'Public' ? true : false,
@@ -84,8 +78,7 @@ const CreateGroup = () => {
 		try {
 			const res = await PostGroupApi.createGroup({ user: currentUser, data: dataGroup });
 			toast.success('Tạo nhóm thành công!!!', { id: toastId });
-			message += res.data.message
-			history.push(`/groups/${res.data}`)
+			navigate(`/groups/detail/${res.data}`);
 		} catch {
 			toast.error(`${message}`, { id: toastId });
 		}
@@ -104,7 +97,7 @@ const CreateGroup = () => {
 					<div className="create--group--sidebar--header">
 						<div className="topbar--create-group-left">
 							<Close onClick={handlerClose} className="close--button" />
-							<img src={noAvatar} alt="icon" onClick={() => history.push(`/`)} />
+							<img src={noAvatar} alt="icon" onClick={() => navigate('/')} />
 						</div>
 						<span className="link--create-group">Nhóm {'>'} Tạo nhóm </span>
 						<h2>Tạo nhóm</h2>
@@ -158,7 +151,7 @@ const CreateGroup = () => {
 														<Public /> <p>Công khai</p>{' '}
 													</>
 												),
-												value: 'Pulic',
+												value: 'Public',
 											},
 											{
 												label: (

@@ -1,14 +1,13 @@
 import './CreateGroup.css';
-import './../NewFeedGroup.css';
 import useTheme from '../../../context/ThemeContext';
 import sampleProPic from '../../../assets/appImages/user.png';
 import noCover from './../../../assets/appImages/noCover.jpg';
 import Share from '../../timeline/sharePost/Share';
-import {  Search, Public, People, MoreHoriz} from '@material-ui/icons';
-const CreateGroupCard = ({nameGroup, role}) => {
+import { Search, Public, People, MoreHoriz } from '@material-ui/icons';
+const CreateGroupCard = ({ nameGroup, role }) => {
 	const { theme } = useTheme();
-	console.log("nameGroup",nameGroup);
-	console.log("role",role);
+	console.log('nameGroup', nameGroup);
+	console.log('role', role);
 	return (
 		<div className="container--create-group">
 			<div className="header--group">
@@ -26,7 +25,7 @@ const CreateGroupCard = ({nameGroup, role}) => {
 							<People htmlColor="#65676B" className="group--member-icon" />
 							<span className="group--member">1 thành viên</span>
 						</div>
-					</div>				
+					</div>
 				</div>
 				<hr />
 				<div className="list--feature--group">
@@ -49,12 +48,11 @@ const CreateGroupCard = ({nameGroup, role}) => {
 			<div className="container--group">
 				<div className="feed">
 					<div className="feedWrapper">
-						<Share  />
+						<Share />
 					</div>
 				</div>
 			</div>
 		</div>
-		
 	);
 };
 export default CreateGroupCard;

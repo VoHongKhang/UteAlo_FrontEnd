@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import './NewFeedGroup.css';
-import PostCard from '../timeline/post/PostCard';
-import useAuth from '../../context/auth/AuthContext';
-import useTheme from '../../context/ThemeContext';
+import PostCard from '../../timeline/post/PostCard';
+import useAuth from '../../../context/auth/AuthContext';
+import useTheme from '../../../context/ThemeContext';
 import axios from 'axios';
-import { BASE_URL } from '../../context/apiCall';
-import sampleProPic from '../../assets/appImages/user.png';
-import noCover from '../../assets/appImages/noCover.jpg';
+import { BASE_URL } from '../../../context/apiCall';
+import sampleProPic from '../../../assets/appImages/user.png';
+import noCover from '../../../assets/appImages/noCover.jpg';
 import { Search, Public, People, MoreHoriz, Visibility, Room } from '@material-ui/icons';
 import { useParams } from 'react-router-dom';
-import Share from '../timeline/sharePost/Share';
+import Share from '../../timeline/sharePost/Share';
 import { Box, CircularProgress } from '@material-ui/core';
 
-const NewFeedGroup = ({ user,postGroup }) => {
+const GroupDetail = ({ user,postGroup }) => {
 	console.log('postGroup',postGroup);
 	const params = useParams();
 	const { user: currentUser } = useAuth();
@@ -21,7 +20,6 @@ const NewFeedGroup = ({ user,postGroup }) => {
 	const [loading, setLoading] = useState(false);
 	const [visiblePosts, setVisiblePosts] = useState(3); // Số lượng bài viết hiển thị ban đầu
 	const { theme } = useTheme();
-
 
 	// Lấy danh sách bài post
 	const fetchPosts = async () => {
@@ -109,7 +107,6 @@ const NewFeedGroup = ({ user,postGroup }) => {
 			borderRadius: borderStyles,
 		};
 	}
-
 
 	return (
 		<div className="menu--post">
@@ -232,4 +229,4 @@ const NewFeedGroup = ({ user,postGroup }) => {
 	);
 };
 
-export default NewFeedGroup;
+export default GroupDetail;

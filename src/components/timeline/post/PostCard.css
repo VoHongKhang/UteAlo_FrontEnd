@@ -67,8 +67,18 @@
   margin-top: 4px;
   font-size: 12px;
   margin-left: 10px;
-  color:#65676B;
+  color: #65676B;
   display: block;
+}
+
+.ant-modal-content {
+  width: 130%;
+  margin-left: -12%;
+}
+
+.postDate:hover {
+  cursor: pointer;
+  text-decoration: underline;
 }
 
 .postCenter {
@@ -172,7 +182,7 @@
   margin-top: 10px;
   min-height: 40px;
   display: flex;
-  align-items: center;  
+  align-items: center;
   padding: 6px;
   background-color: #f0f2f5;
   border-radius: 30px;
@@ -201,8 +211,8 @@
   width: 30px;
   height: 20px;
   display: flex;
-  justify-content: center; 
-  align-items: center; 
+  justify-content: center;
+  align-items: center;
   margin-left: 20px;
 }
 
@@ -224,7 +234,9 @@
   margin-top: -20px;
 }
 
-.postCommentTextDelete, .postCommentTextUpdate, .postCommentReply {
+.postCommentTextDelete,
+.postCommentTextUpdate,
+.postCommentReply {
   margin-left: 6px;
   cursor: pointer;
   font-weight: bold;
@@ -269,7 +281,7 @@
 }
 
 .liked {
-  color: blue; 
+  color: blue;
 }
 
 .showMoreComment {
@@ -304,7 +316,7 @@
 .labelEditPost {
   display: block;
   margin-bottom: 5px;
-  color: rgb(0, 0, 0); 
+  color: rgb(0, 0, 0);
   font-size: 16px;
   font-weight: 600;
 }
@@ -316,7 +328,7 @@
   border: 1px solid rgb(169, 169, 169);
   border-radius: 5px;
   font-size: 16px;
-  color: rgb(0, 0, 0); 
+  color: rgb(0, 0, 0);
   font-size: 14px;
 }
 
@@ -410,10 +422,14 @@
 .commentOption:after {
   content: "";
   position: absolute;
-  top: -19px; /* Khoảng cách từ tam giác đến commentOption */
-  left: 20%; /* Ở giữa đỉnh */
-  transform: translateX(-50%); /* Dịch chuyển 50% chiều ngang để căn giữa */
-  border-width: 10px; /* Độ dài của tam giác */
+  top: -19px;
+  /* Khoảng cách từ tam giác đến commentOption */
+  left: 20%;
+  /* Ở giữa đỉnh */
+  transform: translateX(-50%);
+  /* Dịch chuyển 50% chiều ngang để căn giữa */
+  border-width: 10px;
+  /* Độ dài của tam giác */
   border-style: solid;
   border-color: transparent transparent white transparent;
 }
@@ -445,10 +461,9 @@
 }
 
 #editCancelFiles {
-  margin-top:430px;
+  margin-top: 430px;
 }
 
 .editFilesPost {
   margin-top: 24px;
 }
-

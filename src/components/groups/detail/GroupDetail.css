@@ -1,29 +1,29 @@
-.menu--post .container--group {
+.container--group {
 	background-color: #e9eaf4;
 }
 
-.menu--post .feed {
+.feed {
 	flex: 5.22;
 	margin-left: 20px;
 }
 
-.menu--post .feedWrapper {
+.feedWrapper {
 	padding: 20px;
 }
 
-.menu--post .post {
+.post {
 	background: #FFFFFF;
 }
 
-.menu--post .share {
+.share {
 	background: #FFFFFF;
 }
 
-.menu--post .groupCover {
+.groupCover {
 	height: 320px;
 	position: relative;
 }
-.menu--post .groupCoverImg {
+.groupCoverImg {
 	height: 100%;
 	width: 100%;
 	display: block;
@@ -33,10 +33,10 @@
 	border-bottom-left-radius: 10px;
 	border-bottom-right-radius: 10px;
 }
-.menu--post .header--group {
+.header--group {
 	border-bottom: solid #ccc 1px;
 }
-.menu--post .group--contanier--top {
+.group--contanier--top {
 	display: flex;
 	min-height: 120px;
 	align-items: center;
@@ -45,11 +45,11 @@
 	margin-right: 6%;
 }
 
-.menu--post .group--detail {
+.group--detail {
 	width: 320px;
 }
 
-.menu--post .group--name {
+.group--name {
 	font-size: 16px;
 	font-weight: 600;
 	margin-bottom: 10px;

@@ -1,12 +1,11 @@
 import React, { useEffect } from 'react';
 import { Button, Card, Divider, Form, Input, theme, Typography } from 'antd';
-import { Link } from 'react-router-dom';
 import useAuth from '../../../context/auth/AuthContext';
-import { useHistory } from 'react-router-dom';
+import { Link,useNavigate } from 'react-router-dom';
 
 const LoginForm = () => {
-	const history = useHistory();
 	const { user, loading, loginReq } = useAuth();
+	const navigate = useNavigate();
 	const { token } = theme.useToken();
 	const [form] = Form.useForm();
 	// Login submit handler
@@ -18,9 +17,9 @@ const LoginForm = () => {
 	// if req is successfull, i.e. if user is found in local storage push to timeline screen.
 	useEffect(() => {
 		if (user) {
-			history.push('/');
+			navigate('/');
 		}
-	}, [user, history]);
+	}, [user]);
 	return (
 		<Card
 			title={

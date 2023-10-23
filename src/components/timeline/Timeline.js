@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Toaster } from 'react-hot-toast';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { BASE_URL } from '../../context/apiCall';
 import useAuth from '../../context/auth/AuthContext';
 import Feed from './feed/Feed';
@@ -14,14 +14,12 @@ const Timeline = () => {
 	const [searchFriends, setSearchFriends] = useState([]);
 	const [searchKey, setSearchKey] = useState('');
 	const { user: currentUser } = useAuth();
+	const navigate = useNavigate();
 	const [toggle, setToggle] = useState(false);
-
-	const history = useHistory();
-
 	// logout user and redirect to login page
 	const logoutHandler = () => {
 		localStorage.removeItem('userInfo');
-		history.go('/login');
+		navigate('/login');
 	};
 
 	// Toggle menu
@@ -74,9 +72,8 @@ const Timeline = () => {
 					<hr className="sidebarHr" />
 				</div>
 			)}
-			<div className="homeContainer">
-        
-				<Sidebar  />
+			<div className="homeContainer" >
+				<Sidebar />
 				<Feed />
 				<Rightbar user={currentUser} />
 			</div>

@@ -1,8 +1,9 @@
 import { Button, Divider, List, Space, Typography } from 'antd';
 import { Link } from 'react-router-dom';
-import useTheme from "../../../context/ThemeContext";
+import useTheme from '../../../context/ThemeContext';
 import './Sidebar.css';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import useAuth from '../../../context/auth/AuthContext';
 import {
 	FcAbout,
 	FcCustomerSupport,
@@ -14,17 +15,23 @@ import {
 	FcSettings,
 	FcSportsMode,
 } from 'react-icons/fc';
-const Sidebar = () =>{
-    const { theme } = useTheme();
-	const history = useHistory();
-    const openReport = () => {
-        // openModal(<ReportModal />);
-    };
-
+import AuthEmailApi from '../../../api/auth/authEmailApi';
+const Sidebar = () => {
+	const { theme } = useTheme();
+	const navigate = useNavigate();
+	const openReport = () => {
+		// openModal(<ReportModal />);
+	};
+	const { user: currentUser } = useAuth();
 	//Đăng xuất
-	const logoutHandler = () => {
+	const logoutHandler = async () => {
 		localStorage.removeItem('userInfo');
-		history.go('/login');
+		// try {
+		// 	await AuthEmailApi.logout(currentUser);
+		// } catch {
+		// 	console.log('Lỗi đăng xuất');
+		// }
+		window.location.href = "/login"
 	};
 
 	const listAccountAction = [
@@ -39,7 +46,7 @@ const Sidebar = () =>{
 		},
 	];
 
-	const listShortCutAction= [
+	const listShortCutAction = [
 		{
 			title: 'Cài đặt',
 			icon: FcSettings,
@@ -89,8 +96,11 @@ const Sidebar = () =>{
 	];
 
 	return (
-        
-		<Space  className="sidebar" direction="vertical" style={{ overflow: 'auto',color: theme.foreground, background: theme.background }}>
+		<Space
+			className="sidebar"
+			direction="vertical"
+			style={{ overflow: 'auto', color: theme.foreground, background: theme.background }}
+		>
 			{lists.map((list, index) => (
 				<List
 					key={index}
@@ -140,5 +150,5 @@ const Sidebar = () =>{
 			))}
 		</Space>
 	);
-}
+};
 export default Sidebar;

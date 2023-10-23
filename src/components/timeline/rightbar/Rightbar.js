@@ -95,7 +95,7 @@ const Rightbar = ({ user }) => {
 									</Typography.Title>
 
 									{list.title === 'Yêu cầu kết bạn' ? (
-										<Link to="/friends/request" style={{ float: 'right', color: '#5aa7ff' }}>
+										<Link to="/friends" style={{ float: 'right', color: '#5aa7ff' }}>
 											Xem tất cả
 										</Link>
 									) : (

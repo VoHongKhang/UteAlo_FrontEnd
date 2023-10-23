@@ -7,24 +7,23 @@ import useAuth from '../../../context/auth/AuthContext';
 import useTheme, { themes } from '../../../context/ThemeContext';
 import noAvatar from '../../../assets/appImages/user.png';
 import { BASE_URL } from '../../../context/apiCall';
-import { useHistory } from 'react-router-dom';
-const Topbar = ({ searchHandler, setSearchKey, searchKey, menuHandler }) => {
+import { useNavigate } from 'react-router-dom';
+const Topbar = () => {
 	const [user, setUser] = useState();
 	const { user: currentUser } = useAuth();
 	const { theme, setTheme } = useTheme();
-	
+	const navigate = useNavigate();
 
-  const history = useHistory();
 	// Toggle theme switch
 	const themeModeHandler = () => {
 		setTheme(theme === themes.light ? themes.dark : themes.light);
 		localStorage.setItem('userTheme', theme === themes.light ? 'dark' : 'light');
 	};
 	const handderMessageClick = () => {
-		history.push(`/message/${currentUser.userId}}`);
+		navigate(`/message/${currentUser.userId}}`);
 	};
 	const handderNotificationClick = () => {
-		history.push(`notification/${currentUser.userId}`);
+		navigate(`notification/${currentUser.userId}`);
 	};
 	// get user details
 	useEffect(() => {
@@ -38,19 +37,19 @@ const Topbar = ({ searchHandler, setSearchKey, searchKey, menuHandler }) => {
 			setUser(res.data.result);
 		};
 		fetchUsers();
-	}, [currentUser.accessToken,currentUser.userId]);
+	}, [currentUser.accessToken, currentUser.userId]);
 
 	const buttonCenterHandler = (e, link) => {
-		if (e.tagName === 'svg') e = e.parentNode;
-		if (e.tagName === 'path') e = e.parentNode.parentNode;
+		// if (e.tagName === 'svg') e = e.parentNode;
+		// if (e.tagName === 'path') e = e.parentNode.parentNode;
 
-		const buttons = document.querySelectorAll('.button-center');
-		buttons.forEach((button) => {
-			button.classList.remove('button-active');
-		});
-		e.classList.add('button-active');
-    // Chuyển trang theo link sử dụng history
-    history.push(link);
+		// const buttons = document.querySelectorAll('.button-center');
+		// buttons.forEach((button) => {
+		// 	button.classList.remove('button-active');
+		// });
+		// e.classList.add('button-active');
+		// Chuyển trang theo link sử dụng
+		navigate(link);
 	};
 
 	return (
@@ -67,36 +66,24 @@ const Topbar = ({ searchHandler, setSearchKey, searchKey, menuHandler }) => {
 						<span className="topbarLogo">UTEALO</span>
 					</Link>
 					<div className="searchbar">
-						<input
-							type="text"
-							placeholder="Search....."
-							className="searchInput"
-							value={searchKey}
-							onChange={(e) => setSearchKey(e.target.value)}
-						/>
+						<input type="text" placeholder="Search....." className="searchInput" />
 						<span className="searchIcon">
-							<Search style={{ cursor: 'pointer' }} onClick={searchHandler} />
+							<Search style={{ cursor: 'pointer' }} />
 						</span>
 					</div>
 				</div>
 				<div className="topbarCenter">
-					<div
-						className="button-center button-active"
-						onClick={(e) => buttonCenterHandler(e.target, '/')}
-					>
+					<div className="button-center button-active" onClick={(e) => buttonCenterHandler(e.target, '/')}>
 						<Home className="button-center-home " titleAccess="Trang chủ" />
 					</div>
-					<div className="button-center" onClick={(e) => buttonCenterHandler(e.target,'/groups')}>
+					<div className="button-center" onClick={(e) => buttonCenterHandler(e.target, '/groups')}>
 						<Group className="button-center-groups" titleAccess="Nhóm" />
 					</div>
-					<div
-						className="button-center"
-						onClick={(e) => buttonCenterHandler(e.target,  '/friends')}
-					>
+					<div className="button-center" onClick={(e) => buttonCenterHandler(e.target, '/friends')}>
 						<GroupAdd className="button-center-friends" titleAccess="Bạn bè" />
 					</div>
 					<div className="button-center" onClick={themeModeHandler}>
-						<div className="topbarIconItem button-center-theme" >
+						<div className="topbarIconItem button-center-theme">
 							{theme.background === '#ffffff' ? <NightsStay /> : <WbSunny />}
 						</div>
 					</div>
@@ -104,10 +91,18 @@ const Topbar = ({ searchHandler, setSearchKey, searchKey, menuHandler }) => {
 
 				<div className="topbarRight">
 					<div className="button-right">
-						<Message className="button-right-message" titleAccess="Tin nhắn" onClick={handderMessageClick} />
+						<Message
+							className="button-right-message"
+							titleAccess="Tin nhắn"
+							onClick={handderMessageClick}
+						/>
 					</div>
 					<div className="button-right">
-						<Notifications className="button-right-notifications" titleAccess="Thông báo" onClick={handderNotificationClick}/>
+						<Notifications
+							className="button-right-notifications"
+							titleAccess="Thông báo"
+							onClick={handderNotificationClick}
+						/>
 					</div>
 
 					<Link to={`/profile/${currentUser.userId}`}>

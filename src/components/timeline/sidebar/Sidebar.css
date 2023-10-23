@@ -1,3 +1,7 @@
+.homeContainer{
+  display: flex;
+  width: 100%;
+}
 .sidebar {
   flex: 2.5;
   height: calc(100vh - 50px);

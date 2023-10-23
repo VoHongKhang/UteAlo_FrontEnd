@@ -21,6 +21,7 @@ const NewFeedGroup = ({ user }) => {
 	const [visiblePosts, setVisiblePosts] = useState(3); // Số lượng bài viết hiển thị ban đầu
 	const { theme } = useTheme();
 
+
 	// Lấy danh sách bài post
 	const fetchPosts = async () => {
 		try {
@@ -107,6 +108,7 @@ const NewFeedGroup = ({ user }) => {
 			borderRadius: borderStyles,
 		};
 	}
+
 
 	return (
 		<div className="menu--post">

@@ -81,6 +81,9 @@ const PostCard = ({ post, fetchPosts }) => {
 	const [isShareModalVisible, setIsShareModalVisible] = useState(false);
 	// Xử lý phần dấu 3 chấm
 	const [showOptions, setShowOptions] = useState(false);
+	// Chức năng xem chi tiết bài viết
+	const [showPostDetailModal, setShowPostDetailModal] = useState(false);
+	const [selectedPost, setSelectedPost] = useState(null);
 
 	// Xử lý phần dấu 3 chấm
 	const handleToggleOptions = () => {
@@ -446,7 +449,15 @@ const PostCard = ({ post, fetchPosts }) => {
 						</Link>
 						<div className="postNameAndDate">
 							<span className="postUsername">{user.fullName}</span>
-							<span className="postDate">{formatTime(post.postTime)}</span>
+							<span
+								className="postDate"
+								onClick={() => {
+									setShowPostDetailModal(true);
+									setSelectedPost(post); // Truyền toàn bộ bài viết vào selectedPost
+								}}
+							>
+								{formatTime(post.postTime)}
+							</span>
 						</div>
 						<div className="postLoAndName">
 							{post.location && <span className="postLocation">• {post.location}</span>}
@@ -658,20 +669,18 @@ const PostCard = ({ post, fetchPosts }) => {
 							</a>
 						</div>
 					)}
-					{/* 
+
 					{post.photos && (
 						<Image
 							hoverable
 							cover
 							width="100%"
-							height={100}
-							src="http://via.placeholder.com/200x100?text="
+							className="postImg"
+							src={post.photos} // Sử dụng selectedPost.photos thay vì cố định URL như bạn đã đề cập
 							alt={post.content}
 							style={{ objectFit: 'cover', background: token.colorBgLayout }}
 						/>
-					)} */}
-
-					{post.photos && <img className="postImg" src={post.photos} alt="..." />}
+					)}
 				</div>
 
 				<div className="postBottom">
@@ -758,6 +767,26 @@ const PostCard = ({ post, fetchPosts }) => {
 					<div className="showMoreComment" onClick={toggleShowAllComments}>
 						{showAllComments ? 'Ẩn bình luận' : 'Xem thêm bình luận'}
 					</div>
+				)}
+
+				{/* Modal để mở chi tiết bài viết */}
+				{showPostDetailModal && (
+					<Modal
+						title="Chi tiết bài viết"
+						open={showPostDetailModal}
+						onCancel={() => {
+							setShowPostDetailModal(false);
+							setSelectedPost(null);
+						}}
+						footer={null}
+					>
+						{selectedPost && (
+							<div>
+								{/* Sử dụng toàn bộ dữ liệu của bài viết (PostCard) ở đây */}
+								<PostCard post={selectedPost} />
+							</div>
+						)}
+					</Modal>
 				)}
 			</div>
 		</div>

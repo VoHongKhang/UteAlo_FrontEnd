@@ -1,6 +1,6 @@
 import React from 'react';
 import { Layout, Space } from 'antd';
-import noAvatar from '../assets/appImages/user.png';
+import Topbar from './timeline/topbar/Topbar';
 const { Footer, Content } = Layout;
 
 const contentStyle = {
@@ -25,46 +25,14 @@ const footerStyle = {
 const NotFound = () => {
 	return (
 		<Space direction="vertical" style={{ width: '100%', position: 'fixed', top: 0 }} size={[0, 48]}>
-			<nav>
-				<ul
-					style={{
-						display: 'flex',
-						listStyle: 'none',
-						justifyContent: 'space-around',
-						backgroundColor: 'blue',
-						width: '100%',
-						height: '50px',
-					}}
-				>
-					<li style={{ marginTop: '5px' }}>
-						<a href="/" style={{ color: 'black', fontWeight: 'bold', fontSize: '30px' }}>
-							STEM
-						</a>
-					</li>
-					<li style={{ marginTop: '15px' }}>
-						<a href="/login" style={{ color: 'black' }}>
-							Login
-						</a>
-					</li>
-					<li style={{ marginTop: '15px' }}>
-						<a href="/register" style={{ color: 'black' }}>
-							Register
-						</a>
-					</li>
-					<li style={{ marginTop: '15px' }}>
-						<a href="/help" style={{ color: 'black' }}>
-							Xem hướng dẫn
-						</a>
-					</li>
-				</ul>
-			</nav>
+			<Topbar />
 			<Layout>
 				<Content style={contentStyle}>
 					<div style={{ width: '80%', height: '50%' }}>
 						<img
-							src={noAvatar}
+							src="https://th.bing.com/th/id/OIP.Jb4XrrIxatYfB2DQxV0TngHaFs?pid=ImgDet&rs=1"
 							alt="anh"
-							style={{ width: '80%', height: '50%', margin: '0 0 0 300px' }}
+							style={{ margin: '0 0 0 300px' }}
 						/>
 					</div>
 					<div>

@@ -14,14 +14,16 @@ import NotFound from '../components/NotFound';
 import Topbar from '../components/timeline/topbar/Topbar';
 import Sidebar from '../components/timeline/sidebar/Sidebar';
 import Rightbar from '../components/timeline/rightbar/Rightbar';
+import ManagerGroup from '../components/groups/manager/ManagerGroup';
 const privateRoutes = [
-	{ path: '/', component: Timeline, topbar: Topbar, sidebar: Sidebar, rightbar: Rightbar },
-	{ path: '/groups', component: Groups, topbar: Topbar},
-	{ path: '/groups/create', component: CreateGroup },
-	{ path: '/groups/detail/:uuid', component: GroupDetail },
-	{ path: '/profile/:userId', component: Profile, topbar: Topbar },
 	{ path: '/profile/update/:userId', component: EditProfile },
+	{ path: '/groups/manager/:postGroupId', component: ManagerGroup },
+	{ path: '/groups/create', component: CreateGroup },
+	{ path: '/groups/:postGroupId', component: GroupDetail },
+	{ path: '/groups', component: Groups, topbar: Topbar},
+	{ path: '/profile/:userId', component: Profile, topbar: Topbar },
 	{ path: '/friends', component: FriendRequest },
+	{ path: '/', component: Timeline, topbar: Topbar, sidebar: Sidebar, rightbar: Rightbar },
 ];
 
 const publicRoutes = [

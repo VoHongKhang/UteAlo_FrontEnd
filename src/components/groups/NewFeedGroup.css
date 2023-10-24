@@ -4,7 +4,6 @@
 
 .menu--post .feed {
 	flex: 5.22;
-	margin-left: 20px;
 }
 .menu--post .feedWrapper {
 	padding: 20px;
@@ -125,17 +124,6 @@
     margin-left: 10px;
 }
 
-.group--button-joined {
-	background-color: #E4E6EB;
-    border: none;
-    border-radius: 5px;
-    color: black;
-    font-size: 15px;
-    height: 33px;
-    width: 110px;
-    margin-left: 10px;
-    margin-right: 10px;
-}
 
 .group--button-joined-icon {
 	font-size: 15px;
@@ -277,20 +265,6 @@
 
 .group--file-text {
 	display: flex;
-}
-
-.group--file-text-title {
-	font-size: 15px;
-    font-weight: 600;
-    padding-top: 15px;
-    padding-left: 15px;
-}
-
-.group--file-text-more {
-	margin-left: 105px;
-    margin-top: 17px;
-    font-size: 15px;
-    color: #0064d1;
 }
 
 .file--photos {

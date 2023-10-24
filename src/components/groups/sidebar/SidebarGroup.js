@@ -6,14 +6,13 @@ import { useNavigate } from 'react-router-dom';
 import { Search, Settings, RssFeed, Explore, People } from '@material-ui/icons';
 import PostGroupApi from '../../../api/postGroups/PostGroupApi';
 import { useEffect, useState } from 'react';
+import noAvatar from '../../../assets/appImages/user.png';
 
-const SidebarGroup = ({ user, onPostGroupIdChange }) => {
+const SidebarGroup = ({ user }) => {
 	const { theme } = useTheme();
 	const navigate = useNavigate();
 	const [listGroupOfMe, setListGroupOfMe] = useState([]);
 	const [listGroupJoin, setListGroupJoin] = useState([]);
-	const discoverHandler = () => {};
-	const ownerGroupHandler = () => {};
 	const handlerCreateGroup = () => {
 		navigate('/groups/create');
 	};
@@ -21,16 +20,17 @@ const SidebarGroup = ({ user, onPostGroupIdChange }) => {
 		{
 			postGroupName: 'Bảng feed của bạn',
 			avatarGroup: <RssFeed style={{ fontSize: '25px', margin: 'auto' }} />,
+			href: '/groups',
 		},
 		{
 			postGroupName: 'Khám phá',
 			avatarGroup: <Explore style={{ fontSize: '25px', margin: 'auto' }} />,
-			onClick: discoverHandler,
+			href: '/groups/discover',
 		},
 		{
 			postGroupName: 'Nhóm của bạn',
 			avatarGroup: <People style={{ fontSize: '25px', margin: 'auto' }} />,
-			onClick: ownerGroupHandler,
+			href: '/groups/list',
 		},
 	];
 	useEffect(() => {
@@ -56,9 +56,6 @@ const SidebarGroup = ({ user, onPostGroupIdChange }) => {
 			data: listGroupOfMe,
 		},
 	];
-	const handlerClickGroup = (item) => {
-		onPostGroupIdChange(item);
-	};
 	return (
 		<div className="sidebar--group">
 			<Space className="topSidebar" direction="vertical">
@@ -110,30 +107,12 @@ const SidebarGroup = ({ user, onPostGroupIdChange }) => {
 						renderItem={(item) => (
 							<List.Item style={{ padding: '4px 0' }}>
 								{item.href ? (
-									<Link to={item.href} draggable style={{ width: '100%' }}>
-										<Button
-											type="text"
-											block
-											style={{ height: 'auto', padding: '8px' }}
-											onClick={item.onClick}
-										>
-											<Space align="center" style={{ width: '100%' }}>
-												<img
-													src={item.avatarGroup}
-													alt="avatar_group"
-													className="image--group"
-												/>
-												<Typography.Text strong>{item.title}</Typography.Text>
-											</Space>
-										</Button>
-									</Link>
-								) : (
 									<Button
 										type="text"
 										block
 										style={{ height: 'auto', padding: '8px' }}
 										onClick={() => {
-											handlerClickGroup(item);
+											navigate(item.href);
 										}}
 									>
 										<Space align="center" style={{ width: '100%', marginLeft: '10px' }}>
@@ -143,6 +122,24 @@ const SidebarGroup = ({ user, onPostGroupIdChange }) => {
 													<div style={{ fontSize: '15px' }}>{item.postGroupName}</div>
 												</Typography.Text>
 											</div>
+										</Space>
+									</Button>
+								) : (
+									<Button
+										type="text"
+										block
+										style={{ height: 'auto', padding: '8px' }}
+										onClick={() => {
+											navigate(`/groups/${item?.postGroupId}`);
+										}}
+									>
+										<Space align="center" style={{ width: '100%' }}>
+											<img
+												src={item?.avatarGroup ? item?.avatarGroup : noAvatar}
+												alt="avatar_group"
+												className="image--group"
+											/>
+											<Typography.Text strong>{item.postGroupName}</Typography.Text>
 										</Space>
 									</Button>
 								)}

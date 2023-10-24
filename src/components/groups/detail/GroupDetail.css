@@ -4,7 +4,6 @@
 
 .feed {
 	flex: 5.22;
-	margin-left: 20px;
 }
 
 .feedWrapper {
@@ -109,7 +108,7 @@
 
 }
 
-.group--button-add {
+.header--group .group--button-add {
 	background-color: #1877F2;
     border: none;
 	border-radius: 5px;
@@ -117,6 +116,7 @@
     font-size: 15px;
 	height: 32px;
     width: 64px;
+	cursor: pointer;
 }
 
 .group--button-more {
@@ -137,9 +137,10 @@
     color: black;
     font-size: 15px;
     height: 33px;
-    width: 110px;
+	padding: 6px 12px;
     margin-left: 10px;
     margin-right: 10px;
+	cursor: pointer;
 }
 
 .group--button-joined-icon {
@@ -187,14 +188,15 @@
 	display: flex;
 }
 
-.rightbar--group {
+.menu--post .rightbar--group {
 	flex:4;
 	margin-top: -31px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
 }
 
 .group--infor {
-	height: 426px;
-	width: 426px;
 	background: #ffffff;
 	box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.1), 0px -3px 5px rgba(0, 0, 0, 0.1), 3px 0px 5px rgba(0, 0, 0, 0.1),
 		-3px 0px 5px rgba(0, 0, 0, 0.1);
@@ -265,8 +267,6 @@
 
 .group--file {
 	margin-top: 25px;
-	height: 390px;
-	width: 426px;
 	background: #ffffff;
 	box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.1), 0px -3px 5px rgba(0, 0, 0, 0.1), 3px 0px 5px rgba(0, 0, 0, 0.1),
 		-3px 0px 5px rgba(0, 0, 0, 0.1);
@@ -276,18 +276,17 @@
 
 .group--file-text {
 	display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
 }
 
 .group--file-text-title {
 	font-size: 18px;
 	font-weight: 600;
-	padding-top: 15px;
-	padding-left: 15px;
 }
 
 .group--file-text-more {
-	margin-left: 140px;
-	margin-top: 17px;
 	font-size: 17px;
 	color: #0064d1;
 }

@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }) => {
           userId
         }));
       
-        toast.success("Logged in successfully", { id: toastId });
+        toast.success("Đăng nhập thành công", { id: toastId });
       } else {
         dispatch({
           type: "LOGIN_FAIL",

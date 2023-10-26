@@ -4,7 +4,6 @@ import { useParams } from 'react-router-dom';
 import PostCard from '../post/PostCard';
 import SharePostCard from '../post/SharePostCard';
 import Share from '../sharePost/Share';
-import { Box, CircularProgress } from '@material-ui/core';
 import useAuth from '../../../context/auth/AuthContext';
 import useTheme from '../../../context/ThemeContext';
 import axios from 'axios';
@@ -82,14 +81,9 @@ const Feed = () => {
 		<div className="feed" style={{ color: theme.foreground, background: theme.background }}>
 			<div className="feedWrapper">
 				{(!params.userId || params.userId === currentUser.userId) && <Share fetchPosts={fetchPosts} />}
-				{loading && (
-					<Box display="flex" justifyContent="center" sx={{ my: 2 }}>
-						<CircularProgress color="secondary" />
-					</Box>
-				)}
 
 				{visiblePostData.length === 0 ? (
-					<h2 style={{ marginTop: '20px' }}>No posts yet!</h2>
+					<h2 style={{ marginTop: '20px' }}>Chưa có bài viết!</h2>
 				) : (
 					visiblePostData.map((p) => <PostCard post={p} key={p.postId} fetchPosts={fetchPosts} />)
 				)}

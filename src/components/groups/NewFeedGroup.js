@@ -7,9 +7,10 @@ import axios from 'axios';
 import { BASE_URL } from '../../context/apiCall';
 import noCover from '../../assets/appImages/noCover.jpg';
 import Share from '../timeline/sharePost/Share';
-import { Box, CircularProgress } from '@material-ui/core';
+import { useParams } from 'react-router-dom';
 
 const NewFeedGroup = ({ user }) => {
+	const params = useParams();
 	const { user: currentUser } = useAuth();
 	const [posts, setPosts] = useState([]);
 	const [sharePosts, setSharePosts] = useState([]);
@@ -26,7 +27,7 @@ const NewFeedGroup = ({ user }) => {
 			};
 			setLoading(true);
 
-			const res = await axios.get(`${BASE_URL}/v1/post/${currentUser.userId}/posts`, config);
+			const res = await axios.get(`${BASE_URL}/v1/groupPost/posts/${currentUser.userId}`, config);
 			setLoading(false);
 			setPosts(res.data.result);
 		} catch (error) {
@@ -108,11 +109,6 @@ const NewFeedGroup = ({ user }) => {
 			<div className="container--group">
 				<div className="feed">
 					<div className="feedWrapper">
-						{loading && (
-							<Box display="flex" justifyContent="center" sx={{ my: 2 }}>
-								<CircularProgress color="secondary" />
-							</Box>
-						)}
 						{visiblePostData.length === 0 ? (
 							<h2 style={{ marginTop: '20px' }}>Chưa có bài viết nào</h2>
 						) : (

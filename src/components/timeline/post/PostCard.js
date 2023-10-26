@@ -84,6 +84,10 @@ const PostCard = ({ post, fetchPosts }) => {
 	// Chức năng xem chi tiết bài viết
 	const [showPostDetailModal, setShowPostDetailModal] = useState(false);
 	const [selectedPost, setSelectedPost] = useState(null);
+	// Xác định xem là đang ở trong hay ngoài modal xem chi tiết bài viết
+	const [modalOpenedFromPostCard, setModalOpenedFromPostCard] = useState(false);
+	// Màu nền cho xem chi tiết ảnh
+	const { token } = theme.useToken();
 
 	// Xử lý phần dấu 3 chấm
 	const handleToggleOptions = () => {
@@ -437,7 +441,21 @@ const PostCard = ({ post, fetchPosts }) => {
 		return formattedTime;
 	}
 
-	const { token } = theme.useToken();
+	// Xử lý khi nhấn vào thời gian đăng bài
+	const handlePostDateClick = (post) => {
+		// Kiểm tra xem modal đã mở từ trong PostCard hay chưa
+		if (!modalOpenedFromPostCard && !showPostDetailModal) {
+			setSelectedPost(post);
+			setShowPostDetailModal(true);
+		}
+	};
+
+	// Xử lý khi nhấn vào nút đóng modal
+	const handleCloseModal = () => {
+		setShowPostDetailModal(false);
+		setSelectedPost(null);
+		setModalOpenedFromPostCard(false);
+	};
 
 	return (
 		<div className="post">
@@ -449,13 +467,7 @@ const PostCard = ({ post, fetchPosts }) => {
 						</Link>
 						<div className="postNameAndDate">
 							<span className="postUsername">{user.fullName}</span>
-							<span
-								className="postDate"
-								onClick={() => {
-									setShowPostDetailModal(true);
-									setSelectedPost(post); // Truyền toàn bộ bài viết vào selectedPost
-								}}
-							>
+							<span className="postDate" onClick={() => handlePostDateClick(post)}>
 								{formatTime(post.postTime)}
 							</span>
 						</div>
@@ -770,19 +782,18 @@ const PostCard = ({ post, fetchPosts }) => {
 				)}
 
 				{/* Modal để mở chi tiết bài viết */}
-				{showPostDetailModal && (
+				{showPostDetailModal && !modalOpenedFromPostCard && (
 					<Modal
-						title="Chi tiết bài viết"
+						title={`Chi tiết bài viết - ${modalOpenedFromPostCard}`}
 						open={showPostDetailModal}
-						onCancel={() => {
-							setShowPostDetailModal(false);
-							setSelectedPost(null);
+						onOpen={() => {
+							setModalOpenedFromPostCard(true);
 						}}
+						onCancel={handleCloseModal}
 						footer={null}
 					>
 						{selectedPost && (
 							<div>
-								{/* Sử dụng toàn bộ dữ liệu của bài viết (PostCard) ở đây */}
 								<PostCard post={selectedPost} />
 							</div>
 						)}

@@ -24,6 +24,7 @@ const privateRoutes = [
 	{ path: '/profile/:userId', component: Profile, topbar: Topbar },
 	{ path: '/friends', component: FriendRequest },
 	{ path: '/', component: Timeline, topbar: Topbar, sidebar: Sidebar, rightbar: Rightbar },
+	{ path: '/update/:userId', component: EditProfile },
 ];
 
 const publicRoutes = [

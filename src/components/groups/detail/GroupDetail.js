@@ -9,7 +9,6 @@ import noCover from '../../../assets/appImages/noCover.jpg';
 import { Search, Public, People, MoreHoriz, Visibility, Room, Lock } from '@material-ui/icons';
 import { useParams } from 'react-router-dom';
 import Share from '../../timeline/sharePost/Share';
-import { Box, CircularProgress } from '@material-ui/core';
 import Topbar from '../../timeline/topbar/Topbar';
 import SidebarGroup from '../sidebar/SidebarGroup';
 import { Helmet } from 'react-helmet';
@@ -17,6 +16,14 @@ import toast, { Toaster } from 'react-hot-toast';
 import PostGroupApi from '../../../api/postGroups/PostGroupApi';
 import './GroupDetail.css';
 import { useNavigate } from 'react-router-dom';
+import { Modal, Select, Checkbox } from 'antd';
+import qrCode from '../../../assets/icons/qr-code/qr-code.png';
+import home from '../../../assets/icons/qr-code/home.png';
+import building from '../../../assets/icons/qr-code/building.png';
+import people from '../../../assets/icons/qr-code/people.png';
+import GetFriendApi from '../../../api/profile/friend/getFriendApi';
+import noAvatar from '../../../assets/appImages/user.png';
+
 const GroupDetail = () => {
 	const params = useParams();
 	const { user: currentUser } = useAuth();
@@ -27,6 +34,18 @@ const GroupDetail = () => {
 	const [visiblePosts, setVisiblePosts] = useState(3); // Số lượng bài viết hiển thị ban đầu
 	const { theme } = useTheme();
 	const [postGroup, setPostGroup] = useState([]);
+	const [listFriends, setListFriends] = useState([]);
+	// Xử lý nút hiện thì modal khi bấm nút mời
+	const [isInviteModalVisible, setIsInviteModalVisible] = useState(false);
+	// Những người bạn được chọn
+	const [selectedFriends, setSelectedFriends] = useState([]);
+	const [isFriendSelected, setIsFriendSelected] = useState(false);
+
+	const handleSelectChange = (selectedValues) => {
+		setSelectedFriends(selectedValues);
+		setIsFriendSelected(selectedValues.length > 0);
+	};
+
 	useEffect(() => {
 		const fetchGroup = async () => {
 			const res = await PostGroupApi.getGroup({ user: currentUser, postId: params.postGroupId });
@@ -34,6 +53,7 @@ const GroupDetail = () => {
 		};
 		fetchGroup();
 	}, [params]);
+
 	// Lấy danh sách bài post
 	const fetchPosts = async () => {
 		try {
@@ -44,7 +64,7 @@ const GroupDetail = () => {
 			};
 			setLoading(true);
 
-			const res = await axios.get(`${BASE_URL}/v1/post/${currentUser.userId}/posts`, config);
+			const res = await axios.get(`${BASE_URL}/v1/groupPost/${params.postGroupId}/post`, config);
 			setLoading(false);
 			setPosts(res.data.result);
 		} catch (error) {
@@ -76,6 +96,18 @@ const GroupDetail = () => {
 		//eslint-disable-next-line
 	}, []);
 
+	// Lấy danh sách bạn bè
+	const handlerSelectFriend = async () => {
+		try {
+			setLoading(true);
+			const response = await GetFriendApi.getFriend(currentUser);
+			setListFriends(response.result);
+			setLoading(false);
+		} catch {
+			console.log('error');
+		}
+	};
+
 	// Xử lý nạp thêm bài viết khi cuộn xuống
 	useEffect(() => {
 		const handleScroll = () => {
@@ -90,6 +122,11 @@ const GroupDetail = () => {
 			window.removeEventListener('scroll', handleScroll);
 		};
 	}, []);
+
+	// Model xuất hiện khi nhấn nút mời
+	const showInviteModal = () => {
+		setIsInviteModalVisible(true);
+	};
 
 	const visiblePostData = posts.slice(0, visiblePosts);
 
@@ -205,13 +242,132 @@ const GroupDetail = () => {
 											</p>
 										</button>
 										{(postGroup?.roleGroup === 'Admin' || postGroup?.roleGroup === 'Member') && (
-											<button variant="contained" className="group--button-add">
+											<button
+												variant="contained"
+												className="group--button-add"
+												onClick={() => showInviteModal()}
+											>
 												<p> + Mời</p>
 											</button>
 										)}
 										{/* <button variant="contained" className="group--button-more">
 										<p> ▼ </p>
 									</button> */}
+										<Modal
+											className="modal--invite--friend"
+											title={
+												<span className="custom-modal-title">Mời bạn bè tham gia nhóm này</span>
+											}
+											open={isInviteModalVisible}
+											onCancel={() => {
+												setIsInviteModalVisible(false);
+											}}
+											okText="Gửi lời mời"
+											cancelText="Hủy"
+										>
+											<div className="line--top"></div>
+											<p className="filter--text">Lọc bạn bè để mời theo hạng mục</p>
+											<div className="filter--seletion">
+												<div className="filter--seletion-option">
+													<img src={building} alt="building" />
+													<p>Long Xuyên</p>
+												</div>
+												<div className="filter--seletion-option">
+													<img src={people} alt="people" />
+													<p>Nhóm chung</p>
+												</div>
+												<div className="filter--seletion-option">
+													<img src={home} alt="home" />
+													<p>Chaudok</p>
+												</div>
+											</div>
+											<div className="invite--friend">
+												<div className="invite--friend-search">
+													<div className="input--search">
+														<Search
+															className="icon__search"
+															style={{
+																marginLeft: '10px',
+																fontSize: '24px',
+																color: 'rgb(186 193 205)',
+															}}
+														/>
+														<input
+															type="text"
+															placeholder="Tìm bạn bè theo tên"
+															className="input__search"
+														/>
+													</div>
+													<div className="select-friend">
+														<Select
+															className="select-list--friend"
+															showSearch
+															mode="multiple"
+															loading={loading}
+															placeholder="Mời bạn bè (Không bắt buộc)"
+															optionFilterProp="label"
+															onClick={handlerSelectFriend}
+															onChange={handleSelectChange} 
+														>
+															{listFriends.map((item) => (
+																<Select.Option
+																	key={item.userId}
+																	value={item.userId}
+																	label={item.username}
+																>
+																	<div
+																		style={{
+																			display: 'flex',
+																			alignItems: 'center',
+																		}}
+																	>
+																		<Checkbox style={{ marginRight: '10px' }} />
+																		<img
+																			src={item.avatar ? item.avatar : noAvatar}
+																			alt="avatar"
+																		/>
+																		<p>{item.username}</p>
+																	</div>
+																</Select.Option>
+															))}
+														</Select>
+													</div>
+												</div>
+
+												<div className="number--friend-selected">
+													<div className="friend--seleted-text">
+														{`ĐÃ CHỌN ${selectedFriends.length} NGƯỜI BẠN`}
+													</div>
+													{isFriendSelected && (
+														<div className="friend--selected">
+															{selectedFriends.map((friend) => (
+																<div key={friend} className="selected">
+																	<img
+																		src={friend.avatar ? friend.avatar : noAvatar}
+																		alt="avatar"
+																	/>
+																	<p>{friend.username}</p>
+																</div>
+															))}
+														</div>
+													)}
+												</div>
+											</div>
+											<div className="line--mid"></div>
+											<div className="invite--friend-qr">
+												<div className="icon--qr">
+													<img src={qrCode} alt="QR Code" />
+												</div>
+												<div className="qr--text">
+													<p className="qr--text-one">Mời qua mã QR</p>
+													<p className="qr--text-two">
+														Bạn có thể tạo mã QR cho mọi người quét để truy cập vào nhóm của
+														bạn
+													</p>
+												</div>
+											</div>
+											<div className="line--bottom"></div>
+										</Modal>
 									</div>
 								) : (
 									<div className="group--header--button">
@@ -259,13 +415,8 @@ const GroupDetail = () => {
 									{(postGroup.roleGroup == 'Admin' || postGroup.roleGroup == 'Member') && (
 										<Share fetchPosts={fetchPosts} />
 									)}
-									{loading && (
-										<Box display="flex" justifyContent="center" sx={{ my: 2 }}>
-											<CircularProgress color="secondary" />
-										</Box>
-									)}
 									{visiblePostData.length === 0 ? (
-										<h2 style={{ marginTop: '20px' }}>No posts yet!</h2>
+										<h2 style={{ marginTop: '20px' }}>Chưa có bài viết!</h2>
 									) : (
 										visiblePostData.map((p) => (
 											<PostCard post={p} key={p.postId} fetchPosts={fetchPosts} />

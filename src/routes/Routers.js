@@ -15,15 +15,21 @@ import Topbar from '../components/timeline/topbar/Topbar';
 import Sidebar from '../components/timeline/sidebar/Sidebar';
 import Rightbar from '../components/timeline/rightbar/Rightbar';
 import ManagerGroup from '../components/groups/manager/ManagerGroup';
+import SettingManagerGroup from '../components/groups/manager/SettingManagerGroup';
+import MemberGroup from '../components/groups/manager/MemberGroup';
 const privateRoutes = [
 	{ path: '/profile/update/:userId', component: EditProfile },
 	{ path: '/groups/manager/:postGroupId', component: ManagerGroup },
 	{ path: '/groups/create', component: CreateGroup },
 	{ path: '/groups/:postGroupId', component: GroupDetail },
-	{ path: '/groups', component: Groups, topbar: Topbar},
+	{ path: '/groups', component: Groups, topbar: Topbar },
 	{ path: '/profile/:userId', component: Profile, topbar: Topbar },
 	{ path: '/friends', component: FriendRequest },
+	{ path: '/update/:userId', component: EditProfile },
 	{ path: '/', component: Timeline, topbar: Topbar, sidebar: Sidebar, rightbar: Rightbar },
+	{ path: '/:url', component: Timeline },
+	{ path: '/groups/manager/:postGroupId/edit', component: SettingManagerGroup },
+	{ path: '/groups/manager/:postGroupId/member', component: MemberGroup },
 	{ path: '/update/:userId', component: EditProfile },
 ];
 

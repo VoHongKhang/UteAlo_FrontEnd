@@ -1,0 +1,215 @@
+.manager--group {
+	flex: 5.5;
+}
+.setting--group--member{
+	flex: 5.5;
+	display: flex;
+    justify-content: center;
+}
+.ManagerGroup--groupCoverImg {
+	height: 320px !important;
+	display: block;
+	object-fit: cover;
+}
+.manager--group .rightbar--group {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.manager--group .group--infor {
+	width: 80%;
+	height: auto;
+	padding-bottom: 20px;
+}
+.edit--group--cover {
+	position: absolute;
+	bottom: 10%;
+	right: 1%;
+	cursor: pointer;
+}
+.button--edit {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	font-size: 14px;
+	color: #000;
+	font-weight: 600;
+	padding: 8px;
+	border: 1px solid #ccc;
+	background: #fff;
+	border-radius: 5px;
+	cursor: pointer;
+}
+.icon--edit {
+	color: #000 !important;
+	cursor: pointer;
+}
+.button--edit:hover {
+	background: #ccc;
+	color: #000 !important;
+}
+.contaner--avatar {
+	position: relative;
+	height: 150px;
+}
+.edit--group--avatar {
+	background: #3a3b3c;
+	position: absolute;
+	bottom: 40%;
+	left: 24%;
+	border-radius: 50%;
+	display: flex;
+	padding: 8px;
+	cursor: pointer;
+}
+.contaner--avatar .groupUserImg {
+	bottom: 0;
+	top: -30%;
+	cursor: pointer;
+}
+.edit--group--avatar svg {
+	color: #000;
+	font-size: 22px;
+}
+.edit--group--avatar:hover {
+	opacity: 0.8;
+}
+/* Css modal group */
+.modal--group--avatar {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: fixed;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	background: rgba(0, 0, 0, 0.5);
+}
+.modal--group--avatar .modal--group--avatar--content {
+	width: 500px;
+	height: 500px;
+	background: #fff;
+	border-radius: 10px;
+}
+.modal--group--avatar .modal--group--avatar--content .modal--group--avatar--header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 10px 20px;
+	border-bottom: 1px solid #ccc;
+}
+.modal--group--avatar--title {
+	font-size: 18px;
+	font-weight: 600;
+}
+.modal--group--avatar .modal--group--avatar--content .modal--group--avatar--header svg {
+	color: #000;
+	font-size: 22px;
+	cursor: pointer;
+}
+.modal--group--avatar--body {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	margin: 6px 0px;
+}
+.modal--group--avatar--body--img img {
+	width: 400px;
+	height: 400px;
+}
+.modal--group--avatar .modal--group--avatar--content .modal--group--avatar--footer {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 10px 20px;
+}
+.modal--group--avatar .modal--group--avatar--content .modal--group--avatar--footer button {
+	padding: 10px 20px;
+	border-radius: 5px;
+	background: #1877f2;
+	color: #fff;
+	font-weight: 600;
+	font-size: 14px;
+}
+.modal--group--avatar .modal--group--avatar--content .modal--group--avatar--footer button:hover {
+	opacity: 0.8;
+}
+/* Path: src/components/groups/manager/ManagerGroup.css */
+.manager--group .group--infor .group--infor--name {
+	font-size: 24px;
+	font-weight: 600;
+}
+.manager--group .group--infor .group--infor--name span {
+	font-size: 14px;
+	font-weight: 400;
+}
+.manager--group .group--infor .group--infor--name span svg {
+	color: #000;
+	font-size: 14px;
+	margin-left: 5px;
+}
+.manager--group .group--infor .group--infor--name span:hover {
+	text-decoration: underline;
+}
+.setting--group {
+	flex: 5.5;
+}
+.setting--group--content {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: calc(100vh - 56px);
+}
+#detailGroup {
+	width: 50%;
+	border: 1px solid #ccc;
+	padding: 12px;
+	background: #ddd;
+	border-radius: 15px;
+}
+.setting--group input {
+	flex: 1;
+}
+
+.setting--group .ant-select-selection-item {
+	display: flex;
+}
+.input--nameGroup {
+	display: flex;
+	width: 100%;
+}
+.setting--group .icon--edit {
+	margin-left: 8px;
+}
+.input--container--name {
+}
+.select--group--role {
+	height: 32px;
+}
+.setting--group .MuiSvgIcon-root {
+	height: 30px;
+}
+.member--contaner{
+	width: 80%;
+    margin-top: 30px;
+    height: max-content;
+    background: aliceblue;
+    border: 1px solid #ccc;
+    border-radius: 15px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+.setting--group__title{
+	font-size: 20px;
+    font-weight: 600;
+	margin-bottom: 10px;
+}
+.list--friend{
+	margin-top: 10px;
+}
+.more--icon{
+	cursor: pointer;
+	
+}

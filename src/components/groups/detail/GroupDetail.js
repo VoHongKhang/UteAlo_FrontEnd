@@ -16,6 +16,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import PostGroupApi from '../../../api/postGroups/PostGroupApi';
 import './GroupDetail.css';
 import { useNavigate } from 'react-router-dom';
+import { Image, theme } from 'antd';
 import { Modal, Select, Checkbox } from 'antd';
 import qrCode from '../../../assets/icons/qr-code/qr-code.png';
 import home from '../../../assets/icons/qr-code/home.png';
@@ -33,8 +34,8 @@ const GroupDetail = () => {
 	const navigate = useNavigate();
 	const [loading, setLoading] = useState(false);
 	const [visiblePosts, setVisiblePosts] = useState(3); // Số lượng bài viết hiển thị ban đầu
-	const { theme } = useTheme();
 	const [postGroup, setPostGroup] = useState([]);
+	const { token } = theme.useToken();
 	const [listFriends, setListFriends] = useState([]);
 	// Xử lý nút hiện thì modal khi bấm nút mời
 	const [isInviteModalVisible, setIsInviteModalVisible] = useState(false);
@@ -53,8 +54,7 @@ const GroupDetail = () => {
 			setPostGroup(res.result);
 		};
 		fetchGroup();
-	}, [params]);
-
+	}, [params, currentUser]);
 	// Lấy danh sách bài post
 	const fetchPosts = async () => {
 		try {
@@ -211,15 +211,42 @@ const GroupDetail = () => {
 								className="groupCover"
 								style={{ color: theme.foreground, background: theme.background }}
 							>
-								<img className="groupCoverImg" src={postGroup.background || noCover} alt="..." />
-
-								<img className="groupUserImg" src={postGroup.avatar || sampleProPic} alt="..." />
+								{postGroup.background !== null ? (
+									<Image
+										hoverable
+										cover
+										width="100%"
+										className="groupCoverImg"
+										src={postGroup.background} // Sử dụng selectedPost.photos thay vì cố định URL như bạn đã đề cập
+										alt={'backgroup'}
+										style={{ objectFit: 'cover', background: token.colorBgLayout }}
+									/>
+								) : (
+									<img className="groupCoverImg" src={noCover} alt="..." />
+								)}
+								{postGroup.avatar !== null ? (
+									<Image
+										hoverable
+										cover
+										width="100%"
+										className="groupUserImg"
+										src={postGroup.avatar} // Sử dụng selectedPost.photos thay vì cố định URL như bạn đã đề cập
+										alt={'backgroup'}
+										style={{
+											objectFit: 'cover',
+											background: token.colorBgLayout,
+											top: '-80px',
+										}}
+									/>
+								) : (
+									<img className="groupUserImg" src={sampleProPic} alt="..." />
+								)}
 							</div>
 							<div className="group--contanier--top">
 								<div className="group--detail">
 									<span className="group--name">{postGroup.postGroupName}</span>
 									<div className="group--name-info">
-										{postGroup.isPublic === true ? (
+										{postGroup.groupType === "Public" ? (
 											<>
 												<Public htmlColor="#65676B" className="group--public-icon" />
 												<span className="group--public-text">Nhóm Công khai</span>
@@ -436,12 +463,12 @@ const GroupDetail = () => {
 						{(postGroup.roleGroup === 'Waiting Accept' ||
 							postGroup.roleGroup === 'Accept Invited' ||
 							postGroup.roleGroup === 'None') &&
-						postGroup.isPublic === false ? (
+						postGroup.groupType === "Private" ? (
 							<div></div>
 						) : (
 							<div className="feed">
 								<div className="feedWrapper">
-									{(postGroup.roleGroup == 'Admin' || postGroup.roleGroup == 'Member') && (
+									{(postGroup.roleGroup === 'Admin' || postGroup.roleGroup === 'Member') && (
 										<Share fetchPosts={fetchPosts} />
 									)}
 									{visiblePostData.length === 0 ? (
@@ -461,7 +488,7 @@ const GroupDetail = () => {
 									<div className="group--infor-bio">
 										<span>{postGroup.bio}</span>
 									</div>
-									{postGroup.isPublic ? (
+									{postGroup.groupType ==="Public" ? (
 										<>
 											<div className="group--infor-public">
 												<Public htmlColor="#65676B" className="group--public-icon" />
@@ -507,7 +534,7 @@ const GroupDetail = () => {
 								{(postGroup.roleGroup === 'Waiting Accept' ||
 									postGroup.roleGroup === 'Accept Invited' ||
 									postGroup.roleGroup === 'None') &&
-								postGroup.isPublic === false ? (
+								postGroup.groupType === "Private" ? (
 									<div></div>
 								) : (
 									<div className="group--file">

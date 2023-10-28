@@ -24,7 +24,7 @@
 }
 
 .groupCoverImg {
-	height: 100%;
+	height: 320px!important;
 	width: 100%;
 	display: block;
 	text-align: center;
@@ -174,11 +174,14 @@
 
 
 .groupUserImg {
-	width: 150px;
-	height: 150px;
+	width: 150px!important;
+	height: 150px!important;
 	position: absolute;
 	bottom: -25%;
 	left: 12%;
+	border-radius: 50%;
+    border: 1px solid #ccc;
+	cursor: pointer;
 }
 
 .menu--post {

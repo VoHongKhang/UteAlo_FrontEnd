@@ -22,6 +22,7 @@
 	height: 320px;
 	position: relative;
 }
+
 .groupCoverImg {
 	height: 100%;
 	width: 100%;
@@ -32,9 +33,11 @@
 	border-bottom-left-radius: 10px;
 	border-bottom-right-radius: 10px;
 }
+
 .header--group {
 	border-bottom: solid #ccc 1px;
 }
+
 .group--contanier--top {
 	display: flex;
 	min-height: 120px;
@@ -60,26 +63,26 @@
 }
 
 .group--member {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 	margin-left: 4px;
 }
 
 .group--public {
 	margin-left: 4px;
 	display: flex;
-    justify-content: center;
-    align-items: center;
+	justify-content: center;
+	align-items: center;
 	margin-right: 20px;
 }
 
 .list--feature--group {
 	display: flex;
-    align-items: center;
-    justify-content: space-evenly;
-    margin: 0px 12px;
-    width: 100%;
+	align-items: center;
+	justify-content: space-evenly;
+	margin: 0px 12px;
+	width: 100%;
 }
 
 .list-feature {
@@ -94,8 +97,8 @@
 	color: #333;
 	cursor: pointer;
 	font-size: 15px;
-    color: #65676B;
-    margin: auto;
+	color: #65676B;
+	margin: auto;
 	padding: 0px 16px;
 }
 
@@ -104,42 +107,40 @@
 	color: #000;
 }
 
-.group--header--button {
-
-}
+.group--header--button {}
 
 .header--group .group--button-add {
 	background-color: #1877F2;
-    border: none;
+	border: none;
 	border-radius: 5px;
 	color: white;
-    font-size: 15px;
+	font-size: 15px;
 	height: 32px;
-    width: 64px;
+	width: 64px;
 	cursor: pointer;
 }
 
 .group--button-more {
 	background-color: #E4E6EB;
-    border: none;
-    border-radius: 5px;
-    color: #706565;
-    font-size: 15px;
-    height: 33px;
-    width: 42px;
-    margin-left: 10px;
+	border: none;
+	border-radius: 5px;
+	color: #706565;
+	font-size: 15px;
+	height: 33px;
+	width: 42px;
+	margin-left: 10px;
 }
 
 .group--button-joined {
 	background-color: #E4E6EB;
-    border: none;
-    border-radius: 5px;
-    color: black;
-    font-size: 15px;
-    height: 33px;
+	border: none;
+	border-radius: 5px;
+	color: black;
+	font-size: 15px;
+	height: 33px;
 	padding: 6px 12px;
-    margin-left: 10px;
-    margin-right: 10px;
+	margin-left: 10px;
+	margin-right: 10px;
 	cursor: pointer;
 }
 
@@ -154,23 +155,23 @@
 
 .container--search--group-icon {
 	font-weight: 600;
-    padding: 8px 10px;
-    background: #e4e6eb;
-    border-radius: 5px;
-    font-size: 16px;
-    margin-right: 10px;
+	padding: 8px 10px;
+	background: #e4e6eb;
+	border-radius: 5px;
+	font-size: 16px;
+	margin-right: 10px;
 }
 
 .container--search--group-more {
 	font-weight: 600;
-    padding: 8px 10px;
-    background: #e4e6eb;
-    border-radius: 5px;
-    font-size: 16px;
+	padding: 8px 10px;
+	background: #e4e6eb;
+	border-radius: 5px;
+	font-size: 16px;
 	margin-right: 10px;
 }
 
-  
+
 
 .groupUserImg {
 	width: 150px;
@@ -189,7 +190,7 @@
 }
 
 .menu--post .rightbar--group {
-	flex:4;
+	flex: 4;
 	margin-top: -31px;
 	display: flex;
 	flex-direction: column;
@@ -214,40 +215,46 @@
 
 .group--infor-bio {
 	margin-left: 16px;
-    margin-top: 18px;
-    margin-right: 30px;
+	margin-top: 18px;
+	margin-right: 30px;
 }
 
 .group--infor-bio span {
 	font-size: 15px;
 }
 
-.group--infor-public, .group--infor-show, .group--infor-location {
+.group--infor-public,
+.group--infor-show,
+.group--infor-location {
 	margin-left: 14px;
-    margin-top: 14px;
+	margin-top: 14px;
 	display: flex;
 }
 
-.group--public, .group--show, .group--location {
+.group--public,
+.group--show,
+.group--location {
 	font-size: 17px;
-    font-weight: 600;
-    margin-left: 6px;
+	font-weight: 600;
+	margin-left: 6px;
 }
 
 .group--public-text {
 	display: flex;
-    justify-content: center;
-    align-items: center;
+	justify-content: center;
+	align-items: center;
 	margin-left: 4px;
 	margin-right: 20px;
 }
 
-.group--infor-public-text, .group--infor-show-text {
+.group--infor-public-text,
+.group--infor-show-text {
 	margin-left: 40px;
 	margin-top: 10px;
 }
 
-.group--infor-public-text span, .group--infor-show-text span {
+.group--infor-public-text span,
+.group--infor-show-text span {
 	font-size: 15px;
 }
 
@@ -277,9 +284,9 @@
 
 .group--file-text {
 	display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px;
+	align-items: center;
+	justify-content: space-between;
+	padding: 12px;
 }
 
 .group--file-text-title {
@@ -295,11 +302,14 @@
 .file--photos {
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
-	grid-template-rows: repeat(2, 1fr); /* Sử dụng 2 hàng */
+	grid-template-rows: repeat(2, 1fr);
+	/* Sử dụng 2 hàng */
 	margin-top: 4px;
-	gap: 8px; /* Khoảng cách giữa các ảnh */
+	gap: 8px;
+	/* Khoảng cách giữa các ảnh */
 	width: 96%;
-	height: 86%; /* Chiều cao tự động thay vì cố định 88% */
+	height: 86%;
+	/* Chiều cao tự động thay vì cố định 88% */
 	padding: 8px 8px;
 	margin: auto;
 	margin-top: -2px;
@@ -320,24 +330,24 @@
 .invite--friend {
 	display: flex;
 	width: 100%;
-    height: 360px;
+	height: 360px;
 	margin-top: 14px;
 }
 
 .invite--friend-search {
 	display: flex;
-    border-radius: 30px;
-    height: 10%;
-    width: 62%;
-    background: #f0f2f5;
+	border-radius: 30px;
+	height: 10%;
+	width: 62%;
+	background: #f0f2f5;
 	margin-top: 6px;
 	flex-wrap: wrap;
 }
 
 .input--search {
 	display: flex;
-    align-items: center;
-    justify-content: center;
+	align-items: center;
+	justify-content: center;
 }
 
 .modal--invite--friend {
@@ -346,54 +356,54 @@
 
 .custom-modal-title {
 	display: flex;
-    margin: auto;
-    font-size: 18px;
-    font-weight: 600;
-    justify-content: center;
+	margin: auto;
+	font-size: 18px;
+	font-weight: 600;
+	justify-content: center;
 }
 
 .number--friend-selected {
 	background: #f0f2f5;
-    height: 70%;
-    width: 50%;
-    margin-left: 30px;
+	height: 70%;
+	width: 50%;
+	margin-left: 30px;
 }
 
 .friend--seleted-text {
 	padding-left: 10px;
-    padding-top: 10px;
-    color: #65676B;
-    font-size: 13px;
+	padding-top: 10px;
+	color: #65676B;
+	font-size: 13px;
 }
 
 .line--top {
 	height: 1px;
-    background: #aba1a1;
-    width: 107%;
-    margin-bottom: 16px;
-    margin-top: 16px;
-    margin-left: -21.5px;
+	background: #aba1a1;
+	width: 107%;
+	margin-bottom: 16px;
+	margin-top: 16px;
+	margin-left: -21.5px;
 }
 
 .line--mid {
 	height: 1.5px;
-    background: #aba1a1;
-    width: 107%;
-    margin-left: -21.5px;
-    margin-top: -108px;
+	background: #aba1a1;
+	width: 107%;
+	margin-left: -21.5px;
+	margin-top: -108px;
 }
 
 .invite--friend-qr {
 	margin-bottom: 6px;
-    display: flex;
-    margin-top: 6px;
+	display: flex;
+	margin-top: 6px;
 	padding: 5px;
 }
 
 .invite--friend-qr:hover {
 	background-color: #f0f2f5;
-    border-radius: 5px;
-    padding: 5px;
+	border-radius: 5px;
+	padding: 5px;
 	cursor: pointer;
 }
 
@@ -403,13 +413,13 @@
 
 .icon--qr {
 	display: flex;
-    align-items: center;
-    justify-content: center;
+	align-items: center;
+	justify-content: center;
 }
 
 .icon--qr img {
 	width: 24px;
-    height: 24px;
+	height: 24px;
 }
 
 .qr--text {
@@ -422,21 +432,21 @@
 
 .qr--text-two {
 	font-size: 11px;
-    margin-top: -2px;
-    color: #65676B;
+	margin-top: -2px;
+	color: #65676B;
 }
 
 .line--bottom {
 	height: 0.5px;
-    background: #aba1a1;
-    width: 107%;
-    margin-left: -21.5px;
+	background: #aba1a1;
+	width: 107%;
+	margin-left: -21.5px;
 }
 
 .filter--text {
 	margin-top: -10px;
-    font-size: 12px;
-    color: #868489;
+	font-size: 12px;
+	color: #868489;
 }
 
 .filter--seletion {
@@ -446,13 +456,13 @@
 
 .filter--seletion-option {
 	padding: 5px 10px;
-    background: #e4e6eb;
-    border-radius: 5px;
+	background: #e4e6eb;
+	border-radius: 5px;
 	margin-right: 10px;
 	display: flex;
 }
 
-.filter--seletion-option  img {
+.filter--seletion-option img {
 	width: 20px;
 	height: 20px;
 }
@@ -470,8 +480,27 @@
 	width: 100%;
 }
 
+.selected {
+	display: flex;
+	margin-top: 10px;
+	margin-left: 5px;
+}
+
 .selected img {
-	width: 25px;
+	width: 32px;
+	height: 32px;
 	margin-left: 10px;
-	margin-top: 5px;
+	border-radius: 50%;
+}
+
+.selected p {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-left: 10px;
+}
+
+.ant-select-selection-overflow-item .ant-select-selection-item {
+	height: 38px;
+	margin-top: 4px;
 }

@@ -29,6 +29,7 @@ const Share = ({ fetchPosts }) => {
 	// Xử lý ảnh của bài post
 	const postDetails = (e) => {
 		const file = e.target.files[0];
+		console.log('file',file);
 		setPicLoading(true);
 		if (file === undefined) {
 			toast.error('Please Select an Image!');

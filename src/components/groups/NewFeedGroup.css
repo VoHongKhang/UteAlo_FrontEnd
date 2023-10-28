@@ -16,21 +16,6 @@
 .menu--post .share {
 	background: #FFFFFF;
 }
-
-.menu--post .groupCover {
-	height: 320px;
-	position: relative;
-}
-.menu--post .groupCoverImg {
-	height: 100%;
-	width: 100%;
-	display: block;
-	text-align: center;
-	margin: auto;
-	object-fit: cover;
-	border-bottom-left-radius: 10px;
-	border-bottom-right-radius: 10px;
-}
 .menu--post .header--group {
 	border-bottom: solid #ccc 1px;
 }

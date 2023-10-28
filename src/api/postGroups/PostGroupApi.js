@@ -263,6 +263,44 @@ const PostGroupApi = {
 		} catch (error) {
 			throw new Error(error.message);
 		}
+	},
+	listMemberGroup: async({user,postId}) =>{
+		try {
+			const config = {
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${user.accessToken}`, 
+				},
+			};
+			const res = await axios.get(`${BASE_URL}/v1/groupPost/list/member/${postId}`,config);
+			if (res.data.success) {
+				console.log(res.data);
+				return res.data; // Trả về dữ liệu từ thành công 
+			} else {
+				throw new Error(res.data.message);
+			} 
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	},
+	listMemberRequiredGroup: async({user,postId}) =>{
+		try {
+			const config = {
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${user.accessToken}`, 
+				},
+			};
+			const res = await axios.get(`${BASE_URL}/v1/groupPost/list/memberRequired/${postId}`,config);
+			if (res.data.success) {
+				console.log(res.data);
+				return res.data; // Trả về dữ liệu từ thành công 
+			} else {
+				throw new Error(res.data.message);
+			} 
+		} catch (error) {
+			throw new Error(error.message);
+		} 
 	}
 	
 };

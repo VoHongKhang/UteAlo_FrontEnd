@@ -22,6 +22,7 @@ import home from '../../../assets/icons/qr-code/home.png';
 import building from '../../../assets/icons/qr-code/building.png';
 import people from '../../../assets/icons/qr-code/people.png';
 import GetFriendApi from '../../../api/profile/friend/getFriendApi';
+import InviteFriendApi from '../../../api/postGroups/inviteFriendApi';
 import noAvatar from '../../../assets/appImages/user.png';
 
 const GroupDetail = () => {
@@ -105,6 +106,15 @@ const GroupDetail = () => {
 			setLoading(false);
 		} catch {
 			console.log('error');
+		}
+	};
+
+	// Hàm mời bạn bè vào nhóm
+	const inviteFriend = async () => {
+		try {
+			await InviteFriendApi.inviteFriendApi(currentUser.accessToken, params.postGroupId, selectedFriends);
+		} catch (err) {
+			console.log(err);
 		}
 	};
 
@@ -250,9 +260,6 @@ const GroupDetail = () => {
 												<p> + Mời</p>
 											</button>
 										)}
-										{/* <button variant="contained" className="group--button-more">
-										<p> ▼ </p>
-									</button> */}
 										<Modal
 											className="modal--invite--friend"
 											title={
@@ -263,6 +270,7 @@ const GroupDetail = () => {
 												setIsInviteModalVisible(false);
 											}}
 											okText="Gửi lời mời"
+											onOk={inviteFriend}
 											cancelText="Hủy"
 										>
 											<div className="line--top"></div>
@@ -307,7 +315,7 @@ const GroupDetail = () => {
 															placeholder="Mời bạn bè (Không bắt buộc)"
 															optionFilterProp="label"
 															onClick={handlerSelectFriend}
-															onChange={handleSelectChange} 
+															onChange={handleSelectChange}
 														>
 															{listFriends.map((item) => (
 																<Select.Option
@@ -340,15 +348,36 @@ const GroupDetail = () => {
 													</div>
 													{isFriendSelected && (
 														<div className="friend--selected">
-															{selectedFriends.map((friend) => (
-																<div key={friend} className="selected">
-																	<img
-																		src={friend.avatar ? friend.avatar : noAvatar}
-																		alt="avatar"
-																	/>
-																	<p>{friend.username}</p>
-																</div>
-															))}
+															{selectedFriends.map((friendId) => {
+																const friend = listFriends.find(
+																	(item) => item.userId === friendId
+																);
+																return (
+																	<div key={friendId} className="selected">
+																		<Checkbox
+																			// Thêm sự kiện onClick cho checkbox để xóa bạn đã chọn
+																			onClick={() => {
+																				const updatedSelectedFriends =
+																					selectedFriends.filter(
+																						(id) => id !== friendId
+																					);
+																				setSelectedFriends(
+																					updatedSelectedFriends
+																				);
+																			}}
+																		/>
+																		<img
+																			src={
+																				friend?.avatar
+																					? friend.avatar
+																					: noAvatar
+																			}
+																			alt="avatar"
+																		/>
+																		<p>{friend?.username}</p>
+																	</div>
+																);
+															})}
 														</div>
 													)}
 												</div>

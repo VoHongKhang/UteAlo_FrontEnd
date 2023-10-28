@@ -4,6 +4,7 @@
 
 .menu--post .feed {
 	flex: 5.22;
+	margin-left: 5px;
 }
 .menu--post .feedWrapper {
 	padding: 20px;
@@ -259,7 +260,7 @@
 	margin-top: 4px;
 	gap: 8px; /* Khoảng cách giữa các ảnh */
 	width: 96%;
-	height: 88%; /* Chiều cao tự động thay vì cố định 88% */
+	height: 86%; /* Chiều cao tự động thay vì cố định 88% */
 	padding: 8px 8px;
 	margin: auto;
 	margin-top: 4px;

@@ -30,6 +30,7 @@ const privateRoutes = [
 	{ path: '/:url', component: Timeline },
 	{ path: '/groups/manager/:postGroupId/edit', component: SettingManagerGroup },
 	{ path: '/groups/manager/:postGroupId/member', component: MemberGroup },
+	{ path: '/update/:userId', component: EditProfile },
 ];
 
 const publicRoutes = [

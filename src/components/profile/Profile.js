@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Moment from 'react-moment';
 import './Profile.css';
 import noCover from '../../assets/appImages/noCover.jpg';
 import sampleProPic from '../../assets/appImages/user.png';
@@ -233,12 +234,12 @@ const Profile = () => {
 
 						<div className="profileInfo" style={{ color: theme.foreground, background: theme.background }}>
 							<h4 className="profileInfoName">{user.fullName}</h4>
-							<p className="profileInfoDesc">About me: {user.about || '----'}</p>
+							<p className="profileInfoDesc">Giới thiệu: {user.about || '----'}</p>
 							<small className="profileInfoDesc">
-								Joined on:{' '}
+								Ngày đăng nhập:{' '}
 								{(
 									<em>
-										{user?.createdAt}
+										<Moment format="YYYY/MM/DD">{user?.createdAt}</Moment>
 									</em>
 								) || '----'}
 							</small>
@@ -248,7 +249,7 @@ const Profile = () => {
 								<Button type="default" onClick={handleButtonFriend}>
 									{status}
 								</Button>
-								<Button type="primary" onClick={() =>navigate(`/message/${currentUser.userId}`)}>
+								<Button type="primary" onClick={() => navigate(`/message/${currentUser.userId}`)}>
 									Message
 								</Button>
 							</Space>

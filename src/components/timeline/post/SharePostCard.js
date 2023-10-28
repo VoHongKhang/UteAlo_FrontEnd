@@ -71,6 +71,9 @@ const SharePostCard = ({ share, fetchSharePosts }) => {
 	const [post, setPost] = useState('');
 	// Xử lý phần dấu 3 chấm
 	const [showOptions, setShowOptions] = useState(false);
+	// Chức năng xem chi tiết chia sẻ bài viết
+	const [showSharePostDetailModal, setShowSharePostDetailModal] = useState(false);
+	const [selectedSharePost, setSelectedSharePost] = useState(null);
 
 	// Xử lý phần dấu 3 chấm
 	const handleToggleOptions = () => {
@@ -339,7 +342,15 @@ const SharePostCard = ({ share, fetchSharePosts }) => {
 						</Link>
 						<div className="postNameAndDate">
 							<span className="postUsername">{user.fullName}</span>
-							<span className="postDate">{formatTime(share.createAt)}</span>
+							<span
+								className="postDate"
+								onClick={() => {
+									setShowSharePostDetailModal(true);
+									setSelectedSharePost(post); // Truyền toàn bộ bài viết vào selectedSharePost
+								}}
+							>
+								{formatTime(share.createAt)}
+							</span>
 						</div>
 					</div>
 					<div className="comment" id="postTopRight">
@@ -510,6 +521,28 @@ const SharePostCard = ({ share, fetchSharePosts }) => {
 						Xem thêm bình luận
 					</div>
 				)}
+
+				{/* Modal để mở chi tiết bài viết */}
+				{showSharePostDetailModal && (
+					<Modal
+						title="Chi tiết bài viết"
+						open={showSharePostDetailModal}
+						onCancel={() => {
+							setShowSharePostDetailModal(false);
+							setSelectedSharePost(null);
+						}}
+						footer={null}
+					>
+						{selectedSharePost && (
+							<div>
+								{/* Sử dụng toàn bộ dữ liệu của bài viết (SharePostCard) ở đây */}
+								<SharePostCard share={selectedSharePost} />
+							</div>
+						)}
+					</Modal>
+				)}
+
+				
 			</div>
 		</div>
 	);

@@ -17,6 +17,8 @@ import Rightbar from '../components/timeline/rightbar/Rightbar';
 import ManagerGroup from '../components/groups/manager/ManagerGroup';
 import SettingManagerGroup from '../components/groups/manager/SettingManagerGroup';
 import MemberGroup from '../components/groups/manager/MemberGroup';
+import ParticipantRequests from '../components/groups/manager/ParticipantRequests';
+import HelpGroup from '../components/groups/manager/HelpGroup';
 const privateRoutes = [
 	{ path: '/profile/update/:userId', component: EditProfile },
 	{ path: '/groups/manager/:postGroupId', component: ManagerGroup },
@@ -30,6 +32,9 @@ const privateRoutes = [
 	{ path: '/:url', component: Timeline },
 	{ path: '/groups/manager/:postGroupId/edit', component: SettingManagerGroup },
 	{ path: '/groups/manager/:postGroupId/member', component: MemberGroup },
+	{ path: '/groups/manager/:postGroupId/participant_requests', component: ParticipantRequests },
+	{ path: '/groups/manager/:postGroupId/help', component: HelpGroup },
+	{ path: '/groups/manager/:postGroupId/analysis', component: HelpGroup },
 	{ path: '/update/:userId', component: EditProfile },
 ];
 

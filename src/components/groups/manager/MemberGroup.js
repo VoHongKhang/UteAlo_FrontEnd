@@ -1,40 +1,98 @@
 import { Helmet } from 'react-helmet';
-import { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 import SidebarManagerGroup from './sidebarManagerGroup/SidebarManagerGroup';
 import PostGroupApi from '../../../api/postGroups/PostGroupApi';
 import { useParams } from 'react-router-dom';
 import useAuth from '../../../context/auth/AuthContext';
 import { useState, useEffect } from 'react';
 import Topbar from '../../timeline/topbar/Topbar';
-import { Avatar, List, Button } from 'antd';
+import { Avatar, Button, List, Typography } from 'antd';
 import { MoreHoriz } from '@material-ui/icons';
 import './ManagerGroup.css';
 import Search from 'antd/es/input/Search';
+import { useNavigate } from 'react-router-dom';
+import {
+	Dialog,
+	DialogActions,
+	DialogContent,
+	DialogContentText,
+	DialogTitle,
+	IconButton,
+	ListItem,
+	ListItemText,
+	Popover,
+} from '@material-ui/core';
 const MemberGroup = () => {
 	const params = useParams();
+	const navigate = useNavigate();
 	const { user: currentUser } = useAuth();
 	const [memberGroup, setMemberGroup] = useState();
-	const [anchor, setAnchor] = useState();
-
-	const handleClick = (event) => {
-		setAnchor(anchor ? null : event.currentTarget);
+	const [selectedItem, setSelectedItem] = useState(null);
+	const [anchorEl, setAnchorEl] = useState(null);
+	const [openConfirmation, setOpenConfirmation] = useState(false);
+	const [isAdminChange, setIsAdminChange] = useState(false);
+	const handleClick = (event, item) => {
+		setAnchorEl(event.currentTarget);
+		setSelectedItem(item);
+		setIsAdminChange(false);
 	};
 
-	const open = Boolean(anchor);
-	const id = open ? 'simple-popper' : undefined;
-	const handleClickMember = (e) => {
-		console.log(e);
+	const handleClose = () => {
+		setAnchorEl(null);
+		setSelectedItem(null);
+		setIsAdminChange(false);
+	};
+	const handleOpenConfirmation = (isAdminChange) => {
+		setOpenConfirmation(true);
+		setIsAdminChange(isAdminChange);
+	};
+
+	const handleCloseConfirmation = () => {
+		setOpenConfirmation(false);
+		setIsAdminChange(false);
 	};
 	useEffect(() => {
 		const fetchGroup = async () => {
 			const res = await PostGroupApi.listMemberGroup({ user: currentUser, postId: params.postGroupId });
 			setMemberGroup(res.result);
-			console.log('member', res.result);
 		};
 		fetchGroup();
 	}, [params, currentUser]);
 	const onSearch = (value) => {
 		console.log('value', value);
+	};
+	const handleConfirmAction = async () => {
+		const data = {
+			postGroupId: params.postGroupId,
+			userId: [selectedItem.userId],
+		};
+
+		if (isAdminChange) {
+			const toastId = toast.loading('Đang gửi yêu cầu...');
+			try {
+				await PostGroupApi.appointAdminGroup({ user: currentUser, data: data });
+				toast.success('Chuyển quyền thành công!', { id: toastId });
+				navigate(`/groups/${params.postGroupId}`);
+			} catch (e) {
+				toast.error(`Chuyển quyền thất bại! Lỗi: ${e}`, { id: toastId });
+			}
+		} else {
+			if (selectedItem.roleName === 'Admin') {
+				toast.error('Không thể xóa quản trị viên khỏi nhóm');
+			} else {
+				const toastId = toast.loading('Đang gửi yêu cầu...');
+				try {
+					await PostGroupApi.deleteMember({ user: currentUser, data: data });
+					toast.success('Xóa thành viên thành công!', { id: toastId });
+					const updatedMemberGroup = memberGroup.filter((member) => member !== selectedItem);
+					setMemberGroup(updatedMemberGroup);
+				} catch (e) {
+					toast.error(`Xóa thành viên thất bại! Lỗi: ${e}`, { id: toastId });
+				}
+			}
+		}
+		handleCloseConfirmation();
+		handleClose();
 	};
 	return (
 		<>
@@ -49,36 +107,91 @@ const MemberGroup = () => {
 						<div className="setting--group__search">
 							<Search
 								placeholder="Tìm kiếm thành viên"
-								allowClear
+								allowClear={true}
 								enterButton="Search"
 								size="large"
 								onSearch={onSearch}
 							/>
 						</div>
-						<List
-							className="list--friend"
-							itemLayout="horizontal"
-							dataSource={memberGroup}
-							renderItem={(item) => (
-								<List.Item>
-									<List.Item.Meta
-										avatar={<Avatar src={item.avatarUser} />}
-										title={item.username}
-										description={item.roleName === 'admin' ? 'Quản trị viên' : 'Thành viên'}
+						<List className="list--friend">
+							{memberGroup?.map((item) => (
+								<ListItem key={item.userId}>
+									<Avatar className="avatarMember" alt={item.username} src={item.avatarUser} />
+									<ListItemText
+										primary={item.username}
+										secondary={item.roleName === 'Admin' ? 'Quản trị viên' : 'Thành viên'}
 									/>
 									<div>
-										<Button
-											aria-describedby={id}
-											type="button"
-											onClick={() => handleClickMember(item)}
+										<IconButton
+											aria-describedby="simple-popover"
+											onClick={(e) => handleClick(e, item)}
 										>
-											<MoreHoriz className="more--icon" />
-										</Button>
-										
+											<MoreHoriz />
+										</IconButton>
+										<Popover
+											id="simple-popover"
+											open={Boolean(anchorEl)}
+											className="popper--member"
+											anchorEl={anchorEl}
+											onClose={handleClose}
+											anchorOrigin={{
+												vertical: 'bottom',
+												horizontal: 'right',
+											}}
+											transformOrigin={{
+												vertical: 'top',
+												horizontal: 'right',
+											}}
+										>
+											<div>
+												{selectedItem?.roleName === 'Member' && (
+													<Typography
+														className="poper--member--item"
+														onClick={() => handleOpenConfirmation(true)}
+													>
+														Chỉ định làm admin
+													</Typography>
+												)}
+												<Typography
+													className="poper--member--item"
+													onClick={() => handleOpenConfirmation(false)}
+												>
+													Xóa khỏi nhóm
+												</Typography>
+												<Typography
+													className="poper--member--item"
+													onClick={() => navigate(`/profile/${selectedItem.userId}`)}
+												>
+													Xem trang cá nhân
+												</Typography>
+											</div>
+										</Popover>
 									</div>
-								</List.Item>
-							)}
-						/>
+								</ListItem>
+							))}
+							<Dialog open={openConfirmation} onClose={handleCloseConfirmation}>
+								<DialogTitle>Xác nhận thay đổi</DialogTitle>
+								<DialogContent>
+									<DialogContentText>
+										{isAdminChange
+											? `Bạn có chắc chắn muốn chỉ định thành viên ${
+													selectedItem && selectedItem.username
+											  } làm admin?`
+											: `Bạn có chắc chắn muốn xóa thành viên ${
+													selectedItem && selectedItem.username
+											  } khỏi nhóm?`}
+									</DialogContentText>
+								</DialogContent>
+								<DialogActions>
+									<Button onClick={handleCloseConfirmation} color="primary" variant="outlined">
+										Hủy
+									</Button>
+									<Button onClick={handleConfirmAction} color="primary" variant="contained">
+										Xác nhận
+									</Button>
+								</DialogActions>
+							</Dialog>
+						</List>
 					</div>
 				</div>
 			</div>
@@ -86,25 +199,3 @@ const MemberGroup = () => {
 	);
 };
 export default MemberGroup;
-{
-	/* <div className="setting--group__content">
-						<div className="setting--group__content__title">Thành viên nhóm</div>
-						<div className="setting--group__content__list">
-							{memberGroup?.map((member) => (
-								<div className="setting--group__content__list__item">
-									<div className="setting--group__content__list__item__avatar">
-										<img src={member.avatarUser} alt="" />
-									</div>
-									<div className="setting--group__content__list__item__info">
-										<div className="setting--group__content__list__item__info__name">
-											{member.username}
-										</div>
-										<div className="setting--group__content__list__item__info__role">
-											{member.roleName === 'admin' ? 'Quản trị viên' : 'Thành viên'}
-										</div>
-									</div>
-								</div>
-							))}
-						</div>
-					</div> */
-}

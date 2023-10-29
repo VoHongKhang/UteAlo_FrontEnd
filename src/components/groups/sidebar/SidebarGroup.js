@@ -16,6 +16,7 @@ const SidebarGroup = ({ user }) => {
 	const handlerCreateGroup = () => {
 		navigate('/groups/create');
 	};
+
 	const listAccountAction = [
 		{
 			postGroupName: 'Bảng feed của bạn',
@@ -28,11 +29,13 @@ const SidebarGroup = ({ user }) => {
 			href: '/groups/discover',
 		},
 		{
-			postGroupName: 'Nhóm của bạn',
+			postGroupName: 'Đã gửi lời mời',
 			avatarGroup: <People style={{ fontSize: '25px', margin: 'auto' }} />,
 			href: '/groups/list',
 		},
 	];
+
+	
 	useEffect(() => {
 		async function fetchData() {
 			const res = await PostGroupApi.listOwnerGroup(user);

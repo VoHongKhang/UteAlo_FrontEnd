@@ -3,6 +3,7 @@ import { BASE_URL } from '../../../context/apiCall';
 
 //get 10 friend
 const GetFriendApi = {
+	// Lấy danh sách nhóm đã tham gia
 	getFriend: async (user) => {
 		try {
 			const res = await axios.get(`${BASE_URL}/v1/friend/list/${user.userId}`);

@@ -17,10 +17,12 @@ import Rightbar from '../components/timeline/rightbar/Rightbar';
 import ManagerGroup from '../components/groups/manager/ManagerGroup';
 import SettingManagerGroup from '../components/groups/manager/SettingManagerGroup';
 import MemberGroup from '../components/groups/manager/MemberGroup';
+import DiscoverGroup from '../components/groups/discover/DiscoverGroup';
 const privateRoutes = [
 	{ path: '/profile/update/:userId', component: EditProfile },
 	{ path: '/groups/manager/:postGroupId', component: ManagerGroup },
 	{ path: '/groups/create', component: CreateGroup },
+	{ path: '/groups/discover', component: DiscoverGroup},
 	{ path: '/groups/:postGroupId', component: GroupDetail },
 	{ path: '/groups', component: Groups, topbar: Topbar },
 	{ path: '/profile/:userId', component: Profile, topbar: Topbar },

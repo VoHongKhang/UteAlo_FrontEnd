@@ -3,7 +3,6 @@ import GetFriendApi from '../../api/profile/friend/getFriendApi.js';
 import PostGroupApi from '../../api/postGroups/PostGroupApi.js';
 
 const userAction = ({ currentUser, user, action }) => {
-	console.log('action', action);
 	const handleRequestFriend = async ({ currentUser, user }) => {
 		const toastId = toast.loading('Đang gửi lời mời kết bạn...');
 
@@ -76,7 +75,10 @@ const userAction = ({ currentUser, user, action }) => {
 	const handleCancelJoinGroup = async ({ currentUser, user }) => {
 		const toastId = toast.loading('Đang hủy lời mời kết bạn...');
 		try {
-			await PostGroupApi.cancelJoinGroupRequest({ token: currentUser.accessToken, postGroupRequestId: user.postGroupRequestId });
+			await PostGroupApi.cancelJoinGroupRequest({
+				token: currentUser.accessToken,
+				postGroupRequestId: user.postGroupRequestId,
+			});
 			toast.success('Hủy lời mời kết bạn thành công!', { id: toastId });
 		} catch (error) {
 			toast.error(error.message || error.toString(), { id: toastId });
@@ -87,7 +89,10 @@ const userAction = ({ currentUser, user, action }) => {
 	const handleAcceptJoinGroup = async ({ currentUser, user }) => {
 		const toastId = toast.loading('Đang chấp nhận lời mời tham gia...');
 		try {
-			await PostGroupApi.acceptJoinGroupRequest({ token: currentUser.accessToken, postGroupId: user.postGroupId });
+			await PostGroupApi.acceptJoinGroupRequest({
+				token: currentUser.accessToken,
+				postGroupId: user.postGroupId,
+			});
 			toast.success('Đang chấp nhận lời mời kết bạn thành công!', { id: toastId });
 		} catch (error) {
 			toast.error(error.message || error.toString(), { id: toastId });
@@ -98,13 +103,26 @@ const userAction = ({ currentUser, user, action }) => {
 	const handleDeclineJoinGroup = async ({ currentUser, user }) => {
 		const toastId = toast.loading('Đang hủy lời mời kết bạn...');
 		try {
-			await PostGroupApi.declineJoinGroupRequest({ token: currentUser.accessToken, postGroupId: user.postGroupId });
+			await PostGroupApi.declineJoinGroupRequest({
+				token: currentUser.accessToken,
+				postGroupId: user.postGroupId,
+			});
 			toast.success('Hủy lời mời kết bạn thành công!', { id: toastId });
 		} catch (error) {
 			toast.error(error.message || error.toString(), { id: toastId });
 		}
 	};
 
+	// Rời nhóm
+	const handleLeaveGroup = async ({ currentUser, user }) => {
+		const toastId = toast.loading('Đang rời nhóm...');
+		try {
+			await PostGroupApi.leaveGroup({ token: currentUser.accessToken, postGroupId: user.postGroupId });
+			toast.success('Rời nhóm thành công!', { id: toastId });
+		} catch (error) {
+			toast.error(error.message || error.toString(), { id: toastId });
+		}
+	};
 	switch (action) {
 		case 'unfriend':
 			return handleUnfriend({ currentUser, user });
@@ -116,6 +134,8 @@ const userAction = ({ currentUser, user, action }) => {
 			return handleRejectFriend({ currentUser, user });
 		case 'add':
 			return handleRequestFriend({ currentUser, user });
+		case 'leaveGroup':
+			return handleLeaveGroup({ currentUser, user });
 		case 'acceptJoinGroup':
 			return handleAcceptJoinGroup({ currentUser, user });
 		case 'declineJoinGroup':

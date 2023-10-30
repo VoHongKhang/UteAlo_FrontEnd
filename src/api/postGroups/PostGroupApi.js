@@ -322,7 +322,6 @@ const PostGroupApi = {
 		}
 	},
 	cancelJoinGroupRequest: async ({ token, postGroupRequestId }) => {
-		console.log(token);
 		try {
 			const config = {
 				headers: {
@@ -330,7 +329,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${token}`,
 				},
 			};
-			const res = await axios.put(`${BASE_URL}/v1/groupPost/request/cancel/${postGroupRequestId}`, config);
+			const res = await axios.put(`${BASE_URL}/v1/groupPost/request/cancel/${postGroupRequestId}`,{}, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công
@@ -343,7 +342,6 @@ const PostGroupApi = {
 	},
 	acceptJoinGroupRequest: async ({ token, postGroupId }) => {
 		try {
-			console.log("HI");
 			const config = {
 				headers: {
 					'Content-Type': 'application/json',
@@ -370,6 +368,25 @@ const PostGroupApi = {
 				},
 			};
 			const res = await axios.post(`${BASE_URL}/v1/groupPost/decline/${postGroupId}`, {}, config);
+			if (res.data.success) {
+				console.log(res.data);
+				return res.data; // Trả về dữ liệu từ thành công
+			} else {
+				throw new Error(res.data.message);
+			}
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	},
+	leaveGroup: async ({ token, postGroupId }) => {
+		try {
+			const config = {
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`,
+				},
+			};
+			const res = await axios.put(`${BASE_URL}/v1/groupPost/leaveGroup/${postGroupId}`,{}, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công

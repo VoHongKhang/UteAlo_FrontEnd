@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './Share.css';
-import { AttachFile, PermMedia, Room, Cancel, Group, Public } from '@material-ui/icons';
+import { AttachFile, PermMedia, Room, Cancel, Public } from '@material-ui/icons';
 import { Box, CircularProgress } from '@material-ui/core';
 import toast, { Toaster } from 'react-hot-toast';
 import InputEmoji from 'react-input-emoji';
@@ -11,14 +11,13 @@ import noAvatar from '../../../assets/appImages/user.png';
 import useAuth from '../../../context/auth/AuthContext';
 import usePost from '../../../context/post/PostContext';
 
-const Share = ({ fetchPosts }) => {
+const Share = ({ fetchPosts , postGroupId}) => {
 	const [location, setLocation] = useState('');
 	const [content, setContent] = useState('');
 	const [photos, setPhotos] = useState(null);
 	const [files, setFiles] = useState(null);
 	const [photosUrl, setPhotosUrl] = useState();
 	const [filesUrl, setFilesUrl] = useState();
-	const [postGroupId, setPostGroupId] = useState('');
 	const [privacyLevel, setPrivacyLevel] = useState('PUBLIC');
 	const [picLoading, setPicLoading] = useState(false);
 	const [isLoading, setIsLoading] = useState(true);
@@ -87,16 +86,11 @@ const Share = ({ fetchPosts }) => {
 			setContent('');
 			setPhotos(null);
 			setFiles(null);
-			setPostGroupId('');
 		} catch (error) {
 			console.error(error);
 			toast.error('Có lỗi xảy ra khi tạo bài viết.');
 		}
 	};
-
-	useEffect(() => {
-		console.log('privacyLevel: ', privacyLevel);
-	}, [privacyLevel]);
 
 	useEffect(() => {
 		const fetchUsers = async () => {
@@ -159,7 +153,7 @@ const Share = ({ fetchPosts }) => {
 					<div className="shareBottom">
 						<div className="shareOptions">
 							<label htmlFor="file" className="shareOption">
-								<PermMedia htmlColor="tomato" className="shareIcon" />
+								<PermMedia htmlColor="tomato" className="shareIcon" id="image--icon"/>
 								<span className="shareOptionText">Hình ảnh</span>
 								<input
 									style={{ display: 'none' }}
@@ -189,23 +183,6 @@ const Share = ({ fetchPosts }) => {
 										{Country.getAllCountries().map((item) => (
 											<option key={item.isoCode} value={item.name} id="loc">
 												{item.name}
-											</option>
-										))}
-									</select>
-								</label>
-							</div>
-							<div className="shareOption" id="shareGroup">
-								<label htmlFor="postGroupId" className="shareOption-one" style={{ display: 'flex' }}>
-									<Group htmlColor="yellow" className="shareIcon" />
-									<select
-										id="postGroupId"
-										value={postGroupId}
-										onChange={(e) => setPostGroupId(parseInt(e.target.value))}
-									>
-										<option value={0}>Cá nhân</option>
-										{liveUser?.postGroup?.map((item) => (
-											<option key={item.postGroupId} value={item.postGroupId}>
-												{item.postGroupName}
 											</option>
 										))}
 									</select>

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PostCard from '../../timeline/post/PostCard';
 import useAuth from '../../../context/auth/AuthContext';
-import useTheme from '../../../context/ThemeContext';
 import axios from 'axios';
 import { BASE_URL } from '../../../context/apiCall';
 import sampleProPic from '../../../assets/appImages/user.png';
@@ -25,6 +24,7 @@ import people from '../../../assets/icons/qr-code/people.png';
 import GetFriendApi from '../../../api/profile/friend/getFriendApi';
 import InviteFriendApi from '../../../api/postGroups/inviteFriendApi';
 import noAvatar from '../../../assets/appImages/user.png';
+import SharePostCard from '../../timeline/post/SharePostCard';
 
 const GroupDetail = () => {
 	const params = useParams();
@@ -55,6 +55,7 @@ const GroupDetail = () => {
 		};
 		fetchGroup();
 	}, [params, currentUser]);
+
 	// Lấy danh sách bài post
 	const fetchPosts = async () => {
 		try {
@@ -65,7 +66,7 @@ const GroupDetail = () => {
 			};
 			setLoading(true);
 
-			const res = await axios.get(`${BASE_URL}/v1/groupPost/${params.postGroupId}/post`, config);
+			const res = await axios.get(`${BASE_URL}/v1/groupPost/${params.postGroupId}/posts`, config);
 			setLoading(false);
 			setPosts(res.data.result);
 		} catch (error) {
@@ -83,7 +84,7 @@ const GroupDetail = () => {
 			};
 			setLoading(true);
 
-			const res = await axios.get(`${BASE_URL}/v1/share/${currentUser.userId}/posts`, config);
+			const res = await axios.get(`${BASE_URL}/v1/groupPost/${params.postGroupId}/shares`, config);
 			setLoading(false);
 			setSharePosts(res.data.result);
 		} catch (error) {
@@ -113,6 +114,9 @@ const GroupDetail = () => {
 	const inviteFriend = async () => {
 		try {
 			await InviteFriendApi.inviteFriendApi(currentUser.accessToken, params.postGroupId, selectedFriends);
+			// Nếu gửi lời mời thành công, thực hiện các bước sau:
+			setSelectedFriends([]); // Đặt selectedFriends thành mảng rỗng
+			setIsInviteModalVisible(false); // Đóng modal
 		} catch (err) {
 			console.log(err);
 		}
@@ -246,7 +250,7 @@ const GroupDetail = () => {
 								<div className="group--detail">
 									<span className="group--name">{postGroup.postGroupName}</span>
 									<div className="group--name-info">
-										{postGroup.groupType === "Public" ? (
+										{postGroup.groupType === 'Public' ? (
 											<>
 												<Public htmlColor="#65676B" className="group--public-icon" />
 												<span className="group--public-text">Nhóm Công khai</span>
@@ -463,13 +467,13 @@ const GroupDetail = () => {
 						{(postGroup.roleGroup === 'Waiting Accept' ||
 							postGroup.roleGroup === 'Accept Invited' ||
 							postGroup.roleGroup === 'None') &&
-						postGroup.groupType === "Private" ? (
+						postGroup.groupType === 'Private' ? (
 							<div></div>
 						) : (
 							<div className="feed">
 								<div className="feedWrapper">
 									{(postGroup.roleGroup === 'Admin' || postGroup.roleGroup === 'Member') && (
-										<Share fetchPosts={fetchPosts} />
+										<Share fetchPosts={fetchPosts} postGroupId={postGroup.postGroupId} />
 									)}
 									{visiblePostData.length === 0 ? (
 										<h2 style={{ marginTop: '20px' }}>Chưa có bài viết!</h2>
@@ -478,6 +482,9 @@ const GroupDetail = () => {
 											<PostCard post={p} key={p.postId} fetchPosts={fetchPosts} />
 										))
 									)}
+									{sharePosts.map((p) => (
+										<SharePostCard share={p} key={p.shareId} fetchSharePosts={fetchSharePosts} />
+									))}
 								</div>
 							</div>
 						)}
@@ -488,7 +495,7 @@ const GroupDetail = () => {
 									<div className="group--infor-bio">
 										<span>{postGroup.bio}</span>
 									</div>
-									{postGroup.groupType ==="Public" ? (
+									{postGroup.groupType === 'Public' ? (
 										<>
 											<div className="group--infor-public">
 												<Public htmlColor="#65676B" className="group--public-icon" />
@@ -534,7 +541,7 @@ const GroupDetail = () => {
 								{(postGroup.roleGroup === 'Waiting Accept' ||
 									postGroup.roleGroup === 'Accept Invited' ||
 									postGroup.roleGroup === 'None') &&
-								postGroup.groupType === "Private" ? (
+								postGroup.groupType === 'Private' ? (
 									<div></div>
 								) : (
 									<div className="group--file">

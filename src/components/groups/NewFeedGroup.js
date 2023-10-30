@@ -26,7 +26,6 @@ const NewFeedGroup = ({ user }) => {
 				},
 			};
 			setLoading(true);
-
 			const res = await axios.get(`${BASE_URL}/v1/groupPost/posts/${currentUser.userId}`, config);
 			setLoading(false);
 			setPosts(res.data.result);

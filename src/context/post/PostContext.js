@@ -63,7 +63,7 @@ export const PostProvider = ({ children }) => {
   
 
   // Chia sẻ bài post
-  const sharePost = async (content, postId) => {
+  const sharePost = async (content, postId,postGroupId) => {
     const toastId = toast.loading('Đang gửi yêu cầu...');
     try {
       dispatch({
@@ -73,6 +73,7 @@ export const PostProvider = ({ children }) => {
       const formData = new FormData();
       formData.append('content', content || '') ;
       formData.append('postId', postId );
+      formData.append('postGroupId', postGroupId || 0) ;
   
       const config = {
         headers: {

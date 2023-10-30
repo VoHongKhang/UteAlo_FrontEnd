@@ -5,7 +5,7 @@ import heart from '../../../assets/appImages/heart.png';
 import heartEmpty from '../../../assets/appImages/heartEmpty.png';
 import { Send } from '@material-ui/icons';
 import { Box, CircularProgress } from '@material-ui/core';
-import { AttachFile, PermMedia, Cancel } from '@material-ui/icons';
+import { AttachFile, PermMedia, Cancel, Group } from '@material-ui/icons';
 import axios from 'axios';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
@@ -72,13 +72,14 @@ const PostCard = ({ post, fetchPosts }) => {
 	const [editPrivacyLevel, setEditPrivacyLevel] = useState('PUBLIC');
 	const [editPhotosUrl, setEditPhotosUrl] = useState('');
 	const [editFilesUrl, setEditFilesUrl] = useState('');
-	const [editPostGroupId, setEditPostGroupId] = useState('');
 	// Hình ảnh và nội dung của bình luận
 	const [photosComment, setPhotosComment] = useState('');
 	const [photosCommetUrl, setPhotosCommetUrl] = useState('');
 	const [content, setContent] = useState('');
 	// Chia sẻ
 	const [isShareModalVisible, setIsShareModalVisible] = useState(false);
+	const [postGroupId, setPostGroupId] = useState('');
+	const [liveUser, setLiveUser] = useState(null);
 	// Xử lý phần dấu 3 chấm
 	const [showOptions, setShowOptions] = useState(false);
 	// Chức năng xem chi tiết bài viết
@@ -101,11 +102,10 @@ const PostCard = ({ post, fetchPosts }) => {
 	};
 
 	// Model xuất hiện khi nhấn chỉnh sửa bài post
-	const showEditModal = (content, location, photos, postGroupId, files, privacyLevel) => {
+	const showEditModal = (content, location, photos, files, privacyLevel) => {
 		setEditContent(content);
 		setEditLocation(location);
 		setEditPhotos(photos);
-		setEditPostGroupId(postGroupId);
 		setEditFiles(files);
 		setEditPrivacyLevel(privacyLevel);
 		setIsEditModalVisible(true);
@@ -120,6 +120,25 @@ const PostCard = ({ post, fetchPosts }) => {
 	const closeShareModal = () => {
 		setIsShareModalVisible(false);
 	};
+
+	// Hàm lấy profile của người dùng hiện tại
+	useEffect(() => {
+		const fetchUsers = async () => {
+			const config = {
+				headers: {
+					Authorization: `Bearer ${currentUser.accessToken}`,
+				},
+			};
+			try {
+				const res = await axios.get(`${BASE_URL}/v1/user/profile/${currentUser.userId}`, config);
+				const userData = res.data.result;
+				setLiveUser(userData);
+			} catch (error) {
+				console.error(error);
+			}
+		};
+		fetchUsers();
+	}, [currentUser.userId, currentUser.accessToken]);
 
 	// Hàm kiểm tra xem người dùng đã like bài post chưa
 	useEffect(() => {
@@ -221,14 +240,14 @@ const PostCard = ({ post, fetchPosts }) => {
 	const sharePostHandler = async (e) => {
 		e.preventDefault();
 		setIsShareModalVisible(false);
-		console.log('content', content);
 		try {
 			const newPost = {
 				content: content || '',
+				postGroupId: postGroupId || 0,
 				postId: post.postId,
 			};
 
-			await sharePost(newPost.content, newPost.postId);
+			await sharePost(newPost.content, newPost.postId, newPost.postGroupId);
 			fetchPosts();
 			setContent('');
 		} catch (error) {
@@ -305,7 +324,6 @@ const PostCard = ({ post, fetchPosts }) => {
 				}
 
 				formData.append('privacyLevel', editPrivacyLevel || 'PUBLIC');
-				formData.append('postGroupId', editPostGroupId || 0);
 
 				const config = {
 					headers: {
@@ -530,6 +548,24 @@ const PostCard = ({ post, fetchPosts }) => {
 						onClick: sharePostHandler, // Gọi hàm sharePostHandler khi nút "Chia sẻ" được bấm
 					}}
 				>
+					<div className="shareOption" id="shareGroupOfPost">
+						<label htmlFor="postGroupId" className="shareOption-one" style={{ display: 'flex' }}>
+							<Group htmlColor="yellow" className="shareIcon" />
+							<select
+								className="select--postGroupId"
+								id="postGroupId"
+								value={postGroupId}
+								onChange={(e) => setPostGroupId(parseInt(e.target.value))}
+							>
+								<option value={0}>Cá nhân</option>
+								{liveUser?.postGroup?.map((item) => (
+									<option key={item.postGroupId} value={item.postGroupId}>
+										{item.postGroupName}
+									</option>
+								))}
+							</select>
+						</label>
+					</div>
 					<textarea
 						value={content}
 						onChange={(e) => setContent(e.target.value)}
@@ -566,21 +602,6 @@ const PostCard = ({ post, fetchPosts }) => {
 							{Country.getAllCountries().map((item) => (
 								<option key={item.isoCode} value={item.name}>
 									{item.name}
-								</option>
-							))}
-						</select>
-					</div>
-					<div className="editPost">
-						<label className="labelEditPost">Nhóm:</label>
-						<select
-							id="postGroupId"
-							value={editPostGroupId}
-							onChange={(e) => setEditPostGroupId(e.target.value)}
-						>
-							<option value={0}>Cá nhân</option>
-							{user?.postGroup?.map((item) => (
-								<option key={item.postGroupId} value={item.postGroupId}>
-									{item.postGroupName}
 								</option>
 							))}
 						</select>

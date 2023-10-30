@@ -38,6 +38,9 @@ const GroupCard = ({ user, type }) => {
 		friend: 'Đã tham gia',
 		sent: 'Đã gửi',
 		request: 'Chờ xác nhận',
+		decline: 'Đã từ chối',
+		cancel: 'Đã hủy',
+		leaveGroup: 'Đã rời nhóm',
 		you: 'Bạn',
 	};
 
@@ -45,21 +48,24 @@ const GroupCard = ({ user, type }) => {
 		friend: 'success',
 		sent: 'secondary',
 		request: 'warning',
+		decline: 'danger',
+		cancel: 'danger',
 		suggest: 'info',
+		leaveGroup: 'danger',
 		you: 'secondary',
 	};
 	const [dropdownItems, setDropdownItems] = useState([]);
 	const friend = [
 		{
-			key: 'unfriend',
+			key: 'leaveGroup',
 			icon: <HiUserMinus />,
 			danger: true,
 			label: (
 				<Popconfirm
-					title="Bạn có chắc muốn hủy kết bạn?"
+					title="Bạn có chắc muốn rời nhóm?"
 					okText="Rời nhóm"
 					cancelText="Thoát"
-					onConfirm={() => handleFriend({ tempt: 'unfriend', relationship: 'suggest' })}
+					onConfirm={() => handleFriend({ tempt: 'leaveGroup', relationship: 'leaveGroup' })}
 				>
 					Rời nhóm
 				</Popconfirm>
@@ -73,10 +79,10 @@ const GroupCard = ({ user, type }) => {
 			danger: true,
 			label: (
 				<Popconfirm
-					title="Bạn có chắc muốn hủy lời mời kết bạn?"
+					title="Bạn có chắc muốn hủy lời mời vào nhóm?"
 					okText="Hủy lời mời"
 					cancelText="Thoát"
-					onConfirm={() => handleFriend({ tempt: 'cancelJoinGroup', relationship: 'suggest' })}
+					onConfirm={() => handleFriend({ tempt: 'cancelJoinGroup', relationship: 'cancel' })}
 				>
 					Hủy lời mời
 				</Popconfirm>
@@ -96,10 +102,10 @@ const GroupCard = ({ user, type }) => {
 			danger: true,
 			label: (
 				<Popconfirm
-					title="Bạn có chắc muốn từ chối lời mời kết bạn?"
+					title="Bạn có chắc muốn từ chối lời mời vào nhóm?"
 					okText="Từ chối"
 					cancelText="Thoát"
-					onConfirm={() => handleFriend({ tempt: 'declineJoinGroup', relationship: 'suggest' })}
+					onConfirm={() => handleFriend({ tempt: 'declineJoinGroup', relationship: 'decline' })}
 				>
 					Từ chối
 				</Popconfirm>

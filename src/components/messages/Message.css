@@ -1,0 +1,239 @@
+.chatroom {
+	flex: 5;
+}
+
+.chat-box {
+	box-shadow: 0 2.8px 2.2px rgba(0, 0, 0, 0.034), 0 6.7px 5.3px rgba(0, 0, 0, 0.048),
+		0 12.5px 10px rgba(0, 0, 0, 0.06), 0 22.3px 17.9px rgba(0, 0, 0, 0.072), 0 41.8px 33.4px rgba(0, 0, 0, 0.086),
+		0 100px 80px rgba(0, 0, 0, 0.12);
+	margin: 40px 50px;
+	height: 600px;
+	padding: 10px;
+	display: flex;
+	flex-direction: row;
+}
+
+.member-list {
+	width: 20%;
+}
+
+.chat-content {
+	width: 80%;
+	margin-left: 10px;
+}
+
+.chat-messages {
+	height: 80%;
+	border: 1px solid #000;
+}
+
+.send-message {
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+}
+
+.input-message {
+	width: 90%;
+	border-radius: 50px;
+}
+
+ul {
+	padding: 0;
+	list-style-type: none;
+}
+.send-button {
+	width: 10%;
+	border-radius: 50px;
+	margin-left: 5px;
+	cursor: pointer;
+}
+.member {
+	padding: 10px;
+	background: #eee;
+	border: #000;
+	cursor: pointer;
+	margin: 5px 2px;
+	box-shadow: 0 8px 8px -4px lightblue;
+}
+.member.active {
+	background: blueviolet;
+	color: #fff;
+}
+.member:hover {
+	background: grey;
+	color: #fff;
+}
+
+.avatar {
+	background-color: cornflowerblue;
+	padding: 3px 5px;
+	border-radius: 5px;
+	color: #fff;
+}
+.avatar.self {
+	color: #000;
+	background-color: greenyellow;
+}
+.message {
+	padding: 5px;
+	width: auto;
+	display: flex;
+	flex-direction: row;
+	box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+	margin: 5px 10px;
+}
+.message-data {
+	padding: 5px;
+}
+.message.self {
+	justify-content: end;
+}
+.rightbar--chat {
+	flex: 2;
+	height: calc(100vh - 56px);
+	position: sticky;
+	top: 56px;
+	box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.1), 0px -3px 5px rgba(0, 0, 0, 0.1), 3px 0px 5px rgba(0, 0, 0, 0.1),
+		-3px 0px 5px rgba(0, 0, 0, 0.1);
+}
+.sidebar--chat {
+	flex: 2;
+	height: calc(100vh - 56px);
+	position: sticky;
+	top: 56px;
+	box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.1), 0px -3px 5px rgba(0, 0, 0, 0.1), 3px 0px 5px rgba(0, 0, 0, 0.1),
+		-3px 0px 5px rgba(0, 0, 0, 0.1);
+}
+.header--chat {
+	background-color: #fff;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 1;
+	border-bottom: solid 1px #ccc;
+	flex-direction: column;
+}
+.header--chat--infor {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+	padding: 8px;
+}
+.header--chat--infor span {
+	font-size: 18px;
+	font-weight: 600;
+}
+.search--friend--message {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 8px;
+}
+.search--friend--message input {
+	padding: 8px;
+}
+.search--friend--message button {
+	height: 40px !important;
+	width: 40px !important;
+}
+.search--friend--message button span {
+	font-size: 18px !important;
+}
+.list--message--sidebar {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+}
+.list--message--sidebar .ant-segmented-item-label {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.list--message--sidebar .ant-segmented-item-icon {
+	display: flex;
+}
+.container--sidebar--message {
+	height: 75%;
+	overflow-y: scroll;
+}
+.item--message--sidebar {
+	display: flex;
+	padding: 16px 8px 0px 8px;
+	border-bottom: solid 1px #ccc;
+	cursor: pointer;
+}
+.infor--message--sidebar {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	width: 100%;
+	margin-left: 12px;
+}
+.name--message--sidebar {
+	font-size: 16px;
+	font-weight: 600;
+}
+
+.content--message--sidebar {
+	font-size: 12px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+	max-width: 150px;
+	display: block;
+}
+.avatar--message--sidebar img {
+	width: 56px;
+	height: 56px;
+	object-fit: cover;
+	border-radius: 50%;
+}
+.active--message {
+	background-color: #ccc;
+}
+.rightbar--chat--header {
+	padding: 8px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+.rightbar--chat--header img {
+	width: 80px;
+	height: 80px;
+	object-fit: cover;
+	border-radius: 50%;
+}
+.rightbar--chat--header p {
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+	max-width: 290px;
+	font-weight: 600;
+	display: block;
+	font-size: 16px;
+	margin-top: 8px;
+}
+.file--item {
+	margin-top: 8px;
+}
+.file--container {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-evenly;
+}
+.contaner--item--file {
+	padding: 0px 8px;
+}
+.button--file--item {
+	display: flex;
+	width: 100%;
+	padding: 20px;
+	align-items: center;
+	margin-top: 8px;
+}

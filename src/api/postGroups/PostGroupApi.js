@@ -1,6 +1,25 @@
 import axios from 'axios';
 import { BASE_URL } from '../../context/apiCall';
 const PostGroupApi = {
+	listAllGroup: async (user) => {
+		try {
+			const config = {
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${user?.accessToken}`,
+				},
+			};
+			const res = await axios.get(`${BASE_URL}/v1/groupPost/list/all`, config);
+			if (res.data.success) {
+				console.log(res.data);
+				return res.data;
+			} else {
+				throw new Error(res.data.message);
+			}
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	},
 	listOwnerGroup: async (user) => {
 		try {
 			const config = {

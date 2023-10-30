@@ -19,6 +19,7 @@ import SettingManagerGroup from '../components/groups/manager/SettingManagerGrou
 import MemberGroup from '../components/groups/manager/MemberGroup';
 import ParticipantRequests from '../components/groups/manager/ParticipantRequests';
 import HelpGroup from '../components/groups/manager/HelpGroup';
+import Meessage from '../components/messages/Message';
 const privateRoutes = [
 	{ path: '/profile/update/:userId', component: EditProfile },
 	{ path: '/groups/manager/:postGroupId', component: ManagerGroup },
@@ -36,6 +37,7 @@ const privateRoutes = [
 	{ path: '/groups/manager/:postGroupId/help', component: HelpGroup },
 	{ path: '/groups/manager/:postGroupId/analysis', component: HelpGroup },
 	{ path: '/update/:userId', component: EditProfile },
+	{ path: '/message/:userId', component: Meessage },
 ];
 
 const publicRoutes = [

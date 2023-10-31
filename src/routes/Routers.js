@@ -20,10 +20,12 @@ import MemberGroup from '../components/groups/manager/MemberGroup';
 import ParticipantRequests from '../components/groups/manager/ParticipantRequests';
 import HelpGroup from '../components/groups/manager/HelpGroup';
 import Meessage from '../components/messages/Message';
+import DiscoverGroup from '../components/groups/discover/DiscoverGroup';
 const privateRoutes = [
 	{ path: '/profile/update/:userId', component: EditProfile },
 	{ path: '/groups/manager/:postGroupId', component: ManagerGroup },
 	{ path: '/groups/create', component: CreateGroup },
+	{ path: '/groups/discover', component: DiscoverGroup},
 	{ path: '/groups/:postGroupId', component: GroupDetail },
 	{ path: '/groups', component: Groups, topbar: Topbar },
 	{ path: '/profile/:userId', component: Profile, topbar: Topbar },

@@ -322,8 +322,6 @@ const PostGroupApi = {
 		}
 	},
 	appointAdminGroup: async ({ user, data }) => {
-		console.log('Data', data);
-
 		try {
 			const config = {
 				headers: {
@@ -371,6 +369,82 @@ const PostGroupApi = {
 				},
 			};
 			const res = await axios.post(`${BASE_URL}/v1/groupPost/decline/memberRequired`, data, config);
+			if (res.data.success) {
+				console.log(res.data);
+				return res.data; // Trả về dữ liệu từ thành công
+			} else {
+				throw new Error(res.data.message);
+			}
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	},
+  cancelJoinGroupRequest: async ({ token, postGroupRequestId }) => {
+		try {
+			const config = {
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: Bearer ${token},
+				},
+			};
+			const res = await axios.put(${BASE_URL}/v1/groupPost/request/cancel/${postGroupRequestId},{}, config);
+			if (res.data.success) {
+				console.log(res.data);
+				return res.data; // Trả về dữ liệu từ thành công
+			} else {
+				throw new Error(res.data.message);
+			}
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	},
+	acceptJoinGroupRequest: async ({ token, postGroupId }) => {
+		try {
+			const config = {
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: Bearer ${token},
+				},
+			};
+			const res = await axios.post(${BASE_URL}/v1/groupPost/accept/${postGroupId}, {}, config);
+			if (res.data.success) {
+				console.log(res.data);
+				return res.data; // Trả về dữ liệu từ thành công
+			} else {
+				throw new Error(res.data.message);
+			}
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	},
+	declineJoinGroupRequest: async ({ token, postGroupId }) => {
+		try {
+			const config = {
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: Bearer ${token},
+				},
+			};
+			const res = await axios.post(${BASE_URL}/v1/groupPost/decline/${postGroupId}, {}, config);
+			if (res.data.success) {
+				console.log(res.data);
+				return res.data; // Trả về dữ liệu từ thành công
+			} else {
+				throw new Error(res.data.message);
+			}
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	},
+	leaveGroup: async ({ token, postGroupId }) => {
+		try {
+			const config = {
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: Bearer ${token},
+				},
+			};
+			const res = await axios.put(${BASE_URL}/v1/groupPost/leaveGroup/${postGroupId},{}, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công

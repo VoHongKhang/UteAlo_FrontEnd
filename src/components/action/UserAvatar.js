@@ -9,8 +9,7 @@ const UserAvatar = ({ user: initUser, nickname, badgeProps, avtSize = 40, ...ava
 	const badgeSize = avtSize / 4;
 
 	const [user, setUser] = useState(initUser);
-	const profilePic = user?.avatar ? user?.avatar : user?.avatarUser;
-
+	const profilePic = user?.avatar ? user?.avatar :(user?.avatarGroup ? user?.avatarGroup : user?.avatarUser);
 	useEffect(() => {
 		setUser(initUser);
 	}, [initUser]);

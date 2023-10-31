@@ -1,7 +1,6 @@
 import GetFriendApi from '../profile/friend/getFriendApi';
 
 const FriendApi = async ({ user, api }) => {
-	console.log('userFriendAPi',user);
 	switch (api) {
 		case 'request':
 			return await GetFriendApi.getListFriendRequest(user);

@@ -80,7 +80,7 @@ const FeedOfUser = () => {
 	return (
 		<div className="feed" style={{ color: theme.foreground, background: theme.background }}>
 			<div className="feedWrapper">
-				{(!params.userId || params.userId === currentUser.userId) && <Share fetchPosts={fetchPosts} />}
+				{(!params.userId || params.userId === currentUser.userId) && <Share fetchPosts={fetchPosts} postGroupId={null}/>}
 
 				{visiblePostData.length === 0 ? (
 					<h2 style={{ marginTop: '20px' }}>Chưa có bài viết!</h2>

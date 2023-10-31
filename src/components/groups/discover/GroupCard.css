@@ -1,0 +1,25 @@
+.centerbar .ant-card-meta-title {
+    margin-bottom: 0 !important;
+}
+
+.centerbar .ant-card-body {
+    padding-bottom: 28px !important;
+}
+
+.card--description {
+    display: flex;
+    z-index: 999;
+    width: 100%;
+    margin-left: -66px;
+    position: absolute;
+}
+
+.centerbar .btn--action {
+    position: absolute;
+    margin-top: -186px;
+    margin-left: 77px;
+}
+
+.centerbar .card--description-text {
+    margin: auto;
+}

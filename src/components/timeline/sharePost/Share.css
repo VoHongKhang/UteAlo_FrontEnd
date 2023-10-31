@@ -122,9 +122,13 @@ select {
 }
 
 #sharePublic {
-  margin-left: 36px;
+  margin-left: -14px;
 }
 
 #shareGroup {
   margin-left: -14px;
+}
+
+#image--icon {
+  margin-right: 8px;
 }

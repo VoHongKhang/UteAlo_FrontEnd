@@ -1,10 +1,10 @@
 .manager--group {
 	flex: 5.5;
 }
-.setting--group--member{
+.setting--group--member {
 	flex: 5.5;
 	display: flex;
-    justify-content: center;
+	justify-content: center;
 }
 .ManagerGroup--groupCoverImg {
 	height: 320px !important;
@@ -191,25 +191,46 @@
 .setting--group .MuiSvgIcon-root {
 	height: 30px;
 }
-.member--contaner{
+.member--contaner {
 	width: 80%;
-    margin-top: 30px;
-    height: max-content;
-    background: aliceblue;
-    border: 1px solid #ccc;
-    border-radius: 15px;
-    padding: 20px;
-    box-sizing: border-box;
+	margin-top: 30px;
+	height: max-content;
+	background: aliceblue;
+	border: 1px solid #ccc;
+	border-radius: 15px;
+	padding: 20px;
+	box-sizing: border-box;
 }
-.setting--group__title{
+.setting--group__title {
 	font-size: 20px;
-    font-weight: 600;
+	font-weight: 600;
 	margin-bottom: 10px;
 }
-.list--friend{
+.list--friend {
 	margin-top: 10px;
 }
-.more--icon{
+.more--icon {
 	cursor: pointer;
-	
+}
+.avatarMember {
+	width: 65px;
+	height: 65px;
+	margin-right: 12px;
+}
+.popper--member {
+	border-radius: 15px;
+}
+.poper--member--item {
+	padding: 8px 16px;
+	cursor: pointer;
+}
+.poper--member--item:hover {
+	background: #ccc;
+}
+.list--member--required {
+	width: 100%;
+	padding: 16px;
+	box-sizing: border-box;
+}
+.accept--member--all {
 }

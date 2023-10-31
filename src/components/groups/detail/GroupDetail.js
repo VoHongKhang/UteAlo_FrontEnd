@@ -217,8 +217,8 @@ const GroupDetail = () => {
 							>
 								{postGroup.background !== null ? (
 									<Image
-										hoverable
-										cover
+										hoverable={true}
+										cover={true}
 										width="100%"
 										className="groupCoverImg"
 										src={postGroup.background} // Sử dụng selectedPost.photos thay vì cố định URL như bạn đã đề cập
@@ -230,8 +230,8 @@ const GroupDetail = () => {
 								)}
 								{postGroup.avatar !== null ? (
 									<Image
-										hoverable
-										cover
+										hoverable={true}
+										cover={true}
 										width="100%"
 										className="groupUserImg"
 										src={postGroup.avatar} // Sử dụng selectedPost.photos thay vì cố định URL như bạn đã đề cập

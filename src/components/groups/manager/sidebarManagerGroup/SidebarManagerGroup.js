@@ -40,7 +40,7 @@ const SidebarManagerGroup = ({ user, groupId }) => {
 		{
 			postGroupName: 'Hỗ trợ',
 			avatarGroup: <Help style={{ fontSize: '25px', margin: 'auto' }} />,
-			href: `/groups/manager/help`,
+			href: `/groups/manager/${groupId}/help`,
 		},
 	];
 	const lists = [

@@ -5,13 +5,11 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const UserAvatar = ({ user: initUser, nickname, badgeProps, avtSize = 40, ...avatarProps }) => {
-
 	const { token } = theme.useToken();
 	const badgeSize = avtSize / 4;
 
 	const [user, setUser] = useState(initUser);
-	const profilePic = user?.avatar ? user?.avatar : user?.avatarGroup ;
-
+	const profilePic = user?.avatar ? user?.avatar :(user?.avatarGroup ? user?.avatarGroup : user?.avatarUser);
 	useEffect(() => {
 		setUser(initUser);
 	}, [initUser]);

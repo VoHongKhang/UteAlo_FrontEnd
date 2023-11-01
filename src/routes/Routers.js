@@ -7,7 +7,7 @@ import ForgotPassword from '../components/auth/ForgotPassword/ForgotPassword';
 import AuthEmail from '../components/auth/AuthEmail/AuthEmail';
 import ResetPassord from '../components/auth/ResetPassword/ResetPassword';
 import FriendRequest from '../components/friend/friendRequest/FriendRequest';
-import Groups from '../components/groups/Group';
+import Group from '../components/groups/Group';
 import CreateGroup from '../components/groups/createGroup/CreateGroup';
 import GroupDetail from '../components/groups/detail/GroupDetail';
 import NotFound from '../components/NotFound';
@@ -27,7 +27,7 @@ const privateRoutes = [
 	{ path: '/groups/create', component: CreateGroup },
 	{ path: '/groups/discover', component: DiscoverGroup},
 	{ path: '/groups/:postGroupId', component: GroupDetail },
-	{ path: '/groups', component: Groups, topbar: Topbar },
+	{ path: '/groups', component: Group, topbar: Topbar },
 	{ path: '/profile/:userId', component: Profile, topbar: Topbar },
 	{ path: '/friends', component: FriendRequest },
 	{ path: '/update/:userId', component: EditProfile },

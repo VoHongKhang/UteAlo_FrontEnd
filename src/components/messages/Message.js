@@ -5,22 +5,38 @@ import RightbarChat from './RightbarChat';
 import { Helmet } from 'react-helmet';
 import { Toaster } from 'react-hot-toast';
 import Topbar from '../timeline/topbar/Topbar';
-import SidebarChat from './SidebarChat'
+import SidebarChat from './SidebarChat';
 const Meessage = () => {
+	const [user, setUser] = useState();
 	const { user: currentUser } = useAuth();
-	const { postGroup, setPostGroup } = useState();
+	const [postGroup, setPostGroup] = useState({
+		isGroup: false,
+		id: '',
+	});
+	const [data, setData] = useState({});
+	const [isShowRightbar, setIsShowRightbar] = useState(true);
 	const onChangeMessage = (group) => {
 		setPostGroup(group);
+	};
+	const dataChatRoom = (data) => {
+		setData(data);
+	};
+	const isShowInfo = (info) => {
+		setIsShowRightbar(info);
+	};
+	const getUser = (data) => {
+		console.log("data",data);
+		setUser(data);
 	};
 	return (
 		<>
 			<Helmet title={`Tin nhắn |UTEALO`} />
 			<Toaster />
-			<Topbar />
+			<Topbar dataUser={getUser} />
 			<div className="homeContainer">
 				<SidebarChat user={currentUser} onChangeMessage={onChangeMessage} />
-				<ChatRoom user={currentUser} groupId={postGroup} />
-				<RightbarChat groupId={postGroup} />
+				<ChatRoom user={user} data={data} Toggeinfo={isShowInfo} />
+				<RightbarChat user={currentUser} group={postGroup} currentData={dataChatRoom} showRightbar={isShowRightbar} />
 			</div>
 		</>
 	);

@@ -1,5 +1,4 @@
 import { Button, Divider, List, Space, Typography } from 'antd';
-import { Link } from 'react-router-dom';
 import useTheme from '../../../context/ThemeContext';
 import './SidebarGroup.css';
 import { useNavigate } from 'react-router-dom';

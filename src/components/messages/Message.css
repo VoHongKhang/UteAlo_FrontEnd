@@ -157,7 +157,7 @@ ul {
 	display: flex;
 }
 .container--sidebar--message {
-	height: 75%;
+	height: 70%;
 	overflow-y: scroll;
 }
 .item--message--sidebar {
@@ -207,6 +207,7 @@ ul {
 	height: 80px;
 	object-fit: cover;
 	border-radius: 50%;
+	cursor: pointer;
 }
 .rightbar--chat--header p {
 	text-overflow: ellipsis;
@@ -236,4 +237,115 @@ ul {
 	padding: 20px;
 	align-items: center;
 	margin-top: 8px;
+}
+.header--chatroom {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 12px;
+}
+.header--chatroom--left {
+	display: flex;
+	align-items: center;
+}
+.header--chatroom img {
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	margin-right: 8px;
+}
+.header--chatroom--left p {
+	font-size: 16px;
+	font-weight: 600;
+}
+.header--chatroom--left span {
+	font-size: 12px;
+}
+
+.header--chatroom--right {
+	display: flex;
+	align-items: center;
+}
+.header--chatroom--right--icon {
+	font-size: 26px !important;
+	margin-left: 12px;
+	cursor: pointer;
+}
+.header--chatroom--right--icon:hover {
+	color: #1890ff;
+}
+.container--chatroom {
+	height: 75%;
+	overflow-y: scroll;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+}
+.footer--chatroom {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 8px;
+}
+.footer--chatroom--icon-message {
+	font-size: 24px;
+	flex: 1 1;
+	display: flex;
+	align-items: center;
+	margin-right: 8px;
+}
+.input-message {
+	width: 100%;
+	padding: 8px 16px;
+}
+.footer--chatroom--button-message {
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0.4;
+}
+.container--chatroom .sent {
+	padding: 8px 16px;
+	background: #1890ff;
+	border-radius: 10px;
+	color: #fff;
+	font-size: 16px;
+	max-width: 80%;
+	margin: 8px;
+	position: relative;
+	word-wrap: break-word;
+}
+.container--chatroom .sent .icon--more--message {
+	position: absolute;
+	top: 50%;
+	left: -30px;
+	transform: translateY(-50%);
+	cursor: pointer;
+	color: #000;
+}
+.container--chatroom .received .icon--more--message:hover,
+.container--chatroom .sent .icon--more--message:hover {
+	color: #1890ff;
+}
+.container--chatroom .received {
+	padding: 8px 16px;
+	border-radius: 10px;
+	font-size: 16px;
+	max-width: 80%;
+	margin: 8px;
+	position: relative;
+	border: #ccc 1px solid;
+	word-wrap: break-word;
+}
+.container--chatroom .sent span {
+}
+.container--chatroom .received .icon--more--message {
+	position: absolute;
+	top: 50%;
+	right: -30px;
+	transform: translateY(-50%);
+	cursor: pointer;
+	color: #000;
+	
 }

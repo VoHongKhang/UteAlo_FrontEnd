@@ -5,7 +5,7 @@ import { Toaster } from 'react-hot-toast';
 import useAuth from '../../context/auth/AuthContext';
 import NewFeedGroup from './NewFeedGroup';
 import SidebarGroup from './sidebar/SidebarGroup';
-const Group = () => {
+const TimeLineGroup = () => {
 	const { user: currentUser } = useAuth();
 	return (
 		<>
@@ -19,4 +19,4 @@ const Group = () => {
 		</>
 	);
 };
-export default Group;
+export default TimeLineGroup;

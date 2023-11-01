@@ -8,7 +8,7 @@ import useTheme, { themes } from '../../../context/ThemeContext';
 import noAvatar from '../../../assets/appImages/user.png';
 import { BASE_URL } from '../../../context/apiCall';
 import { useNavigate } from 'react-router-dom';
-const Topbar = () => {
+const Topbar = ({dataUser}) => {
 	const [user, setUser] = useState();
 	const { user: currentUser } = useAuth();
 	const { theme, setTheme } = useTheme();
@@ -35,6 +35,7 @@ const Topbar = () => {
 			};
 			const res = await axios.get(`${BASE_URL}/v1/user/profile/${currentUser.userId}`, config);
 			setUser(res.data.result);
+			dataUser(res.data.result);
 		};
 		fetchUsers();
 	}, [currentUser.accessToken, currentUser.userId]);

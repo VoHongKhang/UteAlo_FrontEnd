@@ -7,7 +7,6 @@ import ForgotPassword from '../components/auth/ForgotPassword/ForgotPassword';
 import AuthEmail from '../components/auth/AuthEmail/AuthEmail';
 import ResetPassord from '../components/auth/ResetPassword/ResetPassword';
 import FriendRequest from '../components/friend/friendRequest/FriendRequest';
-import Group from '../components/groups/Group';
 import CreateGroup from '../components/groups/createGroup/CreateGroup';
 import GroupDetail from '../components/groups/detail/GroupDetail';
 import NotFound from '../components/NotFound';
@@ -21,13 +20,14 @@ import ParticipantRequests from '../components/groups/manager/ParticipantRequest
 import HelpGroup from '../components/groups/manager/HelpGroup';
 import Meessage from '../components/messages/Message';
 import DiscoverGroup from '../components/groups/discover/DiscoverGroup';
+import TimeLineGroup from '../components/groups/TimeLineGroup';
 const privateRoutes = [
 	{ path: '/profile/update/:userId', component: EditProfile },
 	{ path: '/groups/manager/:postGroupId', component: ManagerGroup },
 	{ path: '/groups/create', component: CreateGroup },
 	{ path: '/groups/discover', component: DiscoverGroup},
 	{ path: '/groups/:postGroupId', component: GroupDetail },
-	{ path: '/groups', component: Group, topbar: Topbar },
+	{ path: '/groups', component: TimeLineGroup, topbar: Topbar },
 	{ path: '/profile/:userId', component: Profile, topbar: Topbar },
 	{ path: '/friends', component: FriendRequest },
 	{ path: '/update/:userId', component: EditProfile },

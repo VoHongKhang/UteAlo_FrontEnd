@@ -7,7 +7,7 @@ const getPostGroupApi = async ({ user, api }) => {
 		case 'sent':
 			return await PostGroupApi.listInvitedGroup(user);
 		default:
-			return await PostGroupApi.listJoinGroup(user);
+			return await PostGroupApi.listAllGroup(user);
 	}
 };
 export default getPostGroupApi;

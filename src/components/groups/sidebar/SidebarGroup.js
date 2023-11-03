@@ -1,12 +1,15 @@
 import { Button, Divider, List, Space, Typography } from 'antd';
-import { Link } from 'react-router-dom';
+import { CloseOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import useTheme from '../../../context/ThemeContext';
 import './SidebarGroup.css';
 import { useNavigate } from 'react-router-dom';
 import { Search, Settings, RssFeed, Explore, People } from '@material-ui/icons';
 import PostGroupApi from '../../../api/postGroups/PostGroupApi';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import noAvatar from '../../../assets/appImages/user.png';
+import { BASE_URL } from '../../../context/apiCall';
+import adver4 from '../../../assets/appImages/adver4.jpg';
+import axios from 'axios';
 
 const SidebarGroup = ({ user }) => {
 	const { theme } = useTheme();
@@ -15,6 +18,97 @@ const SidebarGroup = ({ user }) => {
 	const [listGroupJoin, setListGroupJoin] = useState([]);
 	const handlerCreateGroup = () => {
 		navigate('/groups/create');
+	};
+
+	const [searchKey, setSearchKey] = useState('');
+	const [searchHistory, setSearchHistory] = useState([]);
+	const [showDropdown, setShowDropdown] = useState(false);
+	const [searchFriends, setSearchFriends] = useState([]);
+	const [suggestedValues, setSuggestedValues] = useState([]);
+
+	const inputRef = useRef(null);
+
+	const searchGroupsFromAPI = async (searchKey) => {
+		try {
+			const res = await axios.get(`${BASE_URL}/v1/groupPost/getPostGroups/key?search=${searchKey}`);
+			console.log(res.data.result);
+			setSearchFriends(res.data.result);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	useEffect(() => {
+		// Lắng nghe sự kiện click trên toàn bộ trang
+		const handleClickOutside = (e) => {
+			if (inputRef.current && !inputRef.current.contains(e.target)) {
+				setShowDropdown(false);
+			}
+		};
+
+		// Đăng ký sự kiện khi component được mount
+		document.addEventListener('click', handleClickOutside);
+
+		// Hủy đăng ký sự kiện khi component bị unmount
+		return () => {
+			document.removeEventListener('click', handleClickOutside);
+		};
+	}, []);
+
+	const handleSearchInputChange = (e) => {
+		const inputText = e.target.value;
+		setSearchKey(inputText);
+
+		// Gọi hàm tìm kiếm từ API dựa trên giá trị nhập vào
+		searchGroupsFromAPI(inputText);
+
+		const filteredValues = searchHistory.filter((value) => value.toLowerCase().includes(inputText.toLowerCase()));
+		setSuggestedValues(filteredValues);
+		setShowDropdown(true);
+	};
+
+	// Trong useEffect của component hoặc trong hàm khởi tạo
+	useEffect(() => {
+		// Tải lịch sử tìm kiếm từ local storage
+		const storedSearchHistory = localStorage.getItem('searchHistory');
+
+		if (storedSearchHistory) {
+			setSearchHistory(JSON.parse(storedSearchHistory));
+		}
+	}, []);
+
+	const handleRemoveSearchItem = (itemToRemove) => {
+		// Xóa mục khỏi searchHistory trong trạng thái của component
+		const updatedSearchHistory = searchHistory.filter((item) => item !== itemToRemove);
+		setSearchHistory(updatedSearchHistory);
+
+		// Cập nhật Local Storage với mảng mới sau khi xóa
+		localStorage.setItem('searchHistory', JSON.stringify(updatedSearchHistory));
+	};
+
+	const handleSearchSubmit = (e) => {
+		e.preventDefault();
+
+		// Lưu tìm kiếm vào lịch sử
+		const updatedSearchHistory = [...searchHistory, searchKey];
+
+		// Lấy 10 giá trị mới nhất
+		if (updatedSearchHistory.length > 10) {
+			updatedSearchHistory.splice(0, updatedSearchHistory.length - 10);
+		}
+ 
+		setSearchHistory(updatedSearchHistory);
+
+		// Lưu lịch sử vào local storage
+		localStorage.setItem('searchHistory', JSON.stringify(updatedSearchHistory));
+
+		// Đóng dropdown
+		setShowDropdown(false);
+		navigate('/groups/searchGroup', { state: { searchData: searchFriends } });
+	};
+
+	const handleInputClick = () => {
+		setShowDropdown(true);
 	};
 
 	const listAccountAction = [
@@ -35,7 +129,8 @@ const SidebarGroup = ({ user }) => {
 		},
 	];
 
-	
+	console.log(searchFriends);
+
 	useEffect(() => {
 		async function fetchData() {
 			const res = await PostGroupApi.listOwnerGroup(user);
@@ -74,14 +169,67 @@ const SidebarGroup = ({ user }) => {
 					</div>
 				</div>
 				<div className="topSidebar__search">
-					<Search
-						className="icon__search"
-						style={{
-							marginLeft: '10px',
-							fontSize: '24px',
-						}}
-					/>
-					<input type="text" placeholder="Tìm kiếm nhóm" className="input__search" />
+					<div className="group--infor-introduce">
+						<Search
+							className="icon__search"
+							style={{
+								marginLeft: '10px',
+								fontSize: '24px',
+							}}
+						/>
+						{showDropdown && (
+							<div className="search-dropdown">
+								<div className="search-dropdown-title">
+									<span className="span-1">Gần đây</span>
+									<span className="span-2">Chỉnh sửa</span>
+								</div>
+								<div className="search-dropdown-history">
+									<ul>
+										{/* Lịch sử tìm kiếm */}
+										{searchHistory.map((item, index) => (
+											<li key={index} onClick={() => setSearchKey(item)}>
+												<ClockCircleOutlined className="icon--clock" />
+												<span>{item}</span>
+												<CloseOutlined
+													className="icon--remove"
+													onClick={() => handleRemoveSearchItem(item)}
+												/>
+											</li>
+										))}
+										{/* Tiên đoán */}
+										{/* {suggestedValues.map((item, index) => (
+											<li key={index} onClick={() => setSearchKey(item)}>
+												{item}
+											</li>
+										))} */}
+										{/* Kết quả tìm kiếm */}
+										{Object.values(searchFriends).map((item, index) => (
+											<li key={index} onClick={() => setSearchKey(item.postGroupName)}>
+												<img
+													className="search--avatarGroup"
+													src={item.avatarGroup ? item.avatarGroup : adver4}
+													alt="avatarGroup"
+												></img>
+												<span>{item.postGroupName}</span>
+											</li>
+										))}
+									</ul>
+								</div>
+							</div>
+						)}
+					</div>
+					<form onSubmit={handleSearchSubmit}>
+						<div ref={inputRef}>
+							<input
+								type="text"
+								placeholder="Tìm kiếm nhóm"
+								className="input__search"
+								value={searchKey}
+								onChange={handleSearchInputChange}
+								onClick={handleInputClick}
+							/>
+						</div>
+					</form>
 				</div>
 				<div className="topSidebar__createGroup">
 					<Button type="primary" block className="topSidebar__button" onClick={handlerCreateGroup}>

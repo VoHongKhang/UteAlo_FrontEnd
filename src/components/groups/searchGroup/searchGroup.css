@@ -1,0 +1,97 @@
+#search--result {
+    display: flex;
+    background: #f0f2f5;
+}
+
+.search--result-not-join {
+    margin: auto;
+    margin-top: 30px;
+}
+
+.search--result-item {
+    width: 680px;
+    height: 134px;
+    margin: auto;
+    margin-top: 20px;
+    background: #ffffff;
+    border-radius: 10px;
+}
+
+.search--result-item {
+    display: flex;
+    padding-top: 15px;
+    padding-left: 20px;
+}
+
+.img--avatarGroup {
+    width: 10%;
+}
+
+.img--avatarGroup img {
+    width: 60px;
+    height: 60px;
+    border-radius: 7px;
+    object-fit: cover;
+}
+
+.postGroupName {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.search--description {
+    color: #65676b;
+    font-size: 14px;
+    margin-top: 2px;
+}
+
+.text--more {
+    color: #65676b;
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+.search--text {
+    margin-left: 14px;
+    width: 70%;
+}
+
+.search--join {
+    margin: auto;
+    margin-top: 36px;
+    width: 20%;
+    margin-right: -28px;
+}
+
+.search--join button {
+    height: 36px;
+    width: 86px;
+    border: none;
+    background: #ebf5ff;
+    color: #0064d1;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.search--join button:hover {
+    cursor: pointer;
+}
+
+.number--friend-joined {
+    display: flex;
+    margin-top: 7px;
+}
+
+.number--friend-joined img {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+}
+
+.number--friend-joined span {
+    font-size: 14px;
+    color: #65676b;
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+}

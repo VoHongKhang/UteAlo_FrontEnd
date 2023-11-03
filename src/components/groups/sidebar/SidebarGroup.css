@@ -72,10 +72,13 @@
     background: #f0f2f5;
     margin-left: 4%;
 }
+
 .icon__search {
 	min-width: 30px;
 	font-size: 25px;
+	margin-top: -10px;
 }
+
 .input__search {
 	width: 100%;
 	height: 35px;
@@ -187,6 +190,96 @@
 .sidebar__group .ant-spin-container .ant-list-items {
 	margin-left: 14px;
 }
+
+.search-dropdown {
+	position: fixed;
+    z-index: 99;
+    width: 24.1%;
+    border-bottom-right-radius: 14px;
+    border-bottom-left-radius: 14px;
+    background: #f0f2f5;
+    padding: 14px 0;
+    margin-top: -13px;
+    margin-left: -19px;
+}
+
+.search-dropdown-history {
+	display: flex;
+	margin-top: 10px;
+}
+
+.search-dropdown-history ul li {
+	font-size: 15px;
+	font-weight: 500;
+	margin: 5px 0;
+}
+
+.search-dropdown-title {
+	display: flex;
+    justify-content: space-between;
+}
+
+.search-dropdown-title .span-1 {
+	font-weight: 600;
+    font-size: 15px;
+	margin-left: 14px;
+}
+
+.search-dropdown-title .span-2 {
+	font-size: 15px;
+    color: #0064d1;
+	margin-right: 14px;
+}
+
+.search-dropdown ul {
+	margin: auto;
+}
+
+.search-dropdown ul li {
+	padding: 6px 0px;
+	display: flex;
+}
+
+.search-dropdown ul li span{
+	display: flex;
+    align-items: center;
+	margin-left: 12px;
+}
+
+
+.search-dropdown ul li:hover{
+	background-color: #E4E6EB;
+	padding: 8px 110px;
+    border-radius: 5px;
+	cursor: pointer;
+}
+
+.search--avatarGroup {
+	width: 36px;
+    height: 36px;
+    border-radius: 8px;
+	object-fit: cover;
+}
+
+.icon--remove svg{
+	height: 20px;
+    padding: 3px;
+    width: 20px;
+}
+
+.icon--remove svg:hover{
+	height: 20px;
+    padding: 3px;
+    width: 20px;
+    background: #c1c6cd;
+    border-radius: 50%;
+}
+
+.icon--clock {
+	width: 20px;
+	height: 20px;
+}
+
 
 @media screen and (max-width: 820px) {
 	.sidebar {

@@ -29,15 +29,12 @@ const Timeline = () => {
 
 	// search user request
 	const searchHandler = async () => {
-		const config = {
-			headers: {
-				Authorization: `Bearer ${currentUser.token}`,
-			},
-		};
-		const res = await axios.get(`${BASE_URL}/user/all?keyword=${searchKey}}`, config);
+		console.log('searchKey', searchKey);
+		const res = await axios.get(`${BASE_URL}/v1/groupPost/getPostGroups/key?search=${searchKey}`);
 		setSearchFriends(res.data);
 		setSearchKey('');
 	};
+	
 	return (
 		<>
 			<Helmet title="UTEALO" />
@@ -53,16 +50,16 @@ const Timeline = () => {
 					<div className="searchbar">
 						<input
 							type="text"
-							placeholder="Search for friend...example - 'aditya'"
+							placeholder="Tìm kiếm trên UteAlo"
 							className="searchInput "
 							value={searchKey}
 							onChange={(e) => setSearchKey(e.target.value)}
 						/>
 					</div>
 					<button style={{ margin: '0.6rem' }} className="shareButton" onClick={searchHandler}>
-						Search
+						Tìm kiếm trên UteAlo
 					</button>
-					<h4 className="rightbarTitle sb">Search Friends Results</h4>
+					<h4 className="rightbarTitle sb">Kết quả tìm kiếm</h4>
 					<ul className="rightbarFriendList">
 						{searchFriends && searchFriends.map((u) => <SearchUser key={u._id} user={u} />)}
 					</ul>

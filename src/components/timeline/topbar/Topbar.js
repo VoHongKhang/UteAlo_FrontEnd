@@ -67,7 +67,7 @@ const Topbar = ({dataUser}) => {
 						<span className="topbarLogo">UTEALO</span>
 					</Link>
 					<div className="searchbar">
-						<input type="text" placeholder="Search....." className="searchInput" />
+						<input type="text" placeholder="Tìm kiếm trên UteAlo" className="searchInput" />
 						<span className="searchIcon">
 							<Search style={{ cursor: 'pointer' }} />
 						</span>

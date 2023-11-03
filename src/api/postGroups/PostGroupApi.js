@@ -493,5 +493,18 @@ const PostGroupApi = {
 			throw new Error(error.message);
 		}
 	},
+	searchAllGroup: async (searchKey) => {
+		try {
+			const res = await axios.get(`${BASE_URL}/api/v1/groupPost/getPostGroups/key?search=${searchKey}`);
+			if (res.data.success) {
+				console.log(res.data);
+				return res.data;
+			} else {
+				throw new Error(res.data.message);
+			}
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	},
 };
 export default PostGroupApi;

@@ -74,6 +74,9 @@ const GroupDetail = () => {
 		}
 	};
 
+	console.log(posts);
+	console.log(params.postGroupId);
+
 	// Lấy danh sách các bài share post
 	const fetchSharePosts = async () => {
 		try {

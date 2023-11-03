@@ -35,7 +35,7 @@ export const useFetcher = ({ user, api, limit = 21, params = {}, page }) => {
 	useEffect(() => {
 		if (Object.keys(params).length !== 0) {
 			let content = fulldata?.filter((data) =>
-				data.username.toLocaleLowerCase().includes(params.key.toLocaleLowerCase().trim())
+				data.postGroupName.toLocaleLowerCase().includes(params.key.toLocaleLowerCase().trim())
 			);
 			if (content.length > 0) {
 				setFitterData(content);

@@ -1,5 +1,5 @@
 import { Group, Message, MoreHoriz } from '@material-ui/icons';
-import { Button, Segmented } from 'antd';
+import { Button } from 'antd';
 import Search from 'antd/es/input/Search';
 import sampleProPic from '../../assets/appImages/user.png';
 import { useEffect, useState } from 'react';
@@ -9,36 +9,58 @@ import { BottomNavigation, BottomNavigationAction } from '@material-ui/core';
 import PostGroupApi from '../../api/postGroups/PostGroupApi';
 
 const SidebarChat = ({ user, onChangeMessage }) => {
-	console.log('user sidebar', user);
 	const [friend, setFriend] = useState();
 	const [group, setGroup] = useState();
 	const [isGroup, setIsGroup] = useState(0);
+	const [selectItem, setSelectItem] = useState(null);
 
 	const handleClickMessage = (e) => {
 		const item = e.currentTarget;
+		setSelectItem(item.id);
 		const list = document.querySelectorAll('.item--message--sidebar');
 		list.forEach((item) => {
 			item.classList.remove('active--message');
 		});
-		item.classList.add('active--message');
+		document.getElementById(item.id).classList.add('active--message');
+		if (isGroup === 0) {
+			onChangeMessage({
+				isGroup: false,
+				id: item.id,
+			});
+		}
+		if (isGroup === 1) {
+			onChangeMessage({
+				isGroup: true,
+				id: item.id,
+			});
+		}
 	};
+
+	useEffect(() => {
+		const elementCurrent = document.getElementById(selectItem);
+		if (elementCurrent) {
+			elementCurrent.classList.add('active--message');
+		}
+	}, [isGroup]);
 	useEffect(() => {
 		const element = document.querySelector('.item--message--sidebar');
 		if (element) {
-			// Kiểm tra xem phần tử tồn tại
 			element.classList.add('active--message');
-		} else {
-			console.log('Phần tử không tồn tại');
+			setSelectItem(element.id);
+			onChangeMessage({
+				isGroup: false,
+				id: element.id,
+			});
 		}
-	}, [friend,isGroup]);
+	}, [friend]);
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
 				const res = await GetFriendApi.getFriend(user);
-				console.log('res', res);
+
 				setFriend(res.result);
 				const response = await PostGroupApi.listAllGroup(user);
-				console.log('response', response);
+
 				setGroup(response.result);
 			} catch (error) {
 				toast.error(`Lỗi khi lấy danh sách bạn bè ${error}`);
@@ -59,8 +81,6 @@ const SidebarChat = ({ user, onChangeMessage }) => {
 					showLabels
 					value={isGroup}
 					onChange={(event, newValue) => {
-						console.log('event', event);
-						console.log('newValue', newValue);
 						setIsGroup(newValue);
 					}}
 				>
@@ -71,7 +91,12 @@ const SidebarChat = ({ user, onChangeMessage }) => {
 			<div className="container--sidebar--message">
 				{isGroup === 0 &&
 					friend?.map((item, index) => (
-						<div className="item--message--sidebar " key={index} onClick={handleClickMessage}>
+						<div
+							className="item--message--sidebar "
+							key={index}
+							onClick={handleClickMessage}
+							id={item.userId}
+						>
 							<div className="avatar--message--sidebar">
 								<img src={item.avatar} alt="avatar" />
 							</div>
@@ -85,7 +110,12 @@ const SidebarChat = ({ user, onChangeMessage }) => {
 					))}
 				{isGroup === 1 &&
 					group?.map((item, index) => (
-						<div className="item--message--sidebar " key={index} onClick={handleClickMessage}>
+						<div
+							className="item--message--sidebar "
+							key={index}
+							onClick={handleClickMessage}
+							id={item.postGroupId}
+						>
 							<div className="avatar--message--sidebar">
 								<img src={item?.avatarGroup || sampleProPic} alt="avatar" />
 							</div>

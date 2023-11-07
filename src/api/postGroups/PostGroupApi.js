@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { BASE_URL } from '../../context/apiCall';
+import toast from 'react-hot-toast';
 const PostGroupApi = {
 	listAllGroup: async (user) => {
 		try {
@@ -302,16 +303,19 @@ const PostGroupApi = {
 			throw new Error(error.message);
 		}
 	},
-	joinGroup: async ({ user, postId }) => {
+	joinGroup: async ({ token, postGroupId }) => {
+		console.log('Token', token);
+		const toastId = toast.loading('Đang gửi yêu cầu...');
 		try {
 			const config = {
 				headers: {
 					'Content-Type': 'application/json',
-					Authorization: `Bearer ${user.accessToken}`,
+					Authorization: `Bearer ${token}`,
 				},
 			};
-			const res = await axios.post(`${BASE_URL}/v1/groupPost/joinGroup/${postId}`, {}, config);
+			const res = await axios.post(`${BASE_URL}/v1/groupPost/joinGroup/${postGroupId}`, {}, config);
 			if (res.data.success) {
+				toast.success('Thành công!', { id: toastId });
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công
 			} else {

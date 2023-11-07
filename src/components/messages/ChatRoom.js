@@ -13,17 +13,23 @@ import {
 	Send,
 	SportsCricketRounded,
 } from '@material-ui/icons';
-import { Button, Input } from 'antd';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Popover } from '@material-ui/core';
+import { Button, Input, Typography } from 'antd';
 import MessageApi from '../../api/messages/MessageApi';
-import { logDOM } from '@testing-library/react';
+import toast from 'react-hot-toast';
 var stompClient = null;
 const ChatRoom = ({ user, data, Toggeinfo }) => {
+	const moment = require('moment');
 	const chatContainer = document.querySelector('.container--chatroom');
+
 	const [privateChats, setPrivateChats] = useState(new Map());
 	const [publicChats, setPublicChats] = useState(new Map());
 	const [info, setInfo] = useState(false);
 	const [page, setPage] = useState(0);
 	const [loading, setLoading] = useState(false);
+	const [anchorEl, setAnchorEl] = useState(null);
+	const [selectedItem, setSelectedItem] = useState(null);
+	const [openConfirmation, setOpenConfirmation] = useState(false);
 	const [userData, setUserData] = useState({
 		connected: false,
 		content: '',
@@ -57,7 +63,6 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 
 			stompClient.send('/app/private-message', {}, JSON.stringify(chatMessage));
 			setUserData({ ...userData, content: '' });
-			console.log("de",new Date().getTime());
 			chatContainer.scrollTop = chatContainer.scrollHeight;
 		}
 	};
@@ -123,11 +128,11 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 		stompClient = over(Sock);
 		stompClient.connect({}, onConnected, onError);
 	};
-	const disconnect = () => {
-		if (stompClient !== null) {
-			stompClient.disconnect();
-		}
-	};
+	// const disconnect = () => {
+	// 	if (stompClient !== null) {
+	// 		stompClient.disconnect();
+	// 	}
+	// };
 	const onConnected = () => {
 		setUserData({ ...userData, connected: true });
 		if (data?.userId) {
@@ -165,29 +170,60 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 		}
 		chatContainer.scrollTop = chatContainer.scrollHeight;
 	};
-
+	const handleClose = () => {
+		setAnchorEl(null);
+		setSelectedItem(null);
+	};
+	const handleClick = (event, item) => {
+		setAnchorEl(event.currentTarget);
+		setSelectedItem(item);
+	};
 	const onError = (err) => {
 		console.log(err);
 	};
-	const sendValue = () => {
-		if (stompClient) {
-			var chatMessage = {
-				senderId: user.userId,
-				receiverId: data?.userId,
-				groupId: data?.postGroupId,
-				messageType: 'TEXT',
-				content: userData.content,
-				status: 'MESSAGE',
-			};
-			console.log(chatMessage);
-			stompClient.send('/app/message', {}, JSON.stringify(chatMessage));
-			setUserData({ ...userData, content: '' });
+	const handleConfirmAction = async () => {
+		selectedItem.createAt = moment(selectedItem.createAt).format('YYYY-MM-DD HH:mm:ss.SSSSSS');
+
+		const toastId = toast.loading('Đang gửi yêu cầu...');
+		try {
+			await MessageApi.deleteMessage(selectedItem);
+			toast.success('Xóa tin nhắn thành công!', { id: toastId });
+			privateChats.set(
+				data?.userId,
+				[...privateChats.get(data?.userId)].filter((member) => member !== selectedItem)
+			);
+			setPrivateChats(new Map(privateChats));
+		} catch (error) {
+			toast.error(`Có lỗi trong khi xóa Lỗi: ${error}`, { id: toastId });
 		}
+		setOpenConfirmation(false);
+		handleClose();
 	};
+
+	// const sendValue = () => {
+	// 	if (stompClient) {
+	// 		var chatMessage = {
+	// 			senderId: user.userId,
+	// 			receiverId: data?.userId,
+	// 			groupId: data?.postGroupId,
+	// 			messageType: 'TEXT',
+	// 			content: userData.content,
+	// 			status: 'MESSAGE',
+	// 		};
+	// 		console.log(chatMessage);
+	// 		stompClient.send('/app/message', {}, JSON.stringify(chatMessage));
+	// 		setUserData({ ...userData, content: '' });
+	// 	}
+	// };
 	const handleKeyPress = (event) => {
 		if (event.key === 'Enter') {
 			handleSendMessage();
 		}
+	};
+	const handleCloseConfirmation = () => {
+		setOpenConfirmation(false);
+		setAnchorEl(null);
+		setSelectedItem(null);
 	};
 	return (
 		<div className="chatroom">
@@ -217,7 +253,37 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 								key={index}
 							>
 								<div className={msg?.senderId === user?.userId ? 'sent' : 'received'}>
-									<MoreHoriz className="icon--more--message" />
+									<MoreHoriz className="icon--more--message" onClick={(e) => handleClick(e, msg)} />
+									<Popover
+										id="simple-popover"
+										open={Boolean(anchorEl)}
+										className="popper--member"
+										anchorEl={anchorEl}
+										onClose={handleClose}
+										anchorOrigin={{
+											vertical: 'bottom',
+											horizontal: 'right',
+										}}
+										transformOrigin={{
+											vertical: 'top',
+											horizontal: 'right',
+										}}
+									>
+										<div>
+											{msg?.senderId === user?.userId ? (
+												<div>
+													<Typography
+														className="poper--member--item"
+														onClick={() => setOpenConfirmation(true)}
+													>
+														Xóa tin nhắn
+													</Typography>
+												</div>
+											) : (
+												<Typography className="poper--member--item">Bấm vui thôi á</Typography>
+											)}
+										</div>
+									</Popover>
 									<span title={msg.createAt.toLocaleString()}>{msg?.content}</span>
 								</div>
 							</div>
@@ -229,11 +295,25 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 								key={index}
 							>
 								<div className={msg.senderId === user?.userId ? 'sent' : 'received'}>
-									<MoreHoriz className="icon--more--message" />
+									<MoreHoriz className="icon--more--message" onClick={(e) => handleClick(e, msg)} />
 									<span title={msg.createAt.toLocaleString()}>{msg.content}</span>
 								</div>
 							</div>
 					  ))}
+				<Dialog open={openConfirmation} onClose={handleCloseConfirmation}>
+					<DialogTitle>Xác nhận thay đổi</DialogTitle>
+					<DialogContent>
+						<DialogContentText>Bạn có chắc chắn muốn xóa tin nhắn này ?</DialogContentText>
+					</DialogContent>
+					<DialogActions>
+						<Button onClick={handleCloseConfirmation} color="primary" variant="outlined">
+							Hủy
+						</Button>
+						<Button onClick={handleConfirmAction} color="primary" variant="contained">
+							Xác nhận
+						</Button>
+					</DialogActions>
+				</Dialog>
 			</div>
 			<div className="footer--chatroom">
 				<div className="footer--chatroom--icon-message">

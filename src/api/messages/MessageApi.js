@@ -32,9 +32,26 @@ const MessageApi = {
 		const response = await axios.put(`${BASE_URL}/messages/${message.id}`, message);
 		return response.data;
 	},
-	deleteMessage: async (id) => {
-		const response = await axios.delete(`${BASE_URL}/messages/${id}`);
-		return response.data;
+	deleteMessage: async (data) => {
+		try {
+			const config = {
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${
+						localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')).accessToken : ''
+					}`,
+				},
+			};
+			const res = await axios.put(`${BASE_URL}/v1/message/delete`, data, config);
+			if (res.data.success) {
+				console.log(res.data);
+				return res.data;
+			} else {
+				throw new Error(res.data.message);
+			}
+		} catch (error) {
+			throw new Error(error.message);
+		}
 	},
 };
 export default MessageApi;

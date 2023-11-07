@@ -67,23 +67,22 @@ const CreateGroup = () => {
 		}
 		setRole(e);
 	};
+
 	const handlefinishForm = async () => {
 		const toastId = toast.loading('Đang gửi yêu cầu...');
 		const message = 'Tạo nhóm thất bại !!!';
 		let dataGroup = {
-			postGroupName: nameGroup,
-			public: role === 'Public' ? true : false,
-			userId: listFriends.userId,
+			postGroupName: form.getFieldValue().groupName,
+			public: form.getFieldValue().groupNameRole === 'Public' ? true : false,
+			userId: form.getFieldValue().listFriend,
 		};
 		try {
 			const res = await PostGroupApi.createGroup({ user: currentUser, data: dataGroup });
 			toast.success('Tạo nhóm thành công!!!', { id: toastId });
 			navigate(`/groups/detail/${res.data}`);
-		} catch {
-			toast.error(`${message}`, { id: toastId });
+		} catch (e) {
+			toast.error(`${message} ${e}`, { id: toastId });
 		}
-
-		console.log(form.getFieldsValue());
 	};
 	const handlerInputName = (e) => {
 		setNameGroup(e.target.value);
@@ -166,7 +165,7 @@ const CreateGroup = () => {
 									/>
 								</Form.Item>
 								<span className="detail--select"></span>
-								<Form.Item name={'listFriend'}>
+								<Form.Item name="listFriend">
 									<Select
 										className="select-list--friend"
 										showSearch

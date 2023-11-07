@@ -205,7 +205,9 @@
 
 .search-dropdown-history {
 	display: flex;
-	margin-top: 10px;
+    margin-top: 10px;
+    align-items: center;
+    justify-content: center;
 }
 
 .search-dropdown-history ul li {
@@ -231,13 +233,13 @@
 	margin-right: 14px;
 }
 
-.search-dropdown ul {
-	margin: auto;
-}
 
 .search-dropdown ul li {
 	padding: 6px 0px;
-	display: flex;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
 }
 
 .search-dropdown ul li span{

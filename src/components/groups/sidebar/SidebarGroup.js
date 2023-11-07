@@ -9,10 +9,12 @@ import { useEffect, useState, useRef } from 'react';
 import noAvatar from '../../../assets/appImages/user.png';
 import { BASE_URL } from '../../../context/apiCall';
 import adver4 from '../../../assets/appImages/adver4.jpg';
+import useAuth from '../../../context/auth/AuthContext';
 import axios from 'axios';
 
 const SidebarGroup = ({ user }) => {
 	const { theme } = useTheme();
+	const { user: currentUser } = useAuth();
 	const navigate = useNavigate();
 	const [listGroupOfMe, setListGroupOfMe] = useState([]);
 	const [listGroupJoin, setListGroupJoin] = useState([]);
@@ -30,7 +32,13 @@ const SidebarGroup = ({ user }) => {
 
 	const searchGroupsFromAPI = async (searchKey) => {
 		try {
-			const res = await axios.get(`${BASE_URL}/v1/groupPost/getPostGroups/key?search=${searchKey}`);
+			const config = {
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${currentUser.accessToken}`,
+				},
+			};
+			const res = await axios.get(`${BASE_URL}/v1/groupPost/getPostGroups/key?search=${searchKey}`,config);
 			console.log(res.data.result);
 			setSearchFriends(res.data.result);
 		} catch (error) {

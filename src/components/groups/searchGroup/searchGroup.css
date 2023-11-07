@@ -1,6 +1,11 @@
 #search--result {
     display: flex;
     background: #f0f2f5;
+    padding-bottom: 20px;
+}
+
+.search--result-item:hover {
+    cursor: pointer;
 }
 
 .search--result-not-join {
@@ -37,6 +42,10 @@
 .postGroupName {
     font-weight: 600;
     font-size: 16px;
+}
+
+.postGroupName:hover {
+    text-decoration: underline;
 }
 
 .search--description {

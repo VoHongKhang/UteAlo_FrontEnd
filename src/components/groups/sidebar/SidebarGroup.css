@@ -233,6 +233,9 @@
 	margin-right: 14px;
 }
 
+.item--postGroupName:hover {
+	text-decoration: underline;
+}
 
 .search-dropdown ul li {
 	padding: 6px 0px;
@@ -251,7 +254,7 @@
 
 .search-dropdown ul li:hover{
 	background-color: #E4E6EB;
-	padding: 8px 110px;
+	padding: 6px 100px;
     border-radius: 5px;
 	cursor: pointer;
 }

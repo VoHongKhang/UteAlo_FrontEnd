@@ -1,5 +1,9 @@
 .chatroom {
 	flex: 5;
+	height: calc(100vh - 56px);
+	position: sticky;
+	top: 56px;
+	width: 10%;
 }
 
 .chat-box {
@@ -276,7 +280,7 @@ ul {
 }
 .container--chatroom {
 	height: 75%;
-	overflow-y: scroll;
+	overflow-x: scroll;
 	display: flex;
 	flex-direction: column;
 	align-items: flex-end;
@@ -333,19 +337,31 @@ ul {
 	border-radius: 10px;
 	font-size: 16px;
 	max-width: 80%;
-	margin: 8px;
-	position: relative;
 	border: #ccc 1px solid;
+	margin: 8px;
 	word-wrap: break-word;
+	position: relative;
 }
 .container--chatroom .sent span {
 }
-.container--chatroom .received .icon--more--message {
+.container--chatroom .icon--more--message {
 	position: absolute;
 	top: 50%;
 	right: -30px;
 	transform: translateY(-50%);
 	cursor: pointer;
 	color: #000;
-	
+}
+
+.received--item {
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	width: 100%;
+}
+.sent--item {
+	display: flex;
+	justify-content: flex-end;
+	width: 100%;
+	align-items: center;
 }

@@ -29,7 +29,7 @@ const privateRoutes = [
 	{ path: '/groups/create', component: CreateGroup },
 	{ path: '/groups/discover', component: DiscoverGroup},
 	{ path: '/groups/:postGroupId', component: GroupDetail },
-	{ path: '/groups', component: Groups, topbar: Topbar },
+	{ path: '/groups', component: TimeLineGroup, topbar: Topbar },
 	{ path: '/groups/searchGroup', component: SearchGroup },
 	{ path: '/groups', component: TimeLineGroup, topbar: Topbar },
 	{ path: '/profile/:userId', component: Profile, topbar: Topbar },

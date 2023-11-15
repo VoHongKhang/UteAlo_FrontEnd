@@ -342,8 +342,7 @@ ul {
 	word-wrap: break-word;
 	position: relative;
 }
-.container--chatroom .sent span {
-}
+
 .container--chatroom .icon--more--message {
 	position: absolute;
 	top: 50%;

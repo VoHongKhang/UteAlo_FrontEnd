@@ -25,6 +25,7 @@ import GetFriendApi from '../../../api/profile/friend/getFriendApi';
 import InviteFriendApi from '../../../api/postGroups/inviteFriendApi';
 import noAvatar from '../../../assets/appImages/user.png';
 import SharePostCard from '../../timeline/post/SharePostCard';
+import { Skeleton } from 'antd';
 
 const GroupDetail = () => {
 	const params = useParams();
@@ -479,7 +480,24 @@ const GroupDetail = () => {
 										<Share fetchPosts={fetchPosts} postGroupId={postGroup.postGroupId} />
 									)}
 									{visiblePostData.length === 0 ? (
-										<h2 style={{ marginTop: '20px' }}>Chưa có bài viết!</h2>
+										<>
+											<Skeleton
+												style={{ marginTop: '30px' }}
+												active
+												avatar
+												paragraph={{
+													rows: 4,
+												}}
+											/>
+											<Skeleton
+												style={{ marginTop: '30px' }}
+												active
+												avatar
+												paragraph={{
+													rows: 4,
+												}}
+											/>
+										</>
 									) : (
 										visiblePostData.map((p) => (
 											<PostCard post={p} key={p.postId} fetchPosts={fetchPosts} />

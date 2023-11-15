@@ -8,6 +8,7 @@ import useAuth from '../../../context/auth/AuthContext';
 import useTheme from '../../../context/ThemeContext';
 import axios from 'axios';
 import { BASE_URL } from '../../../context/apiCall';
+import { Skeleton } from 'antd';
 
 const Feed = () => {
 	const params = useParams();
@@ -15,7 +16,8 @@ const Feed = () => {
 	const [posts, setPosts] = useState([]);
 	const [sharePosts, setSharePosts] = useState([]);
 	const [loading, setLoading] = useState(false);
-	const [visiblePosts, setVisiblePosts] = useState(3); // Số lượng bài viết hiển thị ban đầu
+	const [visiblePosts, setVisiblePosts] = useState(3);
+	const [visibleSharePosts, setVisibleSharePosts] = useState(3);
 	const { theme } = useTheme();
 
 	// Lấy danh sách bài post
@@ -65,7 +67,8 @@ const Feed = () => {
 		const handleScroll = () => {
 			if (window.innerHeight + window.scrollY >= document.documentElement.offsetHeight - 100) {
 				// Khi cuộn xuống gần cuối trang (khoảng cách 100 pixel)
-				setVisiblePosts((prevVisiblePosts) => prevVisiblePosts + 3); // Nạp thêm 5 bài viết
+				setVisiblePosts((prevVisiblePosts) => prevVisiblePosts + 3); // Nạp thêm 3 bài viết
+				setVisibleSharePosts((prevVisibleSharePosts) => prevVisibleSharePosts + 3);
 			}
 		};
 
@@ -76,22 +79,42 @@ const Feed = () => {
 	}, []);
 
 	const visiblePostData = posts.slice(0, visiblePosts);
+	const visibleSharePostData = sharePosts.slice(0, visibleSharePosts);
+
 
 	return (
 		<div className="feed" style={{ color: theme.foreground, background: theme.background }}>
 			<div className="feedWrapper">
-				{(!params.userId || params.userId === currentUser.userId) && <Share fetchPosts={fetchPosts} postGroupId={null}/>}
-
-				{visiblePostData.length === 0 ? (
-					<h2 style={{ marginTop: '20px' }}>Chưa có bài viết!</h2>
-				) : (
-					visiblePostData.map((p) => <PostCard post={p} key={p.postId} fetchPosts={fetchPosts} />)
+				{(!params.userId || params.userId === currentUser.userId) && (
+					<Share fetchPosts={fetchPosts} postGroupId={null} />
 				)}
 
-				{sharePosts.map((p) => (
+				{visiblePostData.length === 0 ? (
+					<>
+						<Skeleton
+							style={{ marginTop: '30px' }}
+							active
+							avatar
+							paragraph={{
+								rows: 4,
+							}}
+						/>
+						<Skeleton
+							style={{ marginTop: '30px' }}
+							active
+							avatar
+							paragraph={{
+								rows: 4,
+							}}
+						/>
+					</>
+				) : (
+					 visiblePostData.map((p) => <PostCard post={p} key={p.postId} fetchPosts={fetchPosts} />)
+				)}
+
+				{visibleSharePostData.map((p) => (
 					<SharePostCard share={p} key={p.shareId} fetchSharePosts={fetchSharePosts} />
 				))}
-				
 			</div>
 		</div>
 	);

@@ -8,6 +8,7 @@ import useAuth from '../../../context/auth/AuthContext';
 import useTheme from '../../../context/ThemeContext';
 import axios from 'axios';
 import { BASE_URL } from '../../../context/apiCall';
+import { Skeleton } from 'antd';
 
 const FeedOfUser = () => {
 	const params = useParams();
@@ -80,10 +81,29 @@ const FeedOfUser = () => {
 	return (
 		<div className="feed" style={{ color: theme.foreground, background: theme.background }}>
 			<div className="feedWrapper">
-				{(!params.userId || params.userId === currentUser.userId) && <Share fetchPosts={fetchPosts} postGroupId={null}/>}
+				{(!params.userId || params.userId === currentUser.userId) && (
+					<Share fetchPosts={fetchPosts} postGroupId={null} />
+				)}
 
 				{visiblePostData.length === 0 ? (
-					<h2 style={{ marginTop: '20px' }}>Chưa có bài viết!</h2>
+					<>
+						<Skeleton
+							style={{ marginTop: '30px' }}
+							active
+							avatar
+							paragraph={{
+								rows: 4,
+							}}
+						/>
+						<Skeleton
+							style={{ marginTop: '30px' }}
+							active
+							avatar
+							paragraph={{
+								rows: 4,
+							}}
+						/>
+					</>
 				) : (
 					visiblePostData.map((p) => <PostCard post={p} key={p.postId} fetchPosts={fetchPosts} />)
 				)}

@@ -3,7 +3,7 @@ import { CloseOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import useTheme from '../../../context/ThemeContext';
 import './SidebarGroup.css';
 import { useNavigate } from 'react-router-dom';
-import { Search, Settings, RssFeed, Explore, People } from '@material-ui/icons';
+import { Search, Settings, RssFeed, Explore, People, } from '@material-ui/icons';
 import PostGroupApi from '../../../api/postGroups/PostGroupApi';
 import { useEffect, useState, useRef } from 'react';
 import noAvatar from '../../../assets/appImages/user.png';

@@ -1,0 +1,61 @@
+#search--result-utealo {
+    display: flex;
+    background: #f0f2f5;
+    padding-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.search--result-group,
+.search--result-people {
+    margin: auto;
+    margin-top: 30px;
+    background: white;
+    border-radius: 8px;
+
+}
+
+.search--result {
+    margin: auto;
+    margin-top: 30px;
+    background: white;
+    border-radius: 8px;
+}
+
+.search--result-all {
+    margin: auto;
+    background: white;
+    border-radius: 8px;
+}
+
+.search--result-group .search--result-item,
+.search--result-people .search--result-item {
+    display: flex;
+    padding-top: 15px;
+    padding-left: 20px;
+    margin-top: 0px;
+    height: 110px;
+}
+
+#search--result-utealo .post {
+    margin: auto;
+    width: 69%;
+    margin-top: 20px;
+}
+
+.textShowAll {
+	background: #e4e6eb;
+    width: 96%;
+    height: 36px;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 14px;
+}
+
+.textShowAll:hover {
+    cursor: pointer;
+}

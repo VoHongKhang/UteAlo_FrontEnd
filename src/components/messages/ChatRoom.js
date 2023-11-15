@@ -13,14 +13,23 @@ import {
 	Send,
 	SportsCricketRounded,
 } from '@material-ui/icons';
-import { Button, Input } from 'antd';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Popover } from '@material-ui/core';
+import { Button, Input, Typography } from 'antd';
+import MessageApi from '../../api/messages/MessageApi';
+import toast from 'react-hot-toast';
 var stompClient = null;
 const ChatRoom = ({ user, data, Toggeinfo }) => {
-	const [messages, setMessages] = useState([]);
+	const moment = require('moment');
+	const chatContainer = document.querySelector('.container--chatroom');
+
 	const [privateChats, setPrivateChats] = useState(new Map());
-	const [publicChats, setPublicChats] = useState([]);
-	const [tab, setTab] = useState('CHATROOM');
+	const [publicChats, setPublicChats] = useState(new Map());
 	const [info, setInfo] = useState(false);
+	const [page, setPage] = useState(0);
+	const [loading, setLoading] = useState(false);
+	const [anchorEl, setAnchorEl] = useState(null);
+	const [selectedItem, setSelectedItem] = useState(null);
+	const [openConfirmation, setOpenConfirmation] = useState(false);
 	const [userData, setUserData] = useState({
 		connected: false,
 		content: '',
@@ -44,21 +53,86 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 				createAt: new Date(),
 				status: 'MESSAGE',
 			};
-			setMessages([...messages, chatMessage]);
+			if (data.userId) {
+				privateChats.get(data?.userId).push(chatMessage);
+				setPrivateChats(new Map(privateChats));
+			} else {
+				publicChats.get(data?.groupId).push(chatMessage);
+				setPrivateChats(new Map(publicChats));
+			}
+
 			stompClient.send('/app/private-message', {}, JSON.stringify(chatMessage));
 			setUserData({ ...userData, content: '' });
+			chatContainer.scrollTop = chatContainer.scrollHeight;
+		}
+	};
+	const userJoin = () => {
+		if (!privateChats.get(data?.userId)) {
+			privateChats.set(data?.userId, []);
+			setPrivateChats(new Map(privateChats));
+		}
+		if (!publicChats.get(data?.groupId)) {
+			publicChats.set(data?.groupId, []);
+			setPublicChats(new Map(publicChats));
+		}
+	};
+	const handleScroll = () => {
+		if (chatContainer) {
+			const scrollY = chatContainer.scrollTop; // Lấy vị trí cuộn hiện tại
+
+			// Chiều cao của trang
+			const pageHeight = chatContainer.scrollHeight;
+
+			// Tính toán 60% chiều cao
+			const sixtyPercentHeight = (pageHeight * 40) / 100;
+			if (scrollY < sixtyPercentHeight && !loading) {
+				setLoading(true);
+				setTimeout(() => {
+					AddMessages();
+					setLoading(false);
+					// 	chatContainer.scrollTo(0, scrollY);
+				}, 100); // Giả định thời gian API call
+			}
+		}
+	};
+	const AddMessages = async () => {
+		const res = await MessageApi.getMessage({ userId: data?.userId, page: page + 1, size: 20 });
+		console.log('res', res);
+		setPage(page + 1);
+		if (res) {
+			if (privateChats.get(data?.userId)) {
+				res.result.forEach((element) => {
+					privateChats.get(data?.userId).unshift(element);
+					setPrivateChats(new Map(privateChats));
+				});
+			}
 		}
 	};
 	useEffect(() => {
-		connect();
-		const fetchData = () => {};
+		const fetchData = async () => {
+			// disconnect();
+			connect();
+			if (!privateChats.get(data?.userId)) {
+				const res = await MessageApi.getMessage({ userId: data?.userId, page: page, size: 20 });
+				if (res) {
+					privateChats.set(data?.userId, res.result);
+					setPrivateChats(new Map(privateChats));
+				}
+			}
+			chatContainer.scrollTop = chatContainer.scrollHeight;
+		};
+		fetchData();
 	}, [data]);
 	const connect = () => {
 		let Sock = new SockJS('http://localhost:8089/ws');
 		stompClient = over(Sock);
 		stompClient.connect({}, onConnected, onError);
 	};
-
+	// const disconnect = () => {
+	// 	if (stompClient !== null) {
+	// 		stompClient.disconnect();
+	// 	}
+	// };
 	const onConnected = () => {
 		setUserData({ ...userData, connected: true });
 		if (data?.userId) {
@@ -67,37 +141,23 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 		if (data?.postGroupId) {
 			stompClient.subscribe('/chatroom/public', onMessageReceived);
 		}
-	};
-
-	const userJoin = () => {
-		var chatMessage = {
-			senderId: user.userId,
-			receiverId: data?.userId,
-			groupId: data?.postGroupId,
-			messageType: 'TEXT',
-			status: 'JOIN',
-		};
-		stompClient.send('/app/message', {}, JSON.stringify(chatMessage));
+		userJoin();
 	};
 
 	const onMessageReceived = (payload) => {
 		var payloadData = JSON.parse(payload.body);
-		switch (payloadData.status) {
-			case 'JOIN':
-				if (!privateChats.get(payloadData.senderId)) {
-					privateChats.set(payloadData.senderId, []);
-					setPrivateChats(new Map(privateChats));
-				}
-				break;
-			case 'MESSAGE':
-				publicChats.push(payloadData);
-				setPublicChats([...publicChats]);
-				break;
+		if (publicChats.get(payloadData.groupId)) {
+			publicChats.get(payloadData.groupId).push(payloadData);
+			setPublicChats(new Map(publicChats));
+		} else {
+			let list = [];
+			list.push(payloadData);
+			publicChats.set(payloadData.groupId, list);
+			setPublicChats(new Map(publicChats));
 		}
 	};
 
 	const onPrivateMessage = (payload) => {
-		console.log(payload);
 		var payloadData = JSON.parse(payload.body);
 		if (privateChats.get(payloadData.senderId)) {
 			privateChats.get(payloadData.senderId).push(payloadData);
@@ -108,37 +168,63 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 			privateChats.set(payloadData.senderId, list);
 			setPrivateChats(new Map(privateChats));
 		}
+		chatContainer.scrollTop = chatContainer.scrollHeight;
 	};
-
+	const handleClose = () => {
+		setAnchorEl(null);
+		setSelectedItem(null);
+	};
+	const handleClick = (event, item) => {
+		setAnchorEl(event.currentTarget);
+		setSelectedItem(item);
+	};
 	const onError = (err) => {
 		console.log(err);
 	};
+	const handleConfirmAction = async () => {
+		selectedItem.createAt = moment(selectedItem.createAt).format('YYYY-MM-DD HH:mm:ss.SSSSSS');
 
-	const handleMessage = (event) => {
-		const { value } = event.target;
-		setUserData({ ...userData, content: value });
+		const toastId = toast.loading('Đang gửi yêu cầu...');
+		try {
+			await MessageApi.deleteMessage(selectedItem);
+			toast.success('Xóa tin nhắn thành công!', { id: toastId });
+			privateChats.set(
+				data?.userId,
+				[...privateChats.get(data?.userId)].filter((member) => member !== selectedItem)
+			);
+			setPrivateChats(new Map(privateChats));
+		} catch (error) {
+			toast.error(`Có lỗi trong khi xóa Lỗi: ${error}`, { id: toastId });
+		}
+		setOpenConfirmation(false);
+		handleClose();
 	};
-	const sendValue = () => {
-		if (stompClient) {
-			var chatMessage = {
-				senderId: user.userId,
-				receiverId: data?.userId,
-				groupId: data?.postGroupId,
-				messageType: 'TEXT',
-				content: userData.content,
-				status: 'MESSAGE',
-			};
-			console.log(chatMessage);
-			stompClient.send('/app/message', {}, JSON.stringify(chatMessage));
-			setUserData({ ...userData, content: '' });
+
+	// const sendValue = () => {
+	// 	if (stompClient) {
+	// 		var chatMessage = {
+	// 			senderId: user.userId,
+	// 			receiverId: data?.userId,
+	// 			groupId: data?.postGroupId,
+	// 			messageType: 'TEXT',
+	// 			content: userData.content,
+	// 			status: 'MESSAGE',
+	// 		};
+	// 		console.log(chatMessage);
+	// 		stompClient.send('/app/message', {}, JSON.stringify(chatMessage));
+	// 		setUserData({ ...userData, content: '' });
+	// 	}
+	// };
+	const handleKeyPress = (event) => {
+		if (event.key === 'Enter') {
+			handleSendMessage();
 		}
 	};
-
-	const handleUsername = (event) => {
-		const { value } = event.target;
-		setUserData({ ...userData, username: value });
+	const handleCloseConfirmation = () => {
+		setOpenConfirmation(false);
+		setAnchorEl(null);
+		setSelectedItem(null);
 	};
-
 	return (
 		<div className="chatroom">
 			<div className="header--chatroom">
@@ -159,18 +245,69 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 					/>
 				</div>
 			</div>
-			<div className="container--chatroom">
-				{data?.userId &&
-					messages.map((msg, index) => (
-						<div key={index} className={msg.senderId === user.userId ? 'sent' : 'received'}>
-							<MoreHoriz className="icon--more--message" />
-							<span title={msg.createAt.toLocaleString()}>{msg.content}</span>
-						</div>
-					))}
-				<div className="received">
-					<MoreHoriz className="icon--more--message" />
-					<span> Tôi đang đi học</span>
-				</div>
+			<div className="container--chatroom" onScroll={handleScroll}>
+				{privateChats.get(data?.userId)
+					? [...privateChats.get(data?.userId)].map((msg, index) => (
+							<div
+								className={msg?.senderId === user?.userId ? 'sent--item' : 'received--item'}
+								key={index}
+							>
+								<div className={msg?.senderId === user?.userId ? 'sent' : 'received'}>
+									<MoreHoriz className="icon--more--message" onClick={(e) => handleClick(e, msg)} />
+									<Popover
+										id="simple-popover"
+										open={Boolean(anchorEl)}
+										className="popper--member"
+										anchorEl={anchorEl}
+										onClose={handleClose}
+										anchorOrigin={{
+											vertical: 'bottom',
+											horizontal: 'right',
+										}}
+										transformOrigin={{
+											vertical: 'top',
+											horizontal: 'right',
+										}}
+									>
+										<div>
+											<Typography
+												className="poper--member--item"
+												onClick={() => setOpenConfirmation(true)}
+											>
+												Xóa tin nhắn
+											</Typography>
+										</div>
+									</Popover>
+									<span title={msg.createAt.toLocaleString()}>{msg?.content}</span>
+								</div>
+							</div>
+					  ))
+					: publicChats.get(data?.groupId) &&
+					  [...publicChats.get(data?.groupId)].map((msg, index) => (
+							<div
+								className={msg.senderId === user?.userId ? 'sent--item' : 'received--item'}
+								key={index}
+							>
+								<div className={msg.senderId === user?.userId ? 'sent' : 'received'}>
+									<MoreHoriz className="icon--more--message" onClick={(e) => handleClick(e, msg)} />
+									<span title={msg.createAt.toLocaleString()}>{msg.content}</span>
+								</div>
+							</div>
+					  ))}
+				<Dialog open={openConfirmation} onClose={handleCloseConfirmation}>
+					<DialogTitle>Xác nhận thay đổi</DialogTitle>
+					<DialogContent>
+						<DialogContentText>Bạn có chắc chắn muốn xóa tin nhắn này ?</DialogContentText>
+					</DialogContent>
+					<DialogActions>
+						<Button onClick={handleCloseConfirmation} color="primary" variant="outlined">
+							Hủy
+						</Button>
+						<Button onClick={handleConfirmAction} color="primary" variant="contained">
+							Xác nhận
+						</Button>
+					</DialogActions>
+				</Dialog>
 			</div>
 			<div className="footer--chatroom">
 				<div className="footer--chatroom--icon-message">
@@ -183,54 +320,11 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 					type="text"
 					placeholder="Nhập tin nhắn..."
 					value={userData.content}
+					onKeyPress={handleKeyPress}
 					onChange={(e) => setUserData({ ...userData, content: e.target.value })}
 				/>
 				<Button className="footer--chatroom--button-message" onClick={handleSendMessage} icon={<Send />} />
 			</div>
-			{/* {userData.connected?
-        <div className="chat-box">
-            <div className="member-list">
-                <ul>
-                    <li onClick={()=>{setTab("CHATROOM")}} className={`member ${tab==="CHATROOM" && "active"}`}>Chatroom</li>
-                    {[...privateChats.keys()].map((name,index)=>(
-                        <li onClick={()=>{setTab(name)}} className={`member ${tab===name && "active"}`} key={index}>{name}</li>
-                    ))}
-                </ul>
-            </div>
-            {tab==="CHATROOM" && <div className="chat-content">
-                <ul className="chat-messages">
-                    {publicChats.map((chat,index)=>(
-                        <li className={`message ${chat.senderName === userData.username && "self"}`} key={index}>
-                            {chat.senderName !== userData.username && <div className="avatar">{chat.senderName}</div>}
-                            <div className="message-data">{chat.content}</div>
-                            {chat.senderName === userData.username && <div className="avatar self">{chat.senderName}</div>}
-                        </li>
-                    ))}
-                </ul>
-
-                <div className="send-message">
-                    <input type="text" className="input-message" placeholder="enter the message" value={userData.content} onChange={handleMessage} /> 
-                    <button type="button" className="send-button" onClick={sendValue}>send</button>
-                </div>
-            </div>}
-            {tab!=="CHATROOM" && <div className="chat-content">
-                <ul className="chat-messages">
-                    {[...privateChats.get(tab)].map((chat,index)=>(
-                        <li className={`message ${chat.senderName === userData.username && "self"}`} key={index}>
-                            {chat.senderName !== userData.username && <div className="avatar">{chat.senderName}</div>}
-                            <div className="message-data">{chat.content}</div>
-                            {chat.senderName === userData.username && <div className="avatar self">{chat.senderName}</div>}
-                        </li>
-                    ))}
-                </ul>
-
-                <div className="send-message">
-                    <input type="text" className="input-message" placeholder="enter the message" value={userData.content} onChange={handleMessage} /> 
-                    <button type="button" className="send-button" onClick={sendPrivateValue}>send</button>
-                </div>
-            </div>}
-        </div>
-        */}
 		</div>
 	);
 };

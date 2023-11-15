@@ -19,7 +19,7 @@ import LikeOrUnlikeApi from '../../../api/timeline/commentPost/likeOrUnlike';
 import GetCommentPostApi from '../../../api/timeline/commentPost/getCommentPost';
 import CommentCard from './CommentCard';
 import { Modal, Image, theme } from 'antd';
-import { Country } from 'country-state-city';
+import vietnamProvinces from '../../../vietnamProvinces.json';
 
 const PostCard = ({ post, fetchPosts }) => {
 	const isMounted = useRef(true);
@@ -540,6 +540,8 @@ const PostCard = ({ post, fetchPosts }) => {
 				{/* Modal chia sẻ bài viết */}
 				<Modal
 					title="Chia sẻ bài viết"
+					// tôi muốn title nằm giữa thì làm sao
+					style={{ textAlign: 'center' }} // Canh giữa title bằng CSS
 					open={isShareModalVisible}
 					onOk={closeShareModal} // Đóng modal khi nút "Chia sẻ" được bấm
 					onCancel={closeShareModal}
@@ -570,6 +572,7 @@ const PostCard = ({ post, fetchPosts }) => {
 						value={content}
 						onChange={(e) => setContent(e.target.value)}
 						placeholder="Nhập nội dung chia sẻ..."
+						style={{ height: '100px', width: '100%', borderRadius: '10px' }}
 					/>
 				</Modal>
 				{/* Modal xóa bài viết */}
@@ -599,9 +602,9 @@ const PostCard = ({ post, fetchPosts }) => {
 						<label className="labelEditPost">Vị trí:</label>
 						<select value={editLocation} onChange={(e) => setEditLocation(e.target.value)}>
 							<option value={editLocation}>{editLocation}</option>
-							{Country.getAllCountries().map((item) => (
-								<option key={item.isoCode} value={item.name}>
-									{item.name}
+							{vietnamProvinces.map((province) => (
+								<option key={province.id} value={province.name}>
+									{province.name}
 								</option>
 							))}
 						</select>

@@ -98,7 +98,7 @@ const SidebarChat = ({ user, onChangeMessage }) => {
 							id={item.userId}
 						>
 							<div className="avatar--message--sidebar">
-								<img src={item.avatar} alt="avatar" />
+								<img src={item?.avatar||sampleProPic} alt="avatar" />
 							</div>
 							<div className="infor--message--sidebar">
 								<div className="name--message--sidebar">{item.username}</div>

@@ -3,7 +3,7 @@ import { CloseOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import useTheme from '../../../context/ThemeContext';
 import './SidebarGroup.css';
 import { useNavigate } from 'react-router-dom';
-import { Search, Settings, RssFeed, Explore, People } from '@material-ui/icons';
+import { Search, Settings, RssFeed, Explore, People, } from '@material-ui/icons';
 import PostGroupApi from '../../../api/postGroups/PostGroupApi';
 import { useEffect, useState, useRef } from 'react';
 import noAvatar from '../../../assets/appImages/user.png';
@@ -38,7 +38,7 @@ const SidebarGroup = ({ user }) => {
 					Authorization: `Bearer ${currentUser.accessToken}`,
 				},
 			};
-			const res = await axios.get(`${BASE_URL}/v1/groupPost/getPostGroups/key?search=${searchKey}`,config);
+			const res = await axios.get(`${BASE_URL}/v1/groupPost/getPostGroups/key?search=${searchKey}`, config);
 			console.log(res.data.result);
 			setSearchFriends(res.data.result);
 		} catch (error) {
@@ -104,7 +104,7 @@ const SidebarGroup = ({ user }) => {
 		if (updatedSearchHistory.length > 10) {
 			updatedSearchHistory.splice(0, updatedSearchHistory.length - 10);
 		}
- 
+
 		setSearchHistory(updatedSearchHistory);
 
 		// Lưu lịch sử vào local storage
@@ -136,8 +136,6 @@ const SidebarGroup = ({ user }) => {
 			href: '/groups/list',
 		},
 	];
-
-	console.log(searchFriends);
 
 	useEffect(() => {
 		async function fetchData() {
@@ -218,7 +216,14 @@ const SidebarGroup = ({ user }) => {
 													src={item.avatarGroup ? item.avatarGroup : adver4}
 													alt="avatarGroup"
 												></img>
-												<span>{item.postGroupName}</span>
+												<span
+													className="item--postGroupName"
+													onClick={() => {
+														navigate(`/groups/${item.postGroupId}`);
+													}}
+												>
+													{item.postGroupName}
+												</span>
 											</li>
 										))}
 									</ul>

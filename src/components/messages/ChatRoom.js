@@ -270,18 +270,12 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 										}}
 									>
 										<div>
-											{msg?.senderId === user?.userId ? (
-												<div>
-													<Typography
-														className="poper--member--item"
-														onClick={() => setOpenConfirmation(true)}
-													>
-														Xóa tin nhắn
-													</Typography>
-												</div>
-											) : (
-												<Typography className="poper--member--item">Bấm vui thôi á</Typography>
-											)}
+											<Typography
+												className="poper--member--item"
+												onClick={() => setOpenConfirmation(true)}
+											>
+												Xóa tin nhắn
+											</Typography>
 										</div>
 									</Popover>
 									<span title={msg.createAt.toLocaleString()}>{msg?.content}</span>

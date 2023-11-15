@@ -8,6 +8,7 @@ import { BASE_URL } from '../../context/apiCall';
 import noCover from '../../assets/appImages/noCover.jpg';
 import Share from '../timeline/sharePost/Share';
 import { useParams } from 'react-router-dom';
+import { Skeleton } from 'antd';
 
 const NewFeedGroup = ({ user }) => {
 	const params = useParams();
@@ -109,7 +110,24 @@ const NewFeedGroup = ({ user }) => {
 				<div className="feed">
 					<div className="feedWrapper">
 						{visiblePostData.length === 0 ? (
-							<h2 style={{ marginTop: '20px' }}>Chưa có bài viết nào</h2>
+							<>
+								<Skeleton
+									style={{ marginTop: '30px' }}
+									active
+									avatar
+									paragraph={{
+										rows: 4,
+									}}
+								/>
+								<Skeleton
+									style={{ marginTop: '30px' }}
+									active
+									avatar
+									paragraph={{
+										rows: 4,
+									}}
+								/>
+							</>
 						) : (
 							visiblePostData.map((p) => <PostCard post={p} key={p.postId} fetchPosts={fetchPosts} />)
 						)}

@@ -22,6 +22,8 @@ import Meessage from '../components/messages/Message';
 import DiscoverGroup from '../components/groups/discover/DiscoverGroup';
 import SearchGroup from '../components/groups/searchGroup/searchGroup';
 import TimeLineGroup from '../components/groups/TimeLineGroup';
+import SearchResult from '../components/timeline/searchResult/searchResult';
+
 
 const privateRoutes = [
 	{ path: '/profile/update/:userId', component: EditProfile },
@@ -30,6 +32,7 @@ const privateRoutes = [
 	{ path: '/groups/discover', component: DiscoverGroup},
 	{ path: '/groups/:postGroupId', component: GroupDetail },
 	{ path: '/groups/searchGroup', component: SearchGroup },
+	{ path: '/groups/searchResult', component: SearchResult },
 	{ path: '/groups', component: TimeLineGroup, topbar: Topbar },
 	{ path: '/profile/:userId', component: Profile, topbar: Topbar },
 	{ path: '/friends', component: FriendRequest },

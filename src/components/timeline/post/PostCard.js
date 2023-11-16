@@ -491,6 +491,7 @@ const PostCard = ({ post, fetchPosts }) => {
 						</div>
 						<div className="postLoAndName">
 							{post.location && <span className="postLocation">• {post.location}</span>}
+							{post.roleName && <span className="postLocation">• {post.roleName}</span>}
 							{post.postGroupName && <span className="postGroupName">• {post.postGroupName}</span>}
 							{post.privacyLevel && <span className="postGroupName">• {post.privacyLevel}</span>}
 						</div>

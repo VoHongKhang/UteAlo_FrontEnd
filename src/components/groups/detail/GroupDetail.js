@@ -151,10 +151,11 @@ const GroupDetail = () => {
 	const listImage = [noCover, noCover, noCover, noCover];
 	const handleGroup = async (e) => {
 		const target = e.target.innerHTML;
+		console.log('postId', params);
 		switch (target) {
 			case 'Tham gia nhóm':
 				const toastId = toast.loading('Đang gửi yêu cầu tham gia...');
-				await PostGroupApi.joinGroup({ user: currentUser, postId: params.postGroupId })
+				await PostGroupApi.joinGroup({ token: currentUser.accessToken, postGroupId: params.postGroupId })
 					.then((res) => {
 						toast.success('Gửi yêu cầu tham gia thành công!', { id: toastId });
 						//reload trang
@@ -277,7 +278,7 @@ const GroupDetail = () => {
 											onClick={handleGroup}
 										>
 											<p>
-												{postGroup?.roleGroup === 'Admin'
+												{(postGroup?.roleGroup === 'Admin' || postGroup?.roleGroup === 'Deputy')
 													? 'Quản lý nhóm'
 													: postGroup?.roleGroup === 'Member'
 													? 'Đã Tham gia'
@@ -476,7 +477,7 @@ const GroupDetail = () => {
 						) : (
 							<div className="feed">
 								<div className="feedWrapper">
-									{(postGroup.roleGroup === 'Admin' || postGroup.roleGroup === 'Member') && (
+									{(postGroup.roleGroup === 'Admin' || postGroup.roleGroup === 'Member' ||postGroup.roleGroup === 'Deputy') && (
 										<Share fetchPosts={fetchPosts} postGroupId={postGroup.postGroupId} />
 									)}
 									{visiblePostData.length === 0 ? (

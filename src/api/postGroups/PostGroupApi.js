@@ -305,6 +305,7 @@ const PostGroupApi = {
 	},
 	joinGroup: async ({ token, postGroupId }) => {
 		console.log('Token', token);
+		console.log('PostGroupId', postGroupId);
 		const toastId = toast.loading('Đang gửi yêu cầu...');
 		try {
 			const config = {
@@ -510,5 +511,47 @@ const PostGroupApi = {
 			throw new Error(error.message);
 		}
 	},
+	appointDeputyGroup: async ({ user, data }) => {
+		console.log('Data', data);
+		try {
+			const config = {
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${user?.accessToken}`,
+				},
+			};
+			const res = await axios.post(`${BASE_URL}/v1/groupPost/appoint-deputy`, data, config);
+			if (res.data.success) {
+				console.log(res.data);
+				return res.data; // Trả về dữ liệu từ thành công
+			} else {
+				console.log(res.data);
+				throw new Error(res.data.message);
+			}
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	},
+	removeDeputyGroup: async ({ user, data }) => {
+		console.log('Data', data);
+		try {
+			const config = {
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${user?.accessToken}`,
+				},
+			};
+			const res = await axios.post(`${BASE_URL}/v1/groupPost/remove-deputy`, data, config);
+			if (res.data.success) {
+				console.log(res.data);
+				return res.data; // Trả về dữ liệu từ thành công
+			} else { 
+				console.log(res.data);
+				throw new Error(res.data.message);
+			}
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	}
 };
 export default PostGroupApi;

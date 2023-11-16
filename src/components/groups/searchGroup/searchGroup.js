@@ -46,7 +46,7 @@ const SearchGroup = () => {
 														onClick={() => {
 															navigate(`/groups/${item?.postGroupId}`);
 														}}
-														className="postGroupName"
+														className="pGroupName"
 													>
 														{item.postGroupName}
 													</span>

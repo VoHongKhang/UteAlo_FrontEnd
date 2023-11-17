@@ -135,12 +135,9 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 	// };
 	const onConnected = () => {
 		setUserData({ ...userData, connected: true });
-		if (data?.userId) {
-			stompClient.subscribe('/user/' + user.userId + '/private', onPrivateMessage);
-		}
-		if (data?.postGroupId) {
-			stompClient.subscribe('/chatroom/public', onMessageReceived);
-		}
+
+		stompClient.subscribe('/user/' + user.userId + '/private', onPrivateMessage);
+		stompClient.subscribe('/chatroom/public', onMessageReceived);
 		userJoin();
 	};
 

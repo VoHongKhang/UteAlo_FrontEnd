@@ -73,13 +73,14 @@ const CreateGroup = () => {
 		const message = 'Tạo nhóm thất bại !!!';
 		let dataGroup = {
 			postGroupName: form.getFieldValue().groupName,
-			public: form.getFieldValue().groupNameRole === 'Public' ? true : false,
+			isPublic: form.getFieldValue().groupNameRole === 'Public' ? true : false,
 			userId: form.getFieldValue().listFriend,
 		};
 		try {
-			const res = await PostGroupApi.createGroup({ user: currentUser, data: dataGroup });
+			console.log(dataGroup);
+			await PostGroupApi.createGroup({ user: currentUser, data: dataGroup });
 			toast.success('Tạo nhóm thành công!!!', { id: toastId });
-			navigate(`/groups/detail/${res.data}`);
+			navigate(`/groups`);
 		} catch (e) {
 			toast.error(`${message} ${e}`, { id: toastId });
 		}

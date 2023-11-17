@@ -1,31 +1,23 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Card, Divider, Form, Input, theme, Typography } from 'antd';
-import useAuth from '../../../context/auth/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import useAuth from '../../../context/auth/AuthContext';
 
 const LoginForm = () => {
 	const { user, loading, loginReq } = useAuth();
+
 	const navigate = useNavigate();
 	const { token } = theme.useToken();
 	const [form] = Form.useForm();
 	// Login submit handler
 	const onFinish = () => {
-		//const toastId = toast.loading('Đang gửi yêu cầu...');
-		try {
-			loginReq(form.getFieldValue('credentialId'), form.getFieldValue('password'));
-			//toast.success('Đăng nhập thành công!', { id: toastId });
-		} catch (error) {
-			//toast.error(`Đăng nhập thất bại! Lỗi: ${error}`, { id: toastId });
-		}
+		loginReq(form.getFieldValue('credentialId'), form.getFieldValue('password'));
 	};
-
-	// if req is successfull, i.e. if user is found in local storage push to timeline screen.
 	useEffect(() => {
 		if (user) {
 			navigate('/');
 		}
-	}, [user]);
+	}, [user, navigate]);
 	return (
 		<Card
 			title={

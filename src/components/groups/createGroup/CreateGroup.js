@@ -107,7 +107,7 @@ const CreateGroup = () => {
 								className="avatar--user--creategroup"
 							/>
 							<div className="user--create--group">
-								<p className="name--user--create--group">{user?.fullName}</p>
+								<p className="name--user--create--group">{user?.userName}</p>
 								<span>{user?.role ? user?.role : 'Quản trị viên'}</span>
 							</div>
 						</div>

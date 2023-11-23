@@ -76,13 +76,13 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 		setShowAllComments(!showAllComments);
 	};
 
-	// Model xuất hiện khi nhấn chỉnh sửa bài post
+	// Model xuất hiện khi nhấn chỉnh sửa bình luận
 	const showDeleteConfirm = (commentId) => {
 		setCommentIdToDelete(commentId);
 		setIsModalVisible(true);
 	};
 
-	// Model xuất hiện khi nhấn chỉnh sửa bài post
+	// Model xuất hiện khi nhấn chỉnh sửa bình luận
 	const showEditModal = (content, photos) => {
 		setEditContent(content);
 		setEditPhotos(photos);
@@ -252,6 +252,10 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 
 	// chỉnh sửa bình luận
 	const editCommentHandler = async () => {
+		if(!editContent && !editPhotos){ 
+			toast.error('Vui lòng nhập nội dung hoặc hình ảnh!', errorOptions);
+			return;
+		}
 		const toastId = toast.loading('Đang gửi yêu cầu...');
 		try {
 			if (comment.commentId) {
@@ -292,7 +296,7 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 
 				// Xử lý kết quả trực tiếp trong khối try
 				if (response.status === 200) {
-					toast.success('Chỉnh sửa bài đăng thành công!', { id: toastId });
+					toast.success('Chỉnh sửa bình luận thành công!', { id: toastId });
 
 					// Fetch lại danh sách bình luận sau khi chỉnh sửa
 					fetchCommentPost();

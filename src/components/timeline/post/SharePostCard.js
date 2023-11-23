@@ -341,7 +341,7 @@ const SharePostCard = ({ share, fetchSharePosts }) => {
 							<img className="postProfileImg" src={user.avatar || sampleProPic} alt="..." />
 						</Link>
 						<div className="postNameAndDate">
-							<span className="postUsername">{user.fullName}</span>
+							<span className="postUsername">{user.userName}</span>
 							<span
 								className="postDate"
 								onClick={() => {
@@ -415,7 +415,7 @@ const SharePostCard = ({ share, fetchSharePosts }) => {
 										<img className="postProfileImg" src={user.avatar || sampleProPic} alt="..." />
 									</Link>
 									<div className="postNameAndDate">
-										<span className="postUsername">{user.fullName}</span>
+										<span className="postUsername">{user.userName}</span>
 										<span className="postDate">{formatTime(post.postTime)}</span>
 									</div>
 									<div className="postLoAndName">

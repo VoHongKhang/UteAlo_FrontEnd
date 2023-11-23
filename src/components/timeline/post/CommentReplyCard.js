@@ -61,13 +61,13 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete,
 	const [content, setContent] = useState('');
 	const [comments, setCommentPost] = useState({});
 
-	// Model xuất hiện khi nhấn chỉnh sửa bài post
+	// Model xuất hiện khi nhấn chỉnh sửa bình luận
 	const showDeleteConfirm = (commentReply) => {
 		setCommentIdToDelete(commentReply);
 		setIsModalVisible(true);
 	};
 
-	// Model xuất hiện khi nhấn chỉnh sửa bài post
+	// Model xuất hiện khi nhấn chỉnh sửa bình luận
 	const showEditModal = (content, photos) => {
 		setEditContent(content);
 		setEditPhotos(photos);
@@ -279,7 +279,7 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete,
 
 				// Xử lý kết quả trực tiếp trong khối try
 				if (response.status === 200) {
-					toast.success('Chỉnh sửa bài đăng thành công!', { id: toastId });
+					toast.success('Chỉnh sửa bình luận thành công!', { id: toastId });
 
 					// Fetch lại danh sách bình luận sau khi chỉnh sửa
 					fetchCommentReply();

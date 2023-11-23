@@ -210,7 +210,7 @@ const Profile = () => {
 
 	return (
 		<>
-			<Helmet title={`${user?.fullName ? user?.fullName : 'User'} Profile | UTEALO`} />
+			<Helmet title={`${user?.userName ? user?.userName : 'User'} Profile | UTEALO`} />
 			<Toaster />
 
 			<Topbar />
@@ -233,7 +233,7 @@ const Profile = () => {
 						</div>
 
 						<div className="profileInfo" style={{ color: theme.foreground, background: theme.background }}>
-							<h4 className="profileInfoName">{user.fullName}</h4>
+							<h4 className="profileInfoName">{user.userName}</h4>
 							<p className="profileInfoDesc">Giới thiệu: {user.about || '----'}</p>
 							<small className="profileInfoDesc">
 								Ngày đăng nhập:{' '}

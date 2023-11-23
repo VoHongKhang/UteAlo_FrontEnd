@@ -121,6 +121,8 @@ const Share = ({ fetchPosts, postGroupId }) => {
 
 	if (isLoading) return <div>Loading...</div>;
 
+	console.log(liveUser);
+
 	return (
 		<>
 			<Toaster />
@@ -131,7 +133,7 @@ const Share = ({ fetchPosts, postGroupId }) => {
 						<InputEmoji
 							value={content}
 							onChange={setContent}
-							placeholder={`Bạn đang nghĩ gì ${liveUser?.fullName} ?`}
+							placeholder={`Bạn đang nghĩ gì ${liveUser?.userName} ?`}
 						/>
 					</div>
 					<hr className="shareHr" />

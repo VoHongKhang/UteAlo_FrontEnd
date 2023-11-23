@@ -291,6 +291,10 @@ const PostCard = ({ post, fetchPosts }) => {
 
 	// chỉnh sửa bài post
 	const editPostHandler = async () => {
+		if(!editContent && !editPhotos && !editFiles) { 
+			toast.error('Vui lòng không được để trống cả 3 trường dữ liệu!', errorOptions);
+			return;
+		}
 		const toastId = toast.loading('Đang gửi yêu cầu...');
 		try {
 			setCommentLoading(true);
@@ -484,7 +488,7 @@ const PostCard = ({ post, fetchPosts }) => {
 							<img className="postProfileImg" src={user.avatar || sampleProPic} alt="..." />
 						</Link>
 						<div className="postNameAndDate">
-							<span className="postUsername">{user.fullName}</span>
+							<span className="postUsername">{user.userName}</span>
 							<span className="postDate" onClick={() => handlePostDateClick(post)}>
 								{formatTime(post.postTime)}
 							</span>

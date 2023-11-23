@@ -48,13 +48,13 @@ const EditProfile = () => {
 	}, [currentUser.accessToken]);
 
 	useEffect(() => {
-		setFullName(user.fullName);
+		setFullName(user.userName);
 		setAbout(user.about);
 		setAddress(user.address);
 		setPhone(user.phone);
 		setGender(user.gender);
 		setDateOfBirth(user.dateOfBirth);
-	}, [user.fullName, user.about, user.address, user.phone, user.gender, user.dateOfBirth]);
+	}, [user.userName, user.about, user.address, user.phone, user.gender, user.dateOfBirth]);
 
 
 

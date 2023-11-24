@@ -112,7 +112,7 @@ const Sidebar = () => {
 						</Divider>
 					}
 					split={false}
-					dataSource={list.data}S
+					dataSource={list.data}
 					renderItem={(item) => (
 						<List.Item style={{ padding: '4px 0' }}>
 							{item.href ? (

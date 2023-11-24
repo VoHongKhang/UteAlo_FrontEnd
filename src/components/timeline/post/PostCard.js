@@ -713,8 +713,6 @@ const PostCard = ({ post, fetchPosts }) => {
 
 					{post.photos && (
 						<Image
-							hoverable
-							cover
 							width="100%"
 							className="postImg"
 							src={post.photos} // Sử dụng selectedPost.photos thay vì cố định URL như bạn đã đề cập

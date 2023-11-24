@@ -24,13 +24,25 @@ const MessageApi = {
 			throw new Error(error.message);
 		}
 	},
-	addMessage: async (message) => {
-		const response = await axios.post(`${BASE_URL}/messages`, message);
-		return response.data;
-	},
-	updateMessage: async (message) => {
-		const response = await axios.put(`${BASE_URL}/messages/${message.id}`, message);
-		return response.data;
+	getMessageGroup: async ({ currentUser, groupId, page, size }) => {
+		console.log('groupId', groupId);
+		try {
+			const config = {
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${currentUser.accessToken}`,
+				},
+			};
+			const res = await axios.get(`${BASE_URL}/v1/message/group/${groupId}?page=${page}&size=${size}`, config);
+			if (res.data.success) {
+				console.log(res.data);
+				return res.data;
+			} else {
+				throw new Error(res.data.message);
+			}
+		} catch (error) {
+			throw new Error(error.message);
+		}
 	},
 	deleteMessage: async (data) => {
 		try {

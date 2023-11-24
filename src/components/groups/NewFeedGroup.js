@@ -6,12 +6,9 @@ import useTheme from '../../context/ThemeContext';
 import axios from 'axios';
 import { BASE_URL } from '../../context/apiCall';
 import noCover from '../../assets/appImages/noCover.jpg';
-import Share from '../timeline/sharePost/Share';
-import { useParams } from 'react-router-dom';
 import { Skeleton } from 'antd';
 
 const NewFeedGroup = ({ user }) => {
-	const params = useParams();
 	const { user: currentUser } = useAuth();
 	const [posts, setPosts] = useState([]);
 	const [sharePosts, setSharePosts] = useState([]);

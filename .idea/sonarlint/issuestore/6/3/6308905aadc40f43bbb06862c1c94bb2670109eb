@@ -1,0 +1,18 @@
+
+Ljavascript:S1128"0Remove this unused import of 'ArrowForwardIcon'.(ğ©¥ï
+Ijavascript:S3863"('react-router-dom' import is duplicated.(‡±úéÿÿÿÿÿ
+Ejavascript:S6774")'dataUser' is missing in props validation(€²
+\javascript:S1481#"@Remove the declaration of the unused 'suggestedValues' variable.(×£ã…
+Yjavascript:S1854#"=Remove this useless assignment to variable "suggestedValues".(×£ã…
+?javascript:S125O"Remove this commented out code.(ŞÕ§¿şÿÿÿÿ
+Njavascript:S6749¸",A fragment with only one child is redundant.(™åÑğüÿÿÿÿ
+javascript:S1082Ñ"_Visible, non-interactive elements with click handlers must have at least one keyboard listener.(ì•´ëÿÿÿÿÿ
+@javascript:S6479Ñ"Do not use Array index in keys(ì•´ëÿÿÿÿÿ
+@javascript:S125Û"Remove this commented out code.(¿ÍÖóûÿÿÿÿ
+|javascript:S1082â"_Visible, non-interactive elements with click handlers must have at least one keyboard listener.(ÎæÌˆ
+@javascript:S6479ã"Do not use Array index in keys(Ê¹¹óşÿÿÿÿ
+javascript:S1082ï"_Visible, non-interactive elements with click handlers must have at least one keyboard listener.(õ¡ÚÊùÿÿÿÿ
+javascript:S1082’"_Visible, non-interactive elements with click handlers must have at least one keyboard listener.(ƒô€ÿÿÿÿÿ
+javascript:S1082•"_Visible, non-interactive elements with click handlers must have at least one keyboard listener.(´ã€ğûÿÿÿÿ
+javascript:S1082˜"_Visible, non-interactive elements with click handlers must have at least one keyboard listener.(˜Ïÿÿÿÿÿ
+|javascript:S1082›"_Visible, non-interactive elements with click handlers must have at least one keyboard listener.(÷‡­Ñ

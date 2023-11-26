@@ -28,6 +28,7 @@ import './Message.css';
 import { Call, CameraEnhance, InfoOutlined } from '@material-ui/icons';
 import { Modal } from 'antd';
 import MessageApi from '../../api/messages/MessageApi';
+
 var stompClient = null;
 const ChatRoom = ({ user, data, Toggeinfo }) => {
 	const [form] = Form.useForm();
@@ -86,7 +87,8 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 	useEffect(() => {
 		const fetchData = async () => {
 			if (data?.userId && !messages.get(data?.userId)) {
-				const res = await MessageApi.getMessage({ userId: data?.userId, page: page, size: 20 });
+				setPage(0);
+				const res = await MessageApi.getMessage({ userId: data?.userId, page: 0, size: 20 });
 				if (res?.success) {
 					messages.set(data?.userId, res?.result);
 					if (res?.result?.length < 20) {
@@ -99,7 +101,8 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 				}
 			}
 			if (data?.postGroupId && !messages.get(data?.postGroupId.toString())) {
-				const res = await MessageApi.getMessageGroup({ groupId: data?.postGroupId, page: page, size: 40 });
+				setPage(0);
+				const res = await MessageApi.getMessageGroup({ groupId: data?.postGroupId, page: 0, size: 40 });
 				if (res?.success) {
 					messages.set(data?.postGroupId.toString(), res?.result);
 					if (res?.result?.length < 40) {
@@ -116,15 +119,39 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 		const onMessageReceived = (payload) => {
 			var payloadData = JSON.parse(payload.body);
 			if (payloadData?.groupId) {
+				//trường hợp gửi react thì chỉnh sửa trong mảng
+
 				if (messages.get(payloadData.groupId.toString())) {
-					messages.get(payloadData.groupId.toString()).unshift(payloadData);
+					if (payloadData?.isDeleted) {
+						const index = messages
+							.get(payloadData.groupId.toString())
+							.findIndex((item) => item?.createdAt === payloadData?.createdAt);
+						if (index !== -1) {
+							messages.get(payloadData.groupId.toString())[index] = payloadData;
+							//setMessages(new Map(messages));
+							setMessages(new Map(messages.entries()));
+						}
+					} else {
+						messages.get(payloadData.groupId.toString()).unshift(payloadData);
+						//setMessages(new Map(messages));
+						setMessages(new Map(messages.entries()));
+					}
+				}
+			} else {
+				if (payloadData?.isDeleted) {
+					const index = messages
+						.get(payloadData.senderId)
+						.findIndex((item) => item?.createdAt === payloadData?.createdAt);
+					if (index !== -1) {
+						messages.get(payloadData.senderId)[index] = payloadData;
+						//setMessages(new Map(messages));
+						setMessages(new Map(messages.entries()));
+					}
+				} else {
+					messages.get(payloadData.senderId).unshift(payloadData);
 					//setMessages(new Map(messages));
 					setMessages(new Map(messages.entries()));
 				}
-			} else {
-				messages.get(payloadData.senderId).unshift(payloadData);
-				//setMessages(new Map(messages));
-				setMessages(new Map(messages.entries()));
 			}
 		};
 		const onConnected = () => {
@@ -153,27 +180,18 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 		setTimeout(() => textInputRef.current?.focus(), 0);
 		console.log(data);
 		const msgPlaceholder = {
-			...messageData,
+			content: messageData?.content,
+			files: messageData?.files[0],
 			senderId: user.userId,
 			receiverId: data?.userId,
 			groupId: data?.postGroupId,
 			senderAvatar: user.avatar,
-			senderName: user.fullName,
-			fileEntities: [],
+			senderName: user.userName,
 			createdAt: new Date().toISOString(),
 			updatedAt: new Date().toISOString(),
+			isDeleted: false,
 		};
 		try {
-			if(messageData.files){
-				msgPlaceholder.fileEntities = messageData.files?.map((item) => {
-					return {
-						name: item.name,
-						type: item.type,
-						size: item.size,
-						url: URL.createObjectURL(item),
-					};
-				});
-			}
 			if (data?.userId) {
 				messages.get(data?.userId).unshift(msgPlaceholder);
 				//setMessages(new Map(messages));
@@ -224,10 +242,7 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 	const inputFilesRef = useRef(null);
 
 	const onDropAccepted = (acceptedFiles) => {
-		const files = form.getFieldValue('files') || [];
-		files.push(...acceptedFiles);
-
-		form.setFieldValue('files', files);
+		form.setFieldValue('files', acceptedFiles);
 	};
 
 	const onDropRejected = (rejectedFiles) =>
@@ -309,7 +324,7 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 				<div className="header--chatroom--left">
 					<img src={data?.avatar || sampleProPic} alt="avatar" />
 					<div>
-						<p>{data?.fullName || data?.postGroupName}</p>
+						<p>{data?.userName || data?.postGroupName}</p>
 						<span>Đang hoạt động</span>
 					</div>
 				</div>
@@ -327,7 +342,7 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 				className="container--chatroom"
 				form={form}
 				onFinish={sendMessage}
-				initialValues={{ files: [], text: '' }}
+				initialValues={{ files: '', text: '' }}
 			>
 				<div className="history" {...getRootProps()}>
 					<div className="history_content" id="messages-history">
@@ -351,11 +366,11 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 								>
 									<img className="iamge_end" src={data?.avatar || sampleProPic} alt="haha" />
 									<Typography.Title level={4} style={{ margin: 0 }}>
-										{data?.fullName || data?.postGroupName}
+										{data?.userName || data?.postGroupName}
 									</Typography.Title>
 
 									<Typography.Text type="secondary">
-										Đây là đoạn chat của bạn với {data?.fullName || data?.postGroupName}
+										Đây là đoạn chat của bạn với {data?.userName || data?.postGroupName}
 									</Typography.Text>
 								</Space>
 							}
@@ -369,6 +384,7 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 										<MessageItem
 											key={item.createdAt + index}
 											message={item}
+											stompClient={stompClient}
 											isOwner={item.senderId === user?.userId}
 											onRetry={() => sendMessage(item)}
 										/>

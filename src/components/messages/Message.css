@@ -315,6 +315,8 @@ ul {
 	width: fit-content;
 	position: relative;
 	word-wrap: break-word;
+	display: flex;
+	flex-direction: column;
 }
 .container--chatroom .sent .icon--message {
 	position: absolute;
@@ -362,10 +364,12 @@ ul {
 	align-items: flex-end;
 	justify-content: flex-start;
 	width: 100%;
+	margin: 6px 0px;
 }
 .senderMessage {
 	display: flex;
 	justify-content: flex-end;
+	flex-direction: column-reverse;
 }
 .sent--item {
 	display: flex;
@@ -373,8 +377,11 @@ ul {
 	width: 100%;
 	align-items: center;
 }
+.sent--item .senderMessage:last-child {
+	margin-bottom: 12px;
+}
 .sent--item .ant-space-item:nth-child(1),
-.received--item .ant-space-item:nth-child(1){
+.received--item .ant-space-item:nth-child(1) {
 	max-width: 80%;
 }
 .sender-name {
@@ -391,6 +398,10 @@ ul {
 }
 .content--message--group {
 	max-width: 75%;
+}
+.removeMessage{
+	width: 100px!important;
+    display: block;
 }
 .emotion--container {
 	display: flex;
@@ -518,9 +529,26 @@ ul {
 .text {
 	padding: 0 4px;
 }
-.iamge_end{
+.iamge_end {
 	width: 200px;
 	height: 200px;
 	object-fit: cover;
 	border-radius: 50%;
+}
+.file_icon {
+	width: 100px;
+	height: 100px;
+	object-fit: cover;
+	cursor: pointer;
+}
+.icon--react--message {
+	width: 16px;
+	height: 16px;
+	cursor: pointer;
+}
+.react--icon{
+	position: absolute;
+    bottom: -14px;
+    right: 5px;
+	cursor: pointer;
 }

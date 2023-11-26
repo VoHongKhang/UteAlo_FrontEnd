@@ -13,7 +13,7 @@ const MessageApi = {
 					}`,
 				},
 			};
-			const res = await axios.get(`${BASE_URL}/v1/message/user/${userId}?page=${page}&size=${size}`, config);
+			const res = await axios.get(`${BASE_URL}/v1/messages/get/user/${userId}?page=${page}&size=${size}`, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data;
@@ -27,13 +27,8 @@ const MessageApi = {
 	getMessageGroup: async ({ currentUser, groupId, page, size }) => {
 		console.log('groupId', groupId);
 		try {
-			const config = {
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${currentUser.accessToken}`,
-				},
-			};
-			const res = await axios.get(`${BASE_URL}/v1/message/group/${groupId}?page=${page}&size=${size}`, config);
+			
+			const res = await axios.get(`${BASE_URL}/v1/messages/get/group/${groupId}?page=${page}&size=${size}`);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data;

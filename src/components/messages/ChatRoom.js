@@ -60,7 +60,7 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 			var chatMessage = {
 				senderId: user.userId,
 				senderAvatar: user?.avatar,
-				senderName: user?.fullName,
+				senderName: user?.userName,
 				receiverId: data?.userId,
 				groupId: data?.postGroupId,
 				messageType: 'TEXT',
@@ -72,34 +72,15 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 			if (data?.userId) {
 				privateChats.get(data?.userId).push(chatMessage);
 				setPrivateChats(new Map(privateChats));
-
 				stompClient.send('/app/private-message', {}, JSON.stringify(chatMessage));
 			}
 			if (data?.postGroupId) {
-				// publicChats.get(data?.postGroupId.toString()).push(chatMessage);
-				// setPublicChats(new Map(publicChats));
-
 				stompClient.send('/app/sendMessage/' + data?.postGroupId, {}, JSON.stringify(chatMessage));
 			}
-
 			setUserData({ ...userData, content: '' });
 			chatContainer.scrollTop = chatContainer.scrollHeight;
 		}
 	};
-	useEffect(() => {
-		// 	//Kiểm tra unique cho pulic chat
-		console.log('publicChats', publicChats);
-		// 	if (data?.postGroupId) {
-		// 		if (!publicChats.get(data?.postGroupId.toString())) {
-		// 			[...publicChats.get(data?.postGroupId)].forEach((message) => {
-		// 				if (message.message === data?.postGroupId.toString()) {
-		// 					publicChats.delete(key);
-		// 				}
-		// 			});
-		// 			setPublicChats(new Map(publicChats));
-		// 		}
-		// 	}
-	}, [data?.postGroupId, publicChats]);
 
 	const userJoin = () => {
 		if (!privateChats.get(data?.userId)) {
@@ -149,7 +130,6 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 
 	useEffect(() => {
 		const fetchData = async () => {
-			// disconnect();
 			connect();
 
 			if (!privateChats.get(data.userId) && data.userId) {
@@ -177,11 +157,6 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 		stompClient = over(Sock);
 		stompClient.connect({}, onConnected, onError);
 	};
-	// const disconnect = () => {
-	// 	if (stompClient !== null) {
-	// 		stompClient.disconnect();
-	// 	}
-	// };
 	const onConnected = () => {
 		setUserData({ ...userData, connected: true });
 
@@ -275,7 +250,7 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 				<div className="header--chatroom--left">
 					<img src={data?.avatar || sampleProPic} alt="avatar" />
 					<div>
-						<p>{data?.fullName || data?.postGroupName}</p>
+						<p>{data?.userName || data?.postGroupName}</p>
 						<span>Đang hoạt động</span>
 					</div>
 				</div>

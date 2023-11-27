@@ -34,7 +34,7 @@ const listGroups = [
 	'Quản trị kinh doanh 3',
 	'Quản trị kinh doanh 4',
 ];
-function InforFormStudents({ onSubmit ,loading}) {
+function InforFormStudents({ onSubmit, loading }) {
 	const { token } = theme.useToken();
 	const [form] = Form.useForm();
 	const handleNext = () => {
@@ -62,7 +62,7 @@ function InforFormStudents({ onSubmit ,loading}) {
 				>
 					<Input />
 				</Form.Item>
-        <Form.Item
+				<Form.Item
 					label="Giới tính"
 					name="gender"
 					rules={[
@@ -94,15 +94,16 @@ function InforFormStudents({ onSubmit ,loading}) {
 				>
 					<Input />
 				</Form.Item>
-				<Form.Item label="Tên lớp" name="groupName"
-				rules={
-					[
+				<Form.Item
+					label="Tên lớp"
+					name="groupName"
+					rules={[
 						{
 							required: true,
 							message: 'Vui lòng nhập tên lớp!',
 						},
-					]
-				}>
+					]}
+				>
 					<Select
 						showSearch
 						ptionfilterprop="label"

@@ -16,7 +16,8 @@ const ForgotPasswordForm = () => {
 			await ForgotApi.forgotpw(form.getFieldValue('email'));
 			toast.success('Gửi yêu thành công! Vui lòng kiểm tra email của bạn.', { id: toastId });
 		} catch (error) {
-			toast.error(`Gửi yêu thất bại! Lỗi: ${error}`, { id: toastId });
+			console.log(error);
+			toast.error(`Gửi yêu thất bại! Lỗi: ${error.response ? error.response.data.message : error}`, { id: toastId });
 		}
 
 		setLoading(false);

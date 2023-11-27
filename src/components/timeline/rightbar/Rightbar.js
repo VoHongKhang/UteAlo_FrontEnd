@@ -1,5 +1,5 @@
 import { Button, Divider, List, Space, Typography, Modal } from 'antd';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import adverSymbol from '../../../assets/appImages/adverSym.jpg';
 import adImg from '../../../assets/appImages/adver.jpg';
 import adImg2 from '../../../assets/appImages/adver4.jpg';
@@ -7,14 +7,13 @@ import useTheme from '../../../context/ThemeContext';
 import noAvatar from '../../../assets/appImages/user.png';
 import './Rightbar.css';
 import { useEffect, useState } from 'react';
-import ChatBox from '../chatbox/ChatBox';
 import toast from 'react-hot-toast';
 import GetFriendApi from '../../../api/profile/friend/getFriendApi';
 const Rightbar = ({ user }) => {
+	const navigate = useNavigate();
 	const { theme } = useTheme();
 	const [listFriend, setListFriend] = useState([]);
 	const [listFriendRequest, setListFriendRequest] = useState([]);
-	const [selectedUser, setSelectedUser] = useState(null);
 	const [isModalVisible, setIsModalVisible] = useState(false);
 	const [isAccept, setIsAccept] = useState(null);
 	const [isDeny, setIsDeny] = useState(null);
@@ -34,9 +33,6 @@ const Rightbar = ({ user }) => {
 		getListFriendTop();
 		getListFriendRequests();
 	}, []);
-	const messageHandler = (user) => {
-		setSelectedUser(user);
-	};
 
 	const lists = [
 		{
@@ -48,9 +44,7 @@ const Rightbar = ({ user }) => {
 			data: listFriend,
 		},
 	];
-	const handlerCloseChatBox = (close) => {
-		setSelectedUser(close);
-	};
+
 	const handlerAccept = (item) => {
 		setIsModalVisible(true);
 		setIsAccept(item);
@@ -111,7 +105,11 @@ const Rightbar = ({ user }) => {
 								{list.title === 'Yêu cầu kết bạn' ? (
 									<Space align="center" style={{ width: '100%' }}>
 										<Link to={`/profile/${item.userId}`}>
-											<img src={item?.avatar ? item?.avatar : noAvatar} alt="..." className="topbarImg" />
+											<img
+												src={item?.avatar ? item?.avatar : noAvatar}
+												alt="..."
+												className="topbarImg"
+											/>
 										</Link>
 										<Typography.Text className="username_fq" strong>
 											{item.username}
@@ -123,7 +121,7 @@ const Rightbar = ({ user }) => {
 											style={{ float: 'right', margin: '0 4px' }}
 											onClick={() => handlerAccept(item)}
 										>
-											Kết bạn
+											Chấp nhận
 										</Button>
 
 										<Button
@@ -140,9 +138,13 @@ const Rightbar = ({ user }) => {
 										<Space
 											align="center"
 											style={{ width: '100%', cursor: 'pointer' }}
-											onClick={() => messageHandler(item)}
+											onClick={() => navigate(`/profile/${item.userId}`)}
 										>
-											<img src={item?.avatar ? item?.avatar : noAvatar} alt="..." className="topbarImg" />
+											<img
+												src={item?.avatar ? item?.avatar : noAvatar}
+												alt="..."
+												className="topbarImg"
+											/>
 											<Typography.Text strong>{item.username}</Typography.Text>
 										</Space>
 									</Button>
@@ -151,7 +153,6 @@ const Rightbar = ({ user }) => {
 						)}
 					/>
 				))}
-				{selectedUser && <ChatBox user={selectedUser} onCloseChatBox={handlerCloseChatBox} />}
 			</>
 		);
 	};

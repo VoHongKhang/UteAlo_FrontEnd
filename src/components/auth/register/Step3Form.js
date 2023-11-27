@@ -1,8 +1,9 @@
 import { Button, Card, Form, theme, Typography, Input, Radio } from 'antd';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
-function Step3Form({ onSubmit,loading }) {
+function Step3Form({ onSubmit, loading }) {
 	const { token } = theme.useToken();
 	const [form] = Form.useForm();
 	const handleNext = () => {

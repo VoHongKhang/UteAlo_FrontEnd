@@ -127,6 +127,10 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete,
 	// Phản hồi bình luận
 	const postCommentHandler = async () => {
 		try {
+			if(content.length > 250 ) {
+				toast.error('Nội dung bình luận không được quá 250 ký tự!', errorOptions);
+				return;
+			}
 			if (!content && !photosComment) {
 				toast.error('Vui lòng nhập nội dung hoặc hình ảnh!', errorOptions);
 				return; // Dừng việc thực hiện tiếp theo nếu nội dung rỗng
@@ -237,8 +241,28 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete,
 		}
 	};
 
+	document.addEventListener('input', function(event) {
+		const maxLength = 250; // Số ký tự tối đa cho phép
+		const element = document.querySelector('.react-input-emoji--input'); // Chọn đúng div của bạn
+		
+		// Kiểm tra xem sự kiện nhập liệu có phải từ div mong muốn không
+		if (event.target === element) {
+		  const text = element.innerText;
+	  
+		  // Nếu vượt quá giới hạn, cắt bớt phần vượt quá
+		  if (text.length > maxLength) {
+			element.innerText = text.slice(0, maxLength);
+		  }
+		}
+	  });
+	  
+
 	// chỉnh sửa bình luận
 	const editCommentHandler = async () => {
+		if(editContent.length > 250 ) {
+			toast.error('Nội dung bình luận không được quá 250 ký tự!', errorOptions);
+			return;
+		}
 		const toastId = toast.loading('Đang gửi yêu cầu...');
 		try {
 			if (commentReply.commentId) {

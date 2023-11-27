@@ -6,8 +6,15 @@
   margin: 20px 0;
 }
 
+.postCenter {
+  margin: 20px 0;
+}
+
 .postText {
   margin-left: 10px;
+  max-width: 600px;
+  display: inline-block;
+  overflow-wrap: break-word;
 }
 
 .postWrapper {
@@ -81,9 +88,7 @@
   text-decoration: underline;
 }
 
-.postCenter {
-  margin: 20px 0;
-}
+
 
 .postFile {
   display: flex;
@@ -471,4 +476,8 @@
 #shareGroupOfPost {
   margin-left: 40px;
   margin-bottom: 20px;
+}
+
+.postCommentContReply .react-input-emoji--input {
+  max-width: 200px;
 }

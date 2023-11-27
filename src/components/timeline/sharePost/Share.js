@@ -58,9 +58,29 @@ const Share = ({ fetchPosts, postGroupId }) => {
 		setFilesUrl(URL.createObjectURL(file));
 	};
 
+	document.addEventListener('input', function (event) {
+		const maxLength = 250; // Số ký tự tối đa cho phép
+		const element = document.querySelector('.react-input-emoji--input'); // Chọn đúng div của bạn
+
+		// Kiểm tra xem sự kiện nhập liệu có phải từ div mong muốn không
+		if (event.target === element) {
+			const text = element.innerText;
+
+			// Nếu vượt quá giới hạn, cắt bớt phần vượt quá
+			if (text.length > maxLength) {
+				element.innerText = text.slice(0, maxLength);
+			}
+		}
+	});
+
 	// Đăng bài post
 	const postSubmitHandler = async (e) => {
 		e.preventDefault();
+
+		if (content.length > 250) {
+			toast.error('Nội dung bài viết không được quá 250 ký tự!');
+			return;
+		}
 
 		try {
 			const newPost = {
@@ -121,7 +141,6 @@ const Share = ({ fetchPosts, postGroupId }) => {
 
 	if (isLoading) return <div>Loading...</div>;
 
-	console.log(liveUser);
 
 	return (
 		<>

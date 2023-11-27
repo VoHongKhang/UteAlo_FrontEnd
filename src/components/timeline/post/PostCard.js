@@ -191,8 +191,27 @@ const PostCard = ({ post, fetchPosts }) => {
 		setShowAllComments(!showAllComments);
 	};
 
+	document.addEventListener('input', function (event) {
+		const maxLength = 250; // Số ký tự tối đa cho phép
+		const element = document.querySelector('.react-input-emoji--input'); // Chọn đúng div của bạn
+
+		// Kiểm tra xem sự kiện nhập liệu có phải từ div mong muốn không
+		if (event.target === element) {
+			const text = element.innerText;
+
+			// Nếu vượt quá giới hạn, cắt bớt phần vượt quá
+			if (text.length > maxLength) {
+				element.innerText = text.slice(0, maxLength);
+			}
+		}
+	});
+
 	// Đăng bình luận post
 	const postCommentHandler = async () => {
+		if (content.length > 250) {
+			toast.error('Nội dung bình luận không được quá 250 ký tự!', errorOptions);
+			return;
+		}
 		try {
 			if (!content && !photosComment) {
 				toast.error('Vui lòng nhập nội dung hoặc hình ảnh!', errorOptions);
@@ -291,7 +310,11 @@ const PostCard = ({ post, fetchPosts }) => {
 
 	// chỉnh sửa bài post
 	const editPostHandler = async () => {
-		if(!editContent && !editPhotos && !editFiles) { 
+		if (editContent.length > 250) {
+			toast.error('Nội dung bài viết không được quá 250 ký tự!', errorOptions);
+			return;
+		}
+		if (!editContent && !editPhotos && !editFiles) {
 			toast.error('Vui lòng không được để trống cả 3 trường dữ liệu!', errorOptions);
 			return;
 		}

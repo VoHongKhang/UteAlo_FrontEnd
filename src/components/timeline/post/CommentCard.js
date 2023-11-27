@@ -142,6 +142,10 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 	// Phản hồi bình luận
 	const postCommentHandler = async () => {
 		try {
+			if (content.length > 250) {
+				toast.error('Nội dung chỉ được tối đa 250 kí tự!', errorOptions);
+				return;
+			}
 			if (!content && !photosComment) {
 				toast.error('Vui lòng nhập nội dung hoặc hình ảnh!', errorOptions);
 				return; // Dừng việc thực hiện tiếp theo nếu nội dung rỗng
@@ -252,7 +256,11 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 
 	// chỉnh sửa bình luận
 	const editCommentHandler = async () => {
-		if(!editContent && !editPhotos){ 
+		if (editContent.length > 250) {
+			toast.error('Nội dung chỉ được tối đa 250 kí tự!', errorOptions);
+			return;
+		}
+		if (!editContent && !editPhotos) {
 			toast.error('Vui lòng nhập nội dung hoặc hình ảnh!', errorOptions);
 			return;
 		}
@@ -379,6 +387,21 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 
 	const likeButtonClass = isLikedComment ? 'liked' : 'not-liked';
 
+	document.addEventListener('input', function (event) {
+		const maxLength = 250; // Số ký tự tối đa cho phép
+		const element = document.querySelector('.react-input-emoji--input'); // Chọn đúng div của bạn
+
+		// Kiểm tra xem sự kiện nhập liệu có phải từ div mong muốn không
+		if (event.target === element) {
+			const text = element.innerText;
+
+			// Nếu vượt quá giới hạn, cắt bớt phần vượt quá
+			if (text.length > maxLength) {
+				element.innerText = text.slice(0, maxLength);
+			}
+		}
+	});
+
 	return (
 		<div id="comment" className={`comment_${comment.commentId}`} key={comment.commentId}>
 			<div className="commentParent">
@@ -416,7 +439,7 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 										<InputEmoji
 											value={content}
 											onChange={setContent}
-											placeholder={`Viết bình luận ....`}
+											placeholder={`Viết bình luận .t...`}
 										/>
 										{photosComment && (
 											<div className="shareImgContainer">

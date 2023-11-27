@@ -30,7 +30,7 @@ const Feed = () => {
 			};
 			setLoading(true);
 
-			const res = await axios.get(`${BASE_URL}/v1/post/${currentUser.userId}/posts`, config);
+			const res = await axios.get(`${BASE_URL}/v1/post/get/timeLine`, config);
 			setLoading(false);
 			setPosts(res.data.result);
 		} catch (error) {
@@ -48,7 +48,7 @@ const Feed = () => {
 			};
 			setLoading(true);
 
-			const res = await axios.get(`${BASE_URL}/v1/share/${currentUser.userId}/posts`, config);
+			const res = await axios.get(`${BASE_URL}/v1/share/get/timeLine`, config);
 			setLoading(false);
 			setSharePosts(res.data.result);
 		} catch (error) {

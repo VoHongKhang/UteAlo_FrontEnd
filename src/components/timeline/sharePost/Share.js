@@ -5,13 +5,11 @@ import { Box, CircularProgress } from '@material-ui/core';
 import toast, { Toaster } from 'react-hot-toast';
 import InputEmoji from 'react-input-emoji';
 import vietnamProvinces from '../../../vietnamProvinces.json';
-import axios from 'axios';
-import { BASE_URL } from '../../../context/apiCall';
 import noAvatar from '../../../assets/appImages/user.png';
-import useAuth from '../../../context/auth/AuthContext';
 import usePost from '../../../context/post/PostContext';
 
-const Share = ({ fetchPosts, postGroupId }) => {
+const Share = ({ inforUser, newPosts }) => {
+	console.log('inforUserShare', inforUser);
 	const [location, setLocation] = useState('');
 	const [content, setContent] = useState('');
 	const [photos, setPhotos] = useState(null);
@@ -20,9 +18,6 @@ const Share = ({ fetchPosts, postGroupId }) => {
 	const [filesUrl, setFilesUrl] = useState();
 	const [privacyLevel, setPrivacyLevel] = useState('PUBLIC');
 	const [picLoading, setPicLoading] = useState(false);
-	const [isLoading, setIsLoading] = useState(true);
-	const [liveUser, setLiveUser] = useState(null);
-	const { user } = useAuth();
 	const { createPost, createLoading } = usePost();
 
 	// Xử lý ảnh của bài post
@@ -69,7 +64,7 @@ const Share = ({ fetchPosts, postGroupId }) => {
 				photos: photos || '',
 				files: files || '',
 				privacyLevel: privacyLevel || 'PUBLIC',
-				postGroupId: postGroupId || 0,
+				postGroupId: 0,
 			};
 
 			if (!newPost.content && !newPost.photos && !newPost.files) {
@@ -87,7 +82,7 @@ const Share = ({ fetchPosts, postGroupId }) => {
 			);
 
 			// Sau khi createPost hoàn thành, gọi fetchPosts để cập nhật danh sách bài viết
-			fetchPosts();
+			newPosts(newPost);
 			// Xóa nội dung và ảnh đã chọn
 			setLocation('');
 			setContent('');
@@ -99,41 +94,17 @@ const Share = ({ fetchPosts, postGroupId }) => {
 		}
 	};
 
-	useEffect(() => {
-		const fetchUsers = async () => {
-			const config = {
-				headers: {
-					Authorization: `Bearer ${user.accessToken}`,
-				},
-			};
-			try {
-				const res = await axios.get(`${BASE_URL}/v1/user/profile/${user.userId}`, config);
-				const userData = res.data.result;
-				setLiveUser(userData);
-				setIsLoading(false);
-			} catch (error) {
-				console.error(error);
-				setIsLoading(false);
-			}
-		};
-		fetchUsers();
-	}, [user.userId, user.accessToken]);
-
-	if (isLoading) return <div>Loading...</div>;
-
-	console.log(liveUser);
-
 	return (
 		<>
 			<Toaster />
 			<div className="share">
 				<form className="shareWrapper" onSubmit={postSubmitHandler}>
 					<div className="shareTop">
-						<img className="shareProfileImg" src={liveUser?.avatar || noAvatar} alt="..." />
+						<img className="shareProfileImg" src={inforUser?.avatar || noAvatar} alt="..." />
 						<InputEmoji
 							value={content}
 							onChange={setContent}
-							placeholder={`Bạn đang nghĩ gì ${liveUser?.userName} ?`}
+							placeholder={`Bạn đang nghĩ gì ${inforUser?.userName} ?`}
 						/>
 					</div>
 					<hr className="shareHr" />

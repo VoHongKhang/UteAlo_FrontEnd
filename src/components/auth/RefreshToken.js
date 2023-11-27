@@ -3,11 +3,11 @@ import axios from 'axios';
 import { BASE_URL } from '../../context/apiCall';
 
 const RefreshToken = () => {
-	let userInfo;
+	let userInfoString = localStorage.getItem('userInfo');
+	let userInfo = JSON.parse(userInfoString);
 	useEffect(() => {
 		// Lấy dữ liệu từ localStorage
-		let userInfoString = localStorage.getItem('userInfo');
-		userInfo = JSON.parse(userInfoString);
+
 		console.log('refresh info', userInfo);
 		const config = {
 			headers: {

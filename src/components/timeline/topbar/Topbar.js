@@ -10,7 +10,6 @@ import {
 	GroupAdd,
 	Notifications,
 	Message,
-	ArrowForwardIcon,
 } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 import useAuth from '../../../context/auth/AuthContext';
@@ -20,7 +19,6 @@ import noAvatar from '../../../assets/appImages/user.png';
 import { BASE_URL } from '../../../context/apiCall';
 import { useNavigate } from 'react-router-dom';
 import adver4 from '../../../assets/appImages/adver4.jpg';
-import MessageApi from '../../../api/messages/MessageApi';
 
 const Topbar = ({ dataUser }) => {
 	const [user, setUser] = useState();
@@ -34,21 +32,7 @@ const Topbar = ({ dataUser }) => {
 	const [searchFriends, setSearchFriends] = useState([]);
 	const [suggestedValues, setSuggestedValues] = useState([]);
 	const inputRef = useRef(null);
-	const [test, setTest] = useState();
 
-	useEffect(() => {
-		const fetchData = async () => {
-			const res = await MessageApi.getMessageGroup({currentUser:currentUser, groupId: 2, page: 0, size: 40 });
-			if (res?.success) {
-				setTest(res?.result);
-			}
-		};
-		fetchData();
-	}, []);
-
-	useEffect(() => {
-		console.log(test);
-	}, [test]);
 	// Toggle theme switch
 	const themeModeHandler = () => {
 		setTheme(theme === themes.light ? themes.dark : themes.light);

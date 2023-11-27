@@ -6,7 +6,6 @@ import {
 	Badge,
 	Button,
 	Form,
-	Image,
 	Input,
 	List,
 	Popover,

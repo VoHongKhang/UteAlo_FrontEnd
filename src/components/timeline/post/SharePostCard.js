@@ -20,7 +20,7 @@ import GetCommentSharePostApi from '../../../api/timeline/commentSharePost/getCo
 import CommentCard from './CommentCard';
 import { Modal } from 'antd';
 
-const SharePostCard = ({ share, fetchSharePosts }) => {
+const SharePostCard = ({ share, newSharePosts }) => {
 	const isMounted = useRef(true);
 	const { user: currentUser } = useAuth();
 	useEffect(() => {
@@ -224,13 +224,14 @@ const SharePostCard = ({ share, fetchSharePosts }) => {
 			setCommentLoading(true);
 
 			if (postIdToDelete) {
-				await axios.put(`${BASE_URL}/v1/share/delete/${postIdToDelete}`, share.userId, config);
+				const res = await axios.put(`${BASE_URL}/v1/share/delete/${postIdToDelete}`, share.userId, config);
+				if (res.status === 200) {
+					setCommentLoading(false);
+					toast.success('Xóa bài chia sẻ thành công!', { id: toastId });
+					// Fetch lại danh sách bài share post sau khi xóa
+					newSharePosts(postIdToDelete, 'delete');
+				}
 			}
-
-			setCommentLoading(false);
-			toast.success('Xóa bài chia sẻ thành công!', { id: toastId });
-			// Fetch lại danh sách bài share post sau khi xóa
-			fetchSharePosts();
 		} catch (error) {
 			setCommentLoading(false);
 			toast.error(error.response.data.message, errorOptions);
@@ -261,7 +262,7 @@ const SharePostCard = ({ share, fetchSharePosts }) => {
 					toast.success('Chỉnh sửa bài đăng thành công!', { id: toastId });
 
 					// Fetch lại danh sách bài post sau khi chỉnh sửa
-					fetchSharePosts();
+					newSharePosts(response.data.result, 'update');
 				} else {
 					// Xử lý trường hợp API trả về lỗi
 					toast.error(response.message, { id: toastId });
@@ -541,8 +542,6 @@ const SharePostCard = ({ share, fetchSharePosts }) => {
 						)}
 					</Modal>
 				)}
-
-				
 			</div>
 		</div>
 	);

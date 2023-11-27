@@ -17,42 +17,43 @@ export const AuthProvider = ({ children }) => {
 			const config = {
 				headers: { 'Content-Type': 'application/json' },
 			};
-			await axios
-				.post(`${BASE_URL}/v1/auth/login`, { credentialId, password }, config)
-				.then((response) => {
-					const { accessToken, refreshToken, userId } = response.data.result;
-					dispatch({
-						type: 'LOGIN_SUCCESS',
-						payload: {
-							accessToken,
-							refreshToken,
-							userId,
-						},
-					});
-          console.log("123LOgin");
-					toast.success('Đăng nhập thành công!', { id: toastId });
-					localStorage.setItem(
-						'userInfo',
-						JSON.stringify({
-							accessToken,
-							refreshToken,
-							userId,
-						})
-					);
-				})
-				.catch((error) => {
-					dispatch({
-						type: 'LOGIN_FAIL',
-						payload: error.response.data.message,
-					});
-					toast.error(`Đăng nhập thất bại! Lỗi: ${error.response.data.message}`, { id: toastId });
+			const res = await axios.post(`${BASE_URL}/v1/auth/login`, { credentialId, password }, config);
+			if (res.data.success) {
+				const { accessToken, refreshToken, userId } = res.data.result;
+				dispatch({
+					type: 'LOGIN_SUCCESS',
+					payload: {
+						accessToken,
+						refreshToken,
+						userId,
+					},
 				});
+				toast.success('Đăng nhập thành công!', { id: toastId });
+				localStorage.setItem(
+					'userInfo',
+					JSON.stringify({
+						accessToken,
+						refreshToken,
+						userId,
+					})
+				);
+			} else {
+				dispatch({
+					type: 'LOGIN_FAIL',
+					payload: res.data.message,
+				});
+				toast.error(`Đăng nhập thất bại! Lỗi: ${res.data.message}`, { id: toastId });
+				throw new Error(res.data.message);
+			}
 		} catch (error) {
 			dispatch({
 				type: 'LOGIN_FAIL',
-				payload: error.response.data.message,
+				payload: error,
 			});
-			toast.error(`Đăng nhập thất bại! Lỗi: ${error.response.data.message}`, { id: toastId });
+			console.log(error);
+			toast.error(`Đăng nhập thất bại! Lỗi: ${error.response ? error.response.data.message : error}`, {
+				id: toastId,
+			});
 		}
 	};
 

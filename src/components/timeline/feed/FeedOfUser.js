@@ -9,6 +9,7 @@ import useTheme from '../../../context/ThemeContext';
 import axios from 'axios';
 import { BASE_URL } from '../../../context/apiCall';
 import { Skeleton } from 'antd';
+import PostApi from '../../../api/timeline/post/PostApi';
 
 const FeedOfUser = () => {
 	const params = useParams();
@@ -40,16 +41,11 @@ const FeedOfUser = () => {
 	// Lấy danh sách các bài share post
 	const fetchSharePosts = async () => {
 		try {
-			const config = {
-				headers: {
-					Authorization: `Bearer ${currentUser.accessToken}`,
-				},
-			};
 			setLoading(true);
 
-			const res = await axios.get(`${BASE_URL}/v1/share/${currentUser.userId}/posts`, config);
+			const res = await PostApi.fetchPosts(currentUser, 0, 20);
 			setLoading(false);
-			setSharePosts(res.data.result);
+			setSharePosts(res);
 		} catch (error) {
 			console.log(error);
 		}

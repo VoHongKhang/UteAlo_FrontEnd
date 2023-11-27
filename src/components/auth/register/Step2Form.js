@@ -72,7 +72,7 @@ function Step2Form({ onSubmit, data }) {
 						{
 							pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{6,20})/,
 							message:
-								'Mật khẩu phải chứa ít nhất 1 ký tự hoa, 1 ký tự thường, 1 số và 1 ký tự đặc biệt!',
+								'Mật khẩu phải chứa ít nhất 1 ký tự hoa, 1 ký tự thường, 1 số và 1 trong các ký tự đặc biệt !@#$%^&*',
 						},
 					]}
 				>

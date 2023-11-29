@@ -21,12 +21,11 @@ import { useNavigate } from 'react-router-dom';
 import userAction from '../../components/action/useUserAction';
 const Profile = () => {
 	const [user, setUser] = useState({});
+	const getUser = (data) => {
+		setUser(data);
+	};
+
 	const navigate = useNavigate();
-	let listMessage = [
-		'Retrieving user profile successfully and access update denied',
-		'Retrieving user profile successfully and access update',
-	];
-	const [message, setMessage] = useState('');
 
 	const params = useParams();
 
@@ -166,9 +165,6 @@ const Profile = () => {
 					Authorization: `Bearer ${currentUser.accessToken}`,
 				},
 			};
-			const res = await axios.get(`${BASE_URL}/v1/user/profile/${params.userId}`, config);
-			setUser(res.data.result);
-			setMessage(res.data.message);
 			const getStatus = await axios.get(`${BASE_URL}/v1/friend/status/${params.userId}`, config);
 			setStatus(getStatus.data.message);
 		};
@@ -213,7 +209,7 @@ const Profile = () => {
 			<Helmet title={`${user?.userName ? user?.userName : 'User'} Profile | UTEALO`} />
 			<Toaster />
 
-			<Topbar />
+			<Topbar dataUser={getUser} />
 			<div className="profile">
 				<div className="profileRight">
 					<div className="profileRightTop">
@@ -221,7 +217,7 @@ const Profile = () => {
 							<img className="profileCoverImg" src={user.background || noCover} alt="..." />
 
 							<img className="profileUserImg" src={user.avatar || sampleProPic} alt="..." />
-							{message === listMessage[1] && (
+							{params.userId === user.userId && (
 								<Link to={`/update/${currentUser.userId}`}>
 									<div className="profile-edit-icon">
 										<Avatar style={{ cursor: 'pointer', backgroundColor: 'blue' }}>
@@ -244,7 +240,7 @@ const Profile = () => {
 								) || '----'}
 							</small>
 						</div>
-						{message !== listMessage[1] && (
+						{params.userId !== user.userId && (
 							<Space className="button--space">
 								<Button type="default" onClick={handleButtonFriend}>
 									{status}
@@ -376,7 +372,7 @@ const Profile = () => {
 								</div>
 							</div>
 						</div>
-						<FeedOfUser userId={currentUser.accessToken} />
+						<FeedOfUser inforUser={user} />
 					</div>
 				</div>
 			</div>

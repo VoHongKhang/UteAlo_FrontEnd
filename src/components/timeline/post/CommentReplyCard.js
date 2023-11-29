@@ -12,10 +12,8 @@ import DeleteCommentApi from '../../../api/timeline/commentPost/delete';
 import toast from 'react-hot-toast';
 import { Modal } from 'antd';
 import { PermMedia, Cancel } from '@material-ui/icons';
-import { errorOptions } from '../../utils/toastStyle';
 import { Send } from '@material-ui/icons';
 import InputEmoji from 'react-input-emoji';
-import { successOptions } from '../../utils/toastStyle';
 
 const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete, onCreate, commentReplyLength }) => {
 	const { user: currentUser } = useAuth();
@@ -126,9 +124,10 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete,
 
 	// Phản hồi bình luận
 	const postCommentHandler = async () => {
+		const toastId = toast.loading('Đang gửi yêu cầu...');
 		try {
 			if (!content && !photosComment) {
-				toast.error('Vui lòng nhập nội dung hoặc hình ảnh!', errorOptions);
+				toast.error('Vui lòng nhập nội dung hoặc hình ảnh!', { id: toastId });
 				return; // Dừng việc thực hiện tiếp theo nếu nội dung rỗng
 			}
 			setCommentLoading(true);
@@ -156,10 +155,10 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete,
 					setCommentPost({ ...comments, [newComment.commentId]: newComment });
 					onCreate(commentReplyLength + 1);
 					//setCommentLength(commentlength + 1);
-					toast.success('Đăng bình luận thành công!', successOptions);
+					toast.success('Đăng bình luận thành công!', { id: toastId });
 				} else {
 					// Xử lý trường hợp API trả về lỗi
-					toast.error(response.message, errorOptions);
+					toast.error(response.message, { id: toastId });
 				}
 			}
 			if (post.postId && post.shareId) {
@@ -186,10 +185,10 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete,
 					setCommentPost({ ...comments, [newComment.commentId]: newComment });
 					onCreate(commentReplyLength + 1);
 					//setCommentLength(commentlength + 1);
-					toast.success('Đăng bình luận thành công!', successOptions);
+					toast.success('Đăng bình luận thành công!', { id: toastId });
 				} else {
 					// Xử lý trường hợp API trả về lỗi
-					toast.error(response.message, errorOptions);
+					toast.error(response.message, { id: toastId });
 				}
 			}
 			setCommentLoading(false);
@@ -198,7 +197,7 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete,
 			setPhotosComment('');
 		} catch (error) {
 			setCommentLoading(false);
-			toast.error(error.message, errorOptions);
+			toast.error(error.message, { id: toastId });
 		}
 	};
 
@@ -211,7 +210,7 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete,
 		}
 		if (file.size > 1024 * 1024) {
 			// 1MB = 1024 * 1024 bytes
-			toast.error('Vui lòng chọn ảnh dưới 1MB', errorOptions);
+			toast.error('Vui lòng chọn ảnh dưới 1MB');
 			return; // Ngăn việc tiếp tục xử lý nếu kích thước vượt quá 1MB
 		}
 		if (file.type !== 'image/png' || file.type !== 'image/jpeg') {
@@ -289,7 +288,7 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete,
 				}
 			}
 		} catch (error) {
-			toast.error(error.message, errorOptions);
+			toast.error(error.message, { id: toastId });
 		}
 	};
 

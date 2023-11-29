@@ -347,7 +347,7 @@ const SharePostCard = ({ inforUser, share, newSharePosts }) => {
 											: null}
 										{share?.userName}
 									</span>
-									<span className="postDateShare">{formatTime(share?.createAt)}</span>
+									<span className="postDateShare">{formatTime(share?.updateAt)}</span>
 								</div>
 							</div>
 						</div>
@@ -575,6 +575,7 @@ const SharePostCard = ({ inforUser, share, newSharePosts }) => {
 					inforUser={inforUser}
 					visible={isModalVisible}
 					onClose={handleModalClose}
+					modalDetail={0}
 				/>
 				<div className="postBottom">
 					<div className="postBottomLeft">

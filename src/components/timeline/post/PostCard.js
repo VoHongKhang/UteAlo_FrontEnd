@@ -11,19 +11,20 @@ import axios from 'axios';
 import { BASE_URL } from '../../../context/apiCall';
 import InputEmoji from 'react-input-emoji';
 import toast from 'react-hot-toast';
-import { errorOptions, successOptions } from '../../utils/toastStyle';
 import usePost from '../../../context/post/PostContext';
 import useAuth from '../../../context/auth/AuthContext';
 import LikeOrUnlikeApi from '../../../api/timeline/commentPost/likeOrUnlike';
 import GetCommentPostApi from '../../../api/timeline/commentPost/getCommentPost';
 import CommentCard from './CommentCard';
-import { Image, theme, Typography } from 'antd';
+import { Image, Skeleton, theme, Typography } from 'antd';
 import PostApi from '../../../api/timeline/post/PostApi';
 import { ShareModal } from './ShareModal';
 import classnames from 'classnames';
 import { formatTime } from '../../utils/CommonFuc';
 import PostModal from '../../utils/PostModal';
-const PostCard = ({ inforUser, post, newShare }) => {
+const PostCard = ({ inforUser, post, newShare, modalDetail = 0 }) => {
+	const navigate = useNavigate();
+
 	const [isModalVisible, setModalVisible] = useState(false);
 	const [currentPost, setCurrentPost] = useState(null);
 	const handleButtonClick = (post) => {
@@ -37,7 +38,6 @@ const PostCard = ({ inforUser, post, newShare }) => {
 
 	const classPost = ['post'];
 	const classNameUser = [post?.postGroupId && 'hasGroup'];
-	const navigate = useNavigate();
 	// classPost.push(
 	// 	post.roleName === 'SinhVien'
 	// 		? 'postCardSV'
@@ -92,7 +92,6 @@ const PostCard = ({ inforUser, post, newShare }) => {
 	const isMounted = useRef(true);
 	const { sharePost } = usePost();
 	const { user: currentUser } = useAuth();
-	const [toggleModal, setToggleModal] = useState(true);
 	useEffect(() => {
 		return () => {
 			// Cleanup: Set isMounted to false when the component unmounts
@@ -188,9 +187,10 @@ const PostCard = ({ inforUser, post, newShare }) => {
 
 	// Đăng bình luận post
 	const postCommentHandler = async () => {
+		const toastId = toast.loading('Đang gửi yêu cầu...');
 		try {
 			if (!content && !photosComment) {
-				toast.error('Vui lòng nhập nội dung hoặc hình ảnh!', errorOptions);
+				toast.error('Vui lòng nhập nội dung hoặc hình ảnh!', { id: toastId });
 				return; // Dừng việc thực hiện tiếp theo nếu nội dung rỗng
 			}
 			setCommentLoading(true);
@@ -216,10 +216,10 @@ const PostCard = ({ inforUser, post, newShare }) => {
 					// Thêm mới comment vào object comments
 					setCommentPost({ ...comments, [newComment.commentId]: newComment });
 					setCommentLength(commentlength + 1);
-					toast.success('Đăng bình luận thành công!', successOptions);
+					toast.success('Đăng bình luận thành công!', { id: toastId });
 				} else {
 					// Xử lý trường hợp API trả về lỗi
-					toast.error(response.message, errorOptions);
+					toast.error(response.message, { id: toastId });
 				}
 			}
 			setCommentLoading(false);
@@ -228,7 +228,7 @@ const PostCard = ({ inforUser, post, newShare }) => {
 			setPhotosComment('');
 		} catch (error) {
 			setCommentLoading(false);
-			toast.error(error.message, errorOptions);
+			toast.error(error.message, { id: toastId });
 		}
 	};
 	const reportPostHandler = async (e) => {
@@ -271,11 +271,11 @@ const PostCard = ({ inforUser, post, newShare }) => {
 	// chỉnh sửa bài post
 	const editPostHandler = async (data) => {
 		console.log('editPostHandler', data);
+		const toastId = toast.loading('Đang gửi yêu cầu...');
 		if (!data.content && !data.photos && !data.files) {
-			toast.error('Vui lòng không được để trống cả 3 trường dữ liệu!', errorOptions);
+			toast.error('Vui lòng không được để trống cả 3 trường dữ liệu!', { id: toastId });
 			return;
 		}
-		const toastId = toast.loading('Đang gửi yêu cầu...');
 		try {
 			if (post.postId) {
 				const formData = new FormData();
@@ -332,250 +332,261 @@ const PostCard = ({ inforUser, post, newShare }) => {
 		}
 	};
 
+	if (modalDetail === 2) {
+		navigate(`/post/${post.postId}`);
+		return;
+	}
 	return (
 		<div className={classnames(classPost)}>
-			<div className="postWrapper">
-				<div className="postTop">
-					<div className="postTopLeft">
-						<div className="post--header--left">
-							{post.postGroupName && (
-								<span className="postGroupname" onClick={() => navigate(`/groups/${post.postGroupId}`)}>
-									{post.postGroupName}
-								</span>
-							)}
-
-							<div className="post--header--left--item">
-								<img
-									className="postProfileImg"
-									src={post.avatarUser || sampleProPic}
-									alt="..."
-									onClick={() => navigate(`/profile/${post.userId}`)}
-								/>
-
-								<div className="postNameAndDate">
-									<span className={classnames('postUsername', classNameUser)}>
-										{post?.roleName === 'SinhVien'
-											? 'Sinh viên: '
-											: post?.roleName === 'GiangVien'
-											? 'Giảng viên: '
-											: post?.roleName === 'PhuHuynh'
-											? 'Phụ huynh: '
-											: post?.roleName === 'NhanVien'
-											? 'Nhân viên: '
-											: post?.roleName === 'Admin'
-											? 'Quản trị viên: '
-											: null}
-										{post.userName}
-									</span>
-									<span className="postDate" onClick={() => handleButtonClick(post)}>
-										{formatTime(post.postTime)}
-									</span>
-								</div>
-							</div>
-						</div>
-						<div className="postLoAndName">
-							{post.location && (
-								<span className="postLocation">
-									<Room />
-									{post.location}
-								</span>
-							)}
-						</div>
-						{post?.privacyLevel &&
-							(post?.privacyLevel === 'PUBLIC' ? (
-								<div className="postPrivacyLevel">
-									<Public />
-									<span>Công khai</span>
-								</div>
-							) : post.privacyLevel === 'FRIENDS' ? (
-								<div className="postPrivacyLevel">
-									<Group />
-									<span>Bạn bè</span>
-								</div>
-							) : post.privacyLevel === 'PRIVATE' ? (
-								<div className="postPrivacyLevel">
-									<Lock />
-									<span>Riêng tư</span>
-								</div>
-							) : null)}
-					</div>
-					<div className="comment" id="postTopRight">
-						<IconButton aria-describedby="simple-popover" onClick={(e) => handleClick(e)}>
-							<MoreHoriz />
-						</IconButton>
-						<Popover
-							id="simple-popover"
-							open={Boolean(anchorEl)}
-							className="popper--member"
-							anchorEl={anchorEl}
-							onClose={handleClose}
-							anchorOrigin={{
-								vertical: 'bottom',
-								horizontal: 'right',
-							}}
-							transformOrigin={{
-								vertical: 'top',
-								horizontal: 'right',
-							}}
-						>
-							<div>
-								{post?.privacyLevel !== 'PRIVATE' && (
-									<Typography
-										className="poper--member--item"
-										onClick={() => handleOpenConfirmation('sharePost')}
-									>
-										Chia sẻ bài viết
-									</Typography>
-								)}
-								{post?.userId === currentUser.userId && (
-									<>
-										<Typography
-											className="poper--member--item"
-											onClick={() => handleOpenConfirmation('editPost')}
-										>
-											Chỉnh sửa bài viết
-										</Typography>
-										<Typography
-											className="poper--member--item"
-											onClick={() => handleOpenConfirmation('deletePost')}
-										>
-											Xóa bài viết
-										</Typography>
-									</>
-								)}
-
-								{post?.userId !== currentUser.userId && (
-									<Typography
-										className="poper--member--item"
-										onClick={() => handleOpenConfirmation('reportPost')}
-									>
-										Báo cáo bài viết
-									</Typography>
-								)}
-							</div>
-						</Popover>
-					</div>
-					{openConfirmation && (
-						<ShareModal
-							post={post}
-							user={inforUser}
-							currentUser={currentUser}
-							visible={openConfirmation}
-							onClose={handleCloseConfirmation}
-							onShare={handleConfirmAction}
-							action={action}
-						/>
-					)}
-				</div>
-				<PostModal
-					post={currentPost}
-					inforUser={inforUser}
-					visible={isModalVisible}
-					onClose={handleModalClose}
+			{post === null ? (
+				<Skeleton
+					style={{ marginTop: '30px' }}
+					active
+					avatar
+					paragraph={{
+						rows: 2,
+					}}
 				/>
-				<div className="postCenter">
-					{post.content && <span className="postText">{post.content}</span>}
-					{post.photos && (
-						<Image
-							width="100%"
-							className="postImg"
-							src={post.photos} // Sử dụng selectedPost.photos thay vì cố định URL như bạn đã đề cập
-							alt={post.content}
-							style={{ objectFit: 'cover', background: token.colorBgLayout }}
-						/>
-					)}
-					{post.files && post.files.toLowerCase().endsWith('.txt') && (
-						<div className="postFile">
-							<a href={post.files} target="_blank" rel="noopener noreferrer">
-								{post.files.substr(post.files.lastIndexOf('/') + 1)}
-							</a>
-						</div>
-					)}
-					{post.files && post.files.toLowerCase().endsWith('.docx') && (
-						<div className="postFile">
-							<a href={post.files} target="_blank" rel="noopener noreferrer">
-								{post.files.substr(post.files.lastIndexOf('/') + 1)}
-							</a>
-						</div>
-					)}
-					{post.files && post.files.toLowerCase().endsWith('.pdf') && (
-						<div className="postFile">
-							<a href={post.files} target="_blank" rel="noopener noreferrer">
-								{post.files.substr(post.files.lastIndexOf('/') + 1)}
-							</a>
-						</div>
-					)}
-				</div>
+			) : (
+				<div className="postWrapper">
+					<div className="postTop">
+						<div className="postTopLeft">
+							<div className="post--header--left">
+								{post.postGroupName && (
+									<span
+										className="postGroupname"
+										onClick={() => navigate(`/groups/${post.postGroupId}`)}
+									>
+										{post.postGroupName}
+									</span>
+								)}
 
-				<div className="postBottom">
-					<div className="postBottomLeft">
-						<img
-							className="likeIcon"
-							onClick={likePostHandler}
-							src={isLiked ? heart : heartEmpty}
-							alt="heart"
-						/>
-						<span className="postLikeCounter">{like} người đã thích</span>
+								<div className="post--header--left--item">
+									<img
+										className="postProfileImg"
+										src={post.avatarUser || sampleProPic}
+										alt="..."
+										onClick={() => navigate(`/profile/${post.userId}`)}
+									/>
+
+									<div className="postNameAndDate">
+										<span className={classnames('postUsername', classNameUser)}>
+											{post?.roleName === 'SinhVien'
+												? 'Sinh viên: '
+												: post?.roleName === 'GiangVien'
+												? 'Giảng viên: '
+												: post?.roleName === 'PhuHuynh'
+												? 'Phụ huynh: '
+												: post?.roleName === 'NhanVien'
+												? 'Nhân viên: '
+												: post?.roleName === 'Admin'
+												? 'Quản trị viên: '
+												: null}
+											{post.userName}
+										</span>
+										{modalDetail !== 3 ? (
+											<span className="postDate" onClick={() => handleButtonClick(post)}>
+												{formatTime(post.updateAt)}
+											</span>
+										) : (
+											<span className="postDateShare">{formatTime(post.updateAt)}</span>
+										)}
+									</div>
+								</div>
+							</div>
+							<div className="postLoAndName">
+								{post.location && (
+									<span className="postLocation">
+										<Room />
+										{post.location}
+									</span>
+								)}
+							</div>
+							{post?.privacyLevel &&
+								(post?.privacyLevel === 'PUBLIC' ? (
+									<div className="postPrivacyLevel">
+										<Public />
+										<span>Công khai</span>
+									</div>
+								) : post.privacyLevel === 'FRIENDS' ? (
+									<div className="postPrivacyLevel">
+										<Group />
+										<span>Bạn bè</span>
+									</div>
+								) : post.privacyLevel === 'PRIVATE' ? (
+									<div className="postPrivacyLevel">
+										<Lock />
+										<span>Riêng tư</span>
+									</div>
+								) : null)}
+						</div>
+						{modalDetail === 0 && (
+							<div className="comment" id="postTopRight">
+								<IconButton aria-describedby="simple-popover" onClick={(e) => handleClick(e)}>
+									<MoreHoriz />
+								</IconButton>
+								<Popover
+									id="simple-popover"
+									open={Boolean(anchorEl)}
+									className="popper--member"
+									anchorEl={anchorEl}
+									onClose={handleClose}
+									anchorOrigin={{
+										vertical: 'bottom',
+										horizontal: 'right',
+									}}
+									transformOrigin={{
+										vertical: 'top',
+										horizontal: 'right',
+									}}
+								>
+									<div>
+										{post?.privacyLevel !== 'PRIVATE' && (
+											<Typography
+												className="poper--member--item"
+												onClick={() => handleOpenConfirmation('sharePost')}
+											>
+												Chia sẻ bài viết
+											</Typography>
+										)}
+										{post?.userId === currentUser.userId && (
+											<>
+												<Typography
+													className="poper--member--item"
+													onClick={() => handleOpenConfirmation('editPost')}
+												>
+													Chỉnh sửa bài viết
+												</Typography>
+												<Typography
+													className="poper--member--item"
+													onClick={() => handleOpenConfirmation('deletePost')}
+												>
+													Xóa bài viết
+												</Typography>
+											</>
+										)}
+
+										{post?.userId !== currentUser.userId && (
+											<Typography
+												className="poper--member--item"
+												onClick={() => handleOpenConfirmation('reportPost')}
+											>
+												Báo cáo bài viết
+											</Typography>
+										)}
+									</div>
+								</Popover>
+							</div>
+						)}
+						{openConfirmation && (
+							<ShareModal
+								post={post}
+								user={inforUser}
+								currentUser={currentUser}
+								visible={openConfirmation}
+								onClose={handleCloseConfirmation}
+								onShare={handleConfirmAction}
+								action={action}
+							/>
+						)}
 					</div>
-					<div className="postBottomRight">
-						<span className="postCommentText" onClick={toggleShowAllComments}>
-							{commentlength} bình luận
-						</span>
-					</div>
-				</div>
-
-				{commentLoading && (
-					<Box display="flex" justifyContent="center" sx={{ my: 2 }}>
-						<CircularProgress color="secondary" />
-					</Box>
-				)}
-
-				<div className="postCommentCont">
-					<div className="postCommentCont-1">
-						<InputEmoji value={content} onChange={setContent} placeholder={`Viết bình luận ....`} />
-						{photosComment && (
-							<div className="shareImgContainer">
-								<img className="shareimg" src={photosCommetUrl} alt="..." />
-								<Cancel className="shareCancelImg" onClick={() => setPhotosComment(null)} />
+					<PostModal
+						post={currentPost}
+						inforUser={inforUser}
+						visible={isModalVisible}
+						onClose={handleModalClose}
+						modalDetail={modalDetail}
+					/>
+					<div className="postCenter">
+						{post.content && <span className="postText">{post.content}</span>}
+						{post.photos && (
+							<Image
+								width="100%"
+								className="postImg"
+								src={post.photos} // Sử dụng selectedPost.photos thay vì cố định URL như bạn đã đề cập
+								alt={post.content}
+								style={{ objectFit: 'cover', background: token.colorBgLayout }}
+							/>
+						)}
+						{post.files && post.files.toLowerCase().endsWith('.txt') && (
+							<div className="postFile">
+								<a href={post.files} target="_blank" rel="noopener noreferrer">
+									{post.files.substr(post.files.lastIndexOf('/') + 1)}
+								</a>
+							</div>
+						)}
+						{post.files && post.files.toLowerCase().endsWith('.docx') && (
+							<div className="postFile">
+								<a href={post.files} target="_blank" rel="noopener noreferrer">
+									{post.files.substr(post.files.lastIndexOf('/') + 1)}
+								</a>
+							</div>
+						)}
+						{post.files && post.files.toLowerCase().endsWith('.pdf') && (
+							<div className="postFile">
+								<a href={post.files} target="_blank" rel="noopener noreferrer">
+									{post.files.substr(post.files.lastIndexOf('/') + 1)}
+								</a>
 							</div>
 						)}
 					</div>
-					<label htmlFor="fileComment" className="shareOption">
-						<PermMedia htmlColor="tomato" className="shareIcon" />
-						<input
-							style={{ display: 'none' }}
-							type="file"
-							id="fileComment"
-							accept=".png, .jpeg, .jpg"
-							onChange={commentDetails}
-						/>
-					</label>
-					<div className="postCommentCont-2">
-						<button
-							className="postCommentBtn"
-							onClick={postCommentHandler}
-							disabled={commentLoading ? true : false}
-						>
-							<Send style={{ fontSize: '18px' }} />
-						</button>
-					</div>
-				</div>
 
-				{showAllComments
-					? Object.values(comments).map((comment) => (
-							<CommentCard
-								comment={comment}
-								fetchCommentPost={fetchCommentPost}
-								post={post}
-								key={comment.commentId}
-								onDelete={updateCommentLength}
-								onCreate={updateCommentLength}
-								commentLength={commentlength}
+					<div className="postBottom">
+						<div className="postBottomLeft">
+							<img
+								className="likeIcon"
+								onClick={likePostHandler}
+								src={isLiked ? heart : heartEmpty}
+								alt="heart"
 							/>
-					  ))
-					: Object.values(comments)
-							.slice(0, 1)
-							.map((comment) => (
+							<span className="postLikeCounter">{like} người đã thích</span>
+						</div>
+						<div className="postBottomRight">
+							<span className="postCommentText" onClick={toggleShowAllComments}>
+								{commentlength} bình luận
+							</span>
+						</div>
+					</div>
+
+					{commentLoading && (
+						<Box display="flex" justifyContent="center" sx={{ my: 2 }}>
+							<CircularProgress color="secondary" />
+						</Box>
+					)}
+
+					<div className="postCommentCont">
+						<div className="postCommentCont-1">
+							<InputEmoji value={content} onChange={setContent} placeholder={`Viết bình luận ....`} />
+							{photosComment && (
+								<div className="shareImgContainer">
+									<img className="shareimg" src={photosCommetUrl} alt="..." />
+									<Cancel className="shareCancelImg" onClick={() => setPhotosComment(null)} />
+								</div>
+							)}
+						</div>
+						<label htmlFor="fileComment" className="shareOption">
+							<PermMedia htmlColor="tomato" className="shareIcon" />
+							<input
+								style={{ display: 'none' }}
+								type="file"
+								id="fileComment"
+								accept=".png, .jpeg, .jpg"
+								onChange={commentDetails}
+							/>
+						</label>
+						<div className="postCommentCont-2">
+							<button
+								className="postCommentBtn"
+								onClick={postCommentHandler}
+								disabled={commentLoading ? true : false}
+							>
+								<Send style={{ fontSize: '18px' }} />
+							</button>
+						</div>
+					</div>
+
+					{showAllComments
+						? Object.values(comments).map((comment) => (
 								<CommentCard
 									comment={comment}
 									fetchCommentPost={fetchCommentPost}
@@ -585,16 +596,30 @@ const PostCard = ({ inforUser, post, newShare }) => {
 									onCreate={updateCommentLength}
 									commentLength={commentlength}
 								/>
-							))}
+						  ))
+						: Object.values(comments)
+								.slice(0, 1)
+								.map((comment) => (
+									<CommentCard
+										comment={comment}
+										fetchCommentPost={fetchCommentPost}
+										post={post}
+										key={comment.commentId}
+										onDelete={updateCommentLength}
+										onCreate={updateCommentLength}
+										commentLength={commentlength}
+									/>
+								))}
 
-				{Object.values(comments).length >= 2 && (
-					<div className="showMoreComment" onClick={toggleShowAllComments}>
-						{showAllComments ? 'Ẩn bình luận' : 'Xem thêm bình luận'}
-					</div>
-				)}
+					{Object.values(comments).length >= 2 && (
+						<div className="showMoreComment" onClick={toggleShowAllComments}>
+							{showAllComments ? 'Ẩn bình luận' : 'Xem thêm bình luận'}
+						</div>
+					)}
 
-				{/* Modal để mở chi tiết bài viết */}
-			</div>
+					{/* Modal để mở chi tiết bài viết */}
+				</div>
+			)}
 		</div>
 	);
 };

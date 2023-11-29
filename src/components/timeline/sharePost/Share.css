@@ -54,6 +54,7 @@
 	align-items: center;
 	margin-right: 15px;
 	cursor: pointer;
+	min-width: 120px;
 }
 
 .shareOption select {

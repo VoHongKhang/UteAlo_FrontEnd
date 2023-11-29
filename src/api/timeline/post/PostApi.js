@@ -3,7 +3,7 @@ import { BASE_URL } from '../../../context/apiCall';
 
 const PostApi = {
 	// Lấy danh sách bài share
-	fetchPostsShare: async (user, page, size) => {
+	fetchPostsShareTimeLine: async (user, page, size) => {
 		try {
 			const config = {
 				headers: {
@@ -20,7 +20,7 @@ const PostApi = {
 		}
 	},
 	// Lấy danh sách bài post
-	fetchPostsGroup: async (user, page, size) => {
+	fetchPostsTimeLine: async (user, page, size) => {
 		try {
 			const config = {
 				headers: {
@@ -81,6 +81,45 @@ const PostApi = {
 			};
 			const res = await axios.put(`${BASE_URL}/v1/post/delete/${postId}`, postUserid, config);
 			return res.data;
+		} catch (error) {
+			throw new Error(error?.response ? error.response.data.message : error.message);
+		}
+	},
+	findById: async ({ user, postId }) => {
+		try {
+			const config = {
+				headers: {
+					Authorization: `Bearer ${user.accessToken}`,
+				},
+			};
+			const res = await axios.get(`${BASE_URL}/v1/post/${postId}`, config);
+			return res.data.result;
+		} catch (error) {
+			throw new Error(error?.response ? error.response.data.message : error.message);
+		}
+	},
+	fetchPostByUserId: async ({ user, userId, page, size }) => {
+		try {
+			const config = {
+				headers: {
+					Authorization: `Bearer ${user.accessToken}`,
+				},
+			};
+			const res = await axios.get(`${BASE_URL}/v1/post/${userId}/page-posts?page=${page}&size=${size}`, config);
+			return res.data.result;
+		} catch (error) {
+			throw new Error(error?.response ? error.response.data.message : error.message);
+		}
+	},
+	fetchShareByUserId: async ({ user, userId, page, size }) => {
+		try {
+			const config = {
+				headers: {
+					Authorization: `Bearer ${user.accessToken}`,
+				},
+			};
+			const res = await axios.get(`${BASE_URL}/v1/share/${userId}/page-shares?page=${page}&size=${size}`, config);
+			return res.data.result;
 		} catch (error) {
 			throw new Error(error?.response ? error.response.data.message : error.message);
 		}

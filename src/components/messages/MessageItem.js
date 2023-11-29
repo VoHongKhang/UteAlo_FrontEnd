@@ -13,7 +13,7 @@ import { InsertEmoticon, MoreHoriz, Reply } from '@material-ui/icons';
 import { useEffect, useState } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Popover } from '@material-ui/core';
 import { fileUtil } from './utils/fileUtil';
-import userEvent from '@testing-library/user-event';
+import sampleProPic from '../../assets/appImages/user.png';
 function MessageItem({ isOwner, message, stompClient, nextCombine, onRetry }) {
 	const { token } = theme.useToken();
 	const classes = ['message'];
@@ -103,7 +103,7 @@ function MessageItem({ isOwner, message, stompClient, nextCombine, onRetry }) {
 	}, [message]);
 	return (
 		<Space className={classnames(classParent)} align={isOwner ? 'end' : 'start'}>
-			{!isOwner && <img src={message?.senderAvatar} alt="avatar" className="sender-avatar" />}
+			{!isOwner && <img src={message?.senderAvatar || sampleProPic} alt="avatar" className="sender-avatar" />}
 			<div className={isOwner ? 'senderMessage' : 'receivedMessage'}>
 				{!isOwner && <Typography.Text className="sender-name">{message?.senderName}</Typography.Text>}
 				<Space direction="vertical" className={classnames(classes)}>

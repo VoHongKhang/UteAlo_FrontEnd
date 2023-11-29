@@ -3,26 +3,83 @@ import './PostCard.css';
 import sampleProPic from '../../../assets/appImages/user.png';
 import heart from '../../../assets/appImages/heart.png';
 import heartEmpty from '../../../assets/appImages/heartEmpty.png';
-import { Send } from '@material-ui/icons';
-import { Box, CircularProgress } from '@material-ui/core';
+import { Group, Lock, MoreHoriz, Public, Room, Send } from '@material-ui/icons';
+import { Box, CircularProgress, IconButton, Popover } from '@material-ui/core';
 import { PermMedia, Cancel } from '@material-ui/icons';
 import axios from 'axios';
-import moment from 'moment';
-import { Link } from 'react-router-dom';
+import { formatTime } from '../../utils/CommonFuc';
 import { BASE_URL } from '../../../context/apiCall';
 import InputEmoji from 'react-input-emoji';
 import toast from 'react-hot-toast';
-import { errorOptions, successOptions } from '../../utils/toastStyle';
 import usePost from '../../../context/post/PostContext';
 import useAuth from '../../../context/auth/AuthContext';
 import LikeOrUnlikeApi from '../../../api/timeline/commentSharePost/likeOrUnilkeShare';
 import GetCommentSharePostApi from '../../../api/timeline/commentSharePost/getCommentSharePost';
 import CommentCard from './CommentCard';
-import { Modal } from 'antd';
+import { Image, Modal, Typography, theme } from 'antd';
+import classnames from 'classnames';
+import { useNavigate } from 'react-router-dom';
+import PostModal from '../../utils/PostModal';
+import { ModalShare } from '../sharePost/ModalShare';
+const SharePostCard = ({ inforUser, share, newSharePosts }) => {
+	const [isModalVisible, setModalVisible] = useState(false);
+	const [currentPost, setCurrentPost] = useState(null);
+	const handleButtonClick = (post) => {
+		setCurrentPost(post);
+		setModalVisible(true);
+	};
 
-const SharePostCard = ({ share, newSharePosts }) => {
+	const handleModalClose = () => {
+		setModalVisible(false);
+	};
+
+	const navigate = useNavigate();
+	const classNameUser = [share?.postGroupId && 'hasGroup'];
+	const classUserPost = [share?.postsResponse.postGroupId && 'hasGroup'];
+	const { token } = theme.useToken();
+	//=======Open Handler Button More=======
+
+	const [anchor, setAnchor] = useState(null);
+	const [openConfirmation, setOpenConfirmation] = useState(false);
+	const [action, setAction] = useState(null);
+	const handleClose = () => {
+		setAnchor(null);
+		setAction(null);
+	};
+	const handleOpenConfirmation = (action) => {
+		setAnchor(null);
+		setOpenConfirmation(true);
+		setAction(action);
+	};
+
+	const handleClick = (e) => {
+		setAnchor(e.currentTarget);
+	};
+
+	const handleCloseConfirmation = () => {
+		setOpenConfirmation(false);
+		setAnchor(null);
+		setAction(null);
+	};
+	const handleConfirmAction = (data) => {
+		if (action === 'deleteSharePost') {
+			deletePostHandler(data);
+		} else if (action === 'editSharePost') {
+			editPostHandler(data);
+		} else if (action === 'sharePost') {
+			sharePostHandler(data);
+		} else if (action === 'reportPost') {
+			reportPostHandler(data);
+		}
+		setOpenConfirmation(false);
+		setAction(null);
+		setAnchor(null);
+	};
+	//=======Close Handler Button More=======
+
 	const isMounted = useRef(true);
 	const { user: currentUser } = useAuth();
+	const [toggleModal, setToggleModal] = useState(false);
 	useEffect(() => {
 		return () => {
 			// Cleanup: Set isMounted to false when the component unmounts
@@ -52,63 +109,36 @@ const SharePostCard = ({ share, newSharePosts }) => {
 
 	const [like, setLike] = useState(share.likes?.length);
 	const [isLiked, setIsLiked] = useState(false);
-	const [user, setUser] = useState({});
 	const [commentLoading, setCommentLoading] = useState(false);
-	const { getTimelinePosts } = usePost();
 	const [comments, setCommentPost] = useState({});
 	const [commentlength, setCommentLength] = useState(share?.comments.length);
 	const [showAllComments, setShowAllComments] = useState(false);
-	// Xóa bài share
-	const [isModalVisible, setIsModalVisible] = useState(false);
-	const [postIdToDelete, setPostIdToDelete] = useState(null);
-	// Chỉnh sửa bài share
-	const [isEditModalVisible, setIsEditModalVisible] = useState(false);
-	const [editContent, setEditContent] = useState('');
+
 	// Hình ảnh và nội dung của bình luận
 	const [photosComment, setPhotosComment] = useState('');
 	const [photosCommetUrl, setPhotosCommetUrl] = useState('');
 	const [content, setContent] = useState('');
-	const [post, setPost] = useState('');
-	// Xử lý phần dấu 3 chấm
-	const [showOptions, setShowOptions] = useState(false);
+
 	// Chức năng xem chi tiết chia sẻ bài viết
 	const [showSharePostDetailModal, setShowSharePostDetailModal] = useState(false);
 	const [selectedSharePost, setSelectedSharePost] = useState(null);
 
-	// Xử lý phần dấu 3 chấm
-	const handleToggleOptions = () => {
-		setShowOptions(!showOptions);
+	const { sharePost } = usePost();
+	//Chia sẻ bài viết
+	const sharePostHandler = async (e) => {
+		try {
+			const res = await sharePost(e);
+			console.log(res);
+			newSharePosts(res.result, 'create');
+		} catch (error) {
+			console.error(error);
+			toast.error('Có lỗi xảy ra khi tạo bài viết.');
+		}
 	};
-
-	// Model xuất hiện khi nhấn xóa bài share
-	const showDeleteConfirm = (shareId) => {
-		setPostIdToDelete(shareId);
-		setIsModalVisible(true);
+	const reportPostHandler = async (e) => {
+		e.preventDefault();
+		toast.loading('Chức năng đang trong quá trình phát triển');
 	};
-
-	// Model xuất hiện khi nhấn chỉnh sửa bài share
-	const showEditModal = (content) => {
-		setEditContent(content);
-		setIsEditModalVisible(true);
-	};
-
-	// Lấy thông tin của 1 bài post
-	useEffect(() => {
-		const fetchPost = async () => {
-			const config = {
-				headers: {
-					Authorization: `Bearer ${currentUser.accessToken}`,
-				},
-			};
-			if (share.postId) {
-				const res = await axios.get(`${BASE_URL}/v1/post/${share.postId}`, config);
-
-				setPost(res.data.result);
-			}
-		};
-		fetchPost();
-	}, [share.postId, currentUser.accessToken]);
-
 	// Hàm kiểm tra xem người dùng đã like bài post chưa
 	useEffect(() => {
 		const fetchData = async () => {
@@ -161,9 +191,10 @@ const SharePostCard = ({ share, newSharePosts }) => {
 
 	// Đăng bình luận share post
 	const postCommentHandler = async () => {
+		const toastId = toast.loading('Đang gửi yêu cầu...');
 		try {
 			if (!content && !photosComment) {
-				toast.error('Vui lòng nhập nội dung hoặc hình ảnh!', errorOptions);
+				toast.error('Vui lòng nhập nội dung hoặc hình ảnh!', { id: toastId });
 				return; // Dừng việc thực hiện tiếp theo nếu nội dung rỗng
 			}
 			setCommentLoading(true);
@@ -189,10 +220,10 @@ const SharePostCard = ({ share, newSharePosts }) => {
 					// Thêm mới comment vào object comments
 					setCommentPost({ ...comments, [newComment.commentId]: newComment });
 					setCommentLength(commentlength + 1);
-					toast.success('Đăng bình luận thành công!', successOptions);
+					toast.success('Đăng bình luận thành công!', { id: toastId });
 				} else {
 					// Xử lý trường hợp API trả về lỗi
-					toast.error(response.message, errorOptions);
+					toast.error(response.message, { id: toastId });
 				}
 			}
 			setCommentLoading(false);
@@ -201,7 +232,7 @@ const SharePostCard = ({ share, newSharePosts }) => {
 			setPhotosComment('');
 		} catch (error) {
 			setCommentLoading(false);
-			toast.error(error.message, errorOptions);
+			toast.error(error.message, { id: toastId });
 		}
 	};
 
@@ -222,57 +253,44 @@ const SharePostCard = ({ share, newSharePosts }) => {
 			};
 
 			setCommentLoading(true);
-
-			if (postIdToDelete) {
-				const res = await axios.put(`${BASE_URL}/v1/share/delete/${postIdToDelete}`, share.userId, config);
-				if (res.status === 200) {
-					setCommentLoading(false);
-					toast.success('Xóa bài chia sẻ thành công!', { id: toastId });
-					// Fetch lại danh sách bài share post sau khi xóa
-					newSharePosts(postIdToDelete, 'delete');
-				}
+			const res = await axios.put(`${BASE_URL}/v1/share/delete/${share.shareId}`, share.userId, config);
+			if (res.status === 200) {
+				setCommentLoading(false);
+				toast.success('Xóa bài chia sẻ thành công!', { id: toastId });
+				// Fetch lại danh sách bài share post sau khi xóa
+				newSharePosts(share.shareId, 'delete');
 			}
 		} catch (error) {
 			setCommentLoading(false);
-			toast.error(error.response.data.message, errorOptions);
+			toast.error(error.response.data.message, { id: toastId });
 		}
 	};
 
 	// chỉnh sửa bài post
-	const editPostHandler = async () => {
+	const editPostHandler = async (data) => {
 		const toastId = toast.loading('Đang gửi yêu cầu...');
 		try {
-			setCommentLoading(true);
+			const config = {
+				headers: {
+					Authorization: `Bearer ${currentUser.accessToken}`,
+					'Content-Type': 'application/json',
+				},
+			};
+			const response = await axios.put(`${BASE_URL}/v1/share/update`, data, config);
+			console.log(response);
+			// Xử lý kết quả trực tiếp trong khối try
+			if (response.data.success) {
+				toast.success('Chỉnh sửa bài đăng thành công!', { id: toastId });
 
-			if (share.shareId) {
-				const formData = new FormData();
-				formData.append('content', editContent || '');
-
-				const config = {
-					headers: {
-						Authorization: `Bearer ${currentUser.accessToken}`,
-						'Content-Type': 'multipart/form-data',
-					},
-				};
-				setIsEditModalVisible(false);
-				const response = await axios.put(`${BASE_URL}/v1/share/update/${share.shareId}`, formData, config);
-
-				// Xử lý kết quả trực tiếp trong khối try
-				if (response.status === 200) {
-					toast.success('Chỉnh sửa bài đăng thành công!', { id: toastId });
-
-					// Fetch lại danh sách bài post sau khi chỉnh sửa
-					newSharePosts(response.data.result, 'update');
-				} else {
-					// Xử lý trường hợp API trả về lỗi
-					toast.error(response.message, { id: toastId });
-				}
+				// Fetch lại danh sách bài post sau khi chỉnh sửa
+				newSharePosts(data, 'update');
+			} else {
+				// Xử lý trường hợp API trả về lỗi
+				toast.error(response.message, { id: toastId });
 			}
-
-			setCommentLoading(false);
 		} catch (error) {
 			setCommentLoading(false);
-			toast.error(error.message, errorOptions);
+			toast.error(error.message, { id: toastId });
 		}
 	};
 
@@ -291,120 +309,131 @@ const SharePostCard = ({ share, newSharePosts }) => {
 		}
 	};
 
-	// lấy timeline của bài post
-	useEffect(() => {
-		getTimelinePosts();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
-
-	// lấy thông tin của người dùng hiện tại
-	useEffect(() => {
-		const fetchUsers = async () => {
-			const config = {
-				headers: {
-					Authorization: `Bearer ${currentUser.accessToken}`,
-				},
-			};
-			if (share.userId) {
-				const res = await axios.get(`${BASE_URL}/v1/user/profile/${share.userId}`, config);
-
-				setUser(res.data.result);
-			}
-		};
-		fetchUsers();
-	}, [share.userId, currentUser.accessToken]);
-
-	// Format thời gian
-	function formatTime(time) {
-		const postTime = moment(time);
-		const timeDifference = moment().diff(postTime, 'minutes');
-
-		let formattedTime;
-
-		if (timeDifference < 60) {
-			formattedTime = `${timeDifference} phút trước`;
-		} else if (timeDifference < 1440) {
-			const hours = Math.floor(timeDifference / 60);
-			formattedTime = `${hours} giờ trước`;
-		} else {
-			formattedTime = postTime.format('DD [tháng] M [lúc] HH:mm');
-		}
-
-		return formattedTime;
-	}
-
 	return (
 		<div className="post">
 			<div className="postWrapper">
 				<div className="postTop">
 					<div className="postTopLeft">
-						<Link to={`/profile/${user.userId}`}>
-							<img className="postProfileImg" src={user.avatar || sampleProPic} alt="..." />
-						</Link>
-						<div className="postNameAndDate">
-							<span className="postUsername">{user.userName}</span>
-							<span
-								className="postDate"
-								onClick={() => {
-									setShowSharePostDetailModal(true);
-									setSelectedSharePost(post); // Truyền toàn bộ bài viết vào selectedSharePost
-								}}
-							>
-								{formatTime(share.createAt)}
-							</span>
+						<div className="post--header--left">
+							{share?.postGroupName && (
+								<span
+									className="postGroupname"
+									onClick={() => navigate(`/groups/${share?.postGroupId}`)}
+								>
+									{share?.postGroupName}
+								</span>
+							)}
+
+							<div className="post--header--left--item">
+								<img
+									className="postProfileImg"
+									src={share?.avatarUser || sampleProPic}
+									alt="..."
+									onClick={() => navigate(`/profile/${share?.userId}`)}
+								/>
+
+								<div className="postNameAndDate">
+									<span className={classnames('postUsername', classNameUser)}>
+										{share?.roleName === 'SinhVien'
+											? 'Sinh viên: '
+											: share?.roleName === 'GiangVien'
+											? 'Giảng viên: '
+											: share?.roleName === 'PhuHuynh'
+											? 'Phụ huynh: '
+											: share?.roleName === 'NhanVien'
+											? 'Nhân viên: '
+											: share?.roleName === 'Admin'
+											? 'Quản trị viên: '
+											: null}
+										{share?.userName}
+									</span>
+									<span className="postDateShare">{formatTime(share?.createAt)}</span>
+								</div>
+							</div>
 						</div>
+						{share?.privacyLevel &&
+							(share?.privacyLevel === 'PUBLIC' ? (
+								<div className="postPrivacyLevel">
+									<Public />
+									<span>Công khai</span>
+								</div>
+							) : share?.privacyLevel === 'FRIENDS' ? (
+								<div className="postPrivacyLevel">
+									<Group />
+									<span>Bạn bè</span>
+								</div>
+							) : share?.privacyLevel === 'PRIVATE' ? (
+								<div className="postPrivacyLevel">
+									<Lock />
+									<span>Riêng tư</span>
+								</div>
+							) : null)}
 					</div>
 					<div className="comment" id="postTopRight">
-						<span className="handleToggleCommentOptions" onClick={handleToggleOptions}>
-							...
-						</span>
-						{showOptions && (
-							<div className="commentOption">
-								<span className="postCommentTextUpdate">Chia sẻ</span>
-								{currentUser.userId === share.userId && (
+						<IconButton aria-describedby="share--popover" onClick={(e) => handleClick(e)}>
+							<MoreHoriz />
+						</IconButton>
+						<Popover
+							id="share--popover"
+							open={Boolean(anchor)}
+							className="popper--member"
+							anchorEl={anchor}
+							onClose={handleClose}
+							anchorOrigin={{
+								vertical: 'bottom',
+								horizontal: 'left',
+							}}
+						>
+							<div>
+								{share.postsResponse?.privacyLevel !== 'PRIVATE' && (
+									<Typography
+										className="poper--member--item"
+										onClick={() => handleOpenConfirmation('sharePost')}
+									>
+										Chia sẻ bài viết
+									</Typography>
+								)}
+								{share?.userId === currentUser.userId && (
 									<>
-										<span
-											className="postCommentTextUpdate"
-											onClick={() => showEditModal(share.content)}
+										<Typography
+											className="poper--member--item"
+											onClick={() => handleOpenConfirmation('editSharePost')}
 										>
-											Chỉnh sửa
-										</span>
-										<span
-											className="postCommentTextDelete"
-											onClick={() => showDeleteConfirm(share.shareId)}
+											Chỉnh sửa bài chia sẻ
+										</Typography>
+										<Typography
+											className="poper--member--item"
+											onClick={() => handleOpenConfirmation('deleteSharePost')}
 										>
-											Xóa
-										</span>
+											Xóa bài chia sẻ
+										</Typography>
 									</>
 								)}
+
+								{share?.userId !== currentUser.userId && (
+									<Typography
+										className="poper--member--item"
+										onClick={() => handleOpenConfirmation('reportPost')}
+									>
+										Báo cáo bài chia sẻ
+									</Typography>
+								)}
 							</div>
-						)}
+						</Popover>
 					</div>
+					{openConfirmation && (
+						<ModalShare
+							share={share}
+							user={inforUser}
+							currentUser={currentUser}
+							visible={openConfirmation}
+							onClose={handleCloseConfirmation}
+							onShare={handleConfirmAction}
+							action={action}
+						/>
+					)}
 				</div>
-				{/* Modal xóa bài viết */}
-				<Modal
-					title="Xác nhận xóa"
-					open={isModalVisible}
-					onOk={() => {
-						deletePostHandler();
-						setIsModalVisible(false);
-					}}
-					onCancel={() => setIsModalVisible(false)}
-				>
-					Bạn có chắc chắn muốn xóa bài viết này?
-				</Modal>
-				{/* Modal chỉnh sửa bài viết */}
-				<Modal
-					title={<span className="titlEditPost">Chỉnh sửa bài chia sẻ</span>}
-					open={isEditModalVisible}
-					onOk={editPostHandler}
-					onCancel={() => setIsEditModalVisible(false)}
-				>
-					<div className="editPost">
-						<label className="labelEditPost">Nội dung:</label>
-						<textarea value={editContent} onChange={(e) => setEditContent(e.target.value)} />
-					</div>
-				</Modal>
+
 				<div className="postCenter">
 					{share.content && <span className="postText">{share.content}</span>}
 
@@ -412,32 +441,141 @@ const SharePostCard = ({ share, newSharePosts }) => {
 						<div className="postWrapper">
 							<div className="postTop">
 								<div className="postTopLeft">
-									<Link to={`/profile/${user.userId}`}>
-										<img className="postProfileImg" src={user.avatar || sampleProPic} alt="..." />
-									</Link>
-									<div className="postNameAndDate">
-										<span className="postUsername">{user.userName}</span>
-										<span className="postDate">{formatTime(post.postTime)}</span>
+									<div className="post--header--left">
+										{share.postsResponse?.postGroupName && (
+											<span
+												className="postGroupname"
+												onClick={() => navigate(`/groups/${share.postsResponse?.postGroupId}`)}
+											>
+												{share.postsResponse?.postGroupName}
+											</span>
+										)}
+
+										<div className="post--header--left--item">
+											<img
+												className="postProfileImg"
+												src={share.postsResponse?.avatarUser || sampleProPic}
+												alt="..."
+												onClick={() => navigate(`/profile/${share.postsResponse?.userId}`)}
+											/>
+
+											<div className="postNameAndDate">
+												<span className={classnames('postUsername', classUserPost)}>
+													{share.postsResponse?.roleName === 'SinhVien'
+														? 'Sinh viên: '
+														: share.postsResponse?.roleName === 'GiangVien'
+														? 'Giảng viên: '
+														: share.postsResponse?.roleName === 'PhuHuynh'
+														? 'Phụ huynh: '
+														: share.postsResponse?.roleName === 'NhanVien'
+														? 'Nhân viên: '
+														: share.postsResponse?.roleName === 'Admin'
+														? 'Quản trị viên: '
+														: null}
+													{share.postsResponse?.userName}
+												</span>
+												<span
+													className="postDate"
+													onClick={() => handleButtonClick(share.postsResponse)}
+												>
+													{formatTime(share.postsResponse?.postTime)}
+												</span>
+											</div>
+										</div>
 									</div>
 									<div className="postLoAndName">
-										{post.location && (
-											<span className="postLocation">• {post.location || 'Vị trí'}</span>
-										)}
-										{post.postGroupName && (
-											<span className="postGroupName">• {post.postGroupName}</span>
+										{share.postsResponse?.location && (
+											<span className="postLocation">
+												<Room />
+												{share.postsResponse?.location}
+											</span>
 										)}
 									</div>
+									{share.postsResponse?.privacyLevel &&
+										(share.postsResponse?.privacyLevel === 'PUBLIC' ? (
+											<div className="postPrivacyLevel">
+												<Public />
+												<span>Công khai</span>
+											</div>
+										) : share.postsResponse?.privacyLevel === 'FRIENDS' ? (
+											<div className="postPrivacyLevel">
+												<Group />
+												<span>Bạn bè</span>
+											</div>
+										) : share.postsResponse?.privacyLevel === 'PRIVATE' ? (
+											<div className="postPrivacyLevel">
+												<Lock />
+												<span>Riêng tư</span>
+											</div>
+										) : null)}
 								</div>
 							</div>
 
 							<div className="postCenter">
-								{post.content && <span className="postText">{post.content}</span>}
-								{post.photos && <img className="postImg" src={post.photos} alt="..." />}
+								{share.postsResponse?.content && (
+									<span className="postText">{share.postsResponse?.content}</span>
+								)}
+								{share.postsResponse?.photos && (
+									<Image
+										width="100%"
+										className="postImg"
+										src={share.postsResponse?.photos} // Sử dụng selectedPost.photos thay vì cố định URL như bạn đã đề cập
+										alt={share.postsResponse?.content}
+										style={{ objectFit: 'cover', background: token.colorBgLayout }}
+									/>
+								)}
+								{share.postsResponse?.files &&
+									share.postsResponse?.files.toLowerCase().endsWith('.txt') && (
+										<div className="postFile">
+											<a
+												href={share.postsResponse?.files}
+												target="_blank"
+												rel="noopener noreferrer"
+											>
+												{share.postsResponse?.files.substr(
+													share.postsResponse?.files.lastIndexOf('/') + 1
+												)}
+											</a>
+										</div>
+									)}
+								{share.postsResponse?.files &&
+									share.postsResponse?.files.toLowerCase().endsWith('.docx') && (
+										<div className="postFile">
+											<a
+												href={share.postsResponse?.files}
+												target="_blank"
+												rel="noopener noreferrer"
+											>
+												{share.postsResponse?.files.substr(
+													share.postsResponse?.files.lastIndexOf('/') + 1
+												)}
+											</a>
+										</div>
+									)}
+								{share.postsResponse?.files &&
+									share.postsResponse?.files.toLowerCase().endsWith('.pdf') && (
+										<div className="postFile">
+											<a
+												href={share.postsResponse?.files}
+												target="_blank"
+												rel="noopener noreferrer"
+											>
+												{share.postsResponse?.files.substr(
+													share.postsResponse?.files.lastIndexOf('/') + 1
+												)}
+											</a>
+										</div>
+									)}
 							</div>
 						</div>
 					</div>
 				</div>
-
+				<PostModal
+					post={currentPost}
+					inforUser={inforUser}
+					visible={isModalVisible}
+					onClose={handleModalClose}
+				/>
 				<div className="postBottom">
 					<div className="postBottomLeft">
 						<img

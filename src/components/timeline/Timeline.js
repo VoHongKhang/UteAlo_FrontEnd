@@ -12,20 +12,16 @@ const Timeline = () => {
 	const getUser = (data) => {
 		setInforUser(data);
 	};
-	
+
 	return (
 		<>
 			<Helmet title="UTEALO" />
 			<Toaster />
 			<Topbar dataUser={getUser} />
 			<div className="homeContainer">
-				{inforUser && (
-					<>
-						<Sidebar />
-						<Feed inforUser={inforUser} />
-						<Rightbar user={currentUser} />
-					</>
-				)}
+				<Sidebar />
+				<Feed inforUser={inforUser ? inforUser : null} />
+				<Rightbar user={currentUser} />
 			</div>
 		</>
 	);

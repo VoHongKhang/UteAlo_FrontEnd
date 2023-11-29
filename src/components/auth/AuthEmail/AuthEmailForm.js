@@ -19,6 +19,7 @@ const AuthEmailForm = (email) => {
 			await AuthEmailApi.authEmail(form.getFieldValue('opt'), email);
 			toast.success('Xác thực tài khoản thành công! Hãy đăng nhập tài khoản...', { id: toastId });
 		} catch (error) {
+			console.log(error);
 			toast.error(`Gửi yêu thất bại! Lỗi: ${error}`, { id: toastId });
 		}
 

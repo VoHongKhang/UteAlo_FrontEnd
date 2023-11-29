@@ -1,20 +1,7 @@
 import { over } from 'stompjs';
 import SockJS from 'sockjs-client';
 import sampleProPic from '../../assets/appImages/user.png';
-import {
-	Avatar,
-	Badge,
-	Button,
-	Form,
-	Input,
-	List,
-	Popover,
-	Space,
-	Spin,
-	theme,
-	Tooltip,
-	Typography,
-} from 'antd';
+import { Avatar, Badge, Button, Form, Input, List, Popover, Space, Spin, theme, Tooltip, Typography } from 'antd';
 import classnames from 'classnames';
 import { useEffect, useRef, useState } from 'react';
 import { HiX } from 'react-icons/hi';
@@ -42,9 +29,6 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 		setInfo(!info);
 		Toggeinfo(info);
 	};
-	useEffect(() => {
-		console.log('messages', messages);
-	}, [messages]);
 	const loadMore = async (isGroup) => {
 		try {
 			// Tăng trang để tải dữ liệu mới
@@ -80,9 +64,6 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 			console.log('Error loading more data:', error.message);
 		}
 	};
-	useEffect(() => {
-		console.log('message', messages);
-	}, [messages]);
 	useEffect(() => {
 		const fetchData = async () => {
 			if (data?.userId && !messages.get(data?.userId)) {
@@ -169,10 +150,13 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 			stompClient.connect({}, onConnected, (err) => console.log(err));
 		}
 		return () => {
+			if (stompClient !== null) {
+				stompClient.disconnect();
+			}
+			console.log('Disconnected');
 			setPage(0);
 		};
 	}, [data, user?.userId]);
-
 	const textInputRef = useRef(null);
 	const sendMessage = async (messageData) => {
 		form.resetFields();

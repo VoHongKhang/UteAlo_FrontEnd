@@ -70,5 +70,20 @@ const PostApi = {
 			console.log(error);
 		}
 	},
+	deletePost: async (user, postId, postUserid) => {
+		console.log('user', user);
+		try {
+			const config = {
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${user.accessToken}`,
+				},
+			};
+			const res = await axios.put(`${BASE_URL}/v1/post/delete/${postId}`, postUserid, config);
+			return res.data;
+		} catch (error) {
+			throw new Error(error?.response ? error.response.data.message : error.message);
+		}
+	},
 };
 export default PostApi;

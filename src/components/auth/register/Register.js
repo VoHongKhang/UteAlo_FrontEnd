@@ -57,16 +57,16 @@ function Register() {
 				setSubmited(true);
 				const id = toast.loading('Đang gửi yêu cầu..');
 				try {
-					await RegisterApi.register(formData);
+					await RegisterApi.register({ formData: { ...formData, ...stepData } });
 					toast.success('Gửi yêu thành công! Vui lòng kiểm tra email của bạn.', { id: id });
 					// Hiển thị thông báo chuyển trang xác thực email
 					setTimeout(() => {
 						toast.success('Đang chuyển trang xác thực email...', { id: id });
-					}, 2000);
+					}, 1000);
 					// TỰ ĐỘng chuyển sang trang đăng nhập trong 5s
 					setTimeout(() => {
 						window.location.href = `/auth-email?email=${formData.email}`;
-					}, 6000);
+					}, 1000);
 				} catch (error) {
 					toast.error(`Gửi yêu thất bại! Lỗi: ${error.response ? error.response.data.message : error}`, {
 						id: id,

@@ -15,7 +15,7 @@ const AuthEmailApi = {
 				if (res.data.success) {
 					return res.data;
 				} else {
-					throw new Error(res.data.message);
+					throw new Error(res);
 				}
 			})
 			.catch((err) => {

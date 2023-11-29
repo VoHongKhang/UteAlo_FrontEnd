@@ -18,6 +18,7 @@ export const AuthProvider = ({ children }) => {
 				headers: { 'Content-Type': 'application/json' },
 			};
 			const res = await axios.post(`${BASE_URL}/v1/auth/login`, { credentialId, password }, config);
+			console.log(res);
 			if (res.data.success) {
 				const { accessToken, refreshToken, userId } = res.data.result;
 				dispatch({

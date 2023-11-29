@@ -87,22 +87,27 @@ const Feed = ({ inforUser }) => {
 		setPostLength((pre) => pre + 1);
 		setPosts(new Map(posts.entries()));
 	};
-	const getNewShare = (data, action) => {
-		console.log('data', data);
-		console.log('action', action);
+	const getPostUpdate = (data, action) => {
 		if (action === 'delete') {
+			console.log('data', data);
+			posts.set(
+				'post',
+				posts.get('post').filter((item) => item.postId !== data)
+			);
+
+			//check bài share có postId trùng với data thì xóa
 			posts.set(
 				'share',
-				posts.get('share').filter((item) => item.shareId !== data)
+				posts.get('share').filter((item) => item.postsResponse.postId !== data)
 			);
 			setPostLength((pre) => pre - 1);
 			setPosts(new Map(posts.entries()));
 			return;
 		} else if (action === 'update') {
 			posts.set(
-				'share',
-				posts.get('share').map((item) => {
-					if (item.shareId === data.shareId) {
+				'post',
+				posts.get('post').map((item) => {
+					if (item.postId === data.postId) {
 						return data;
 					}
 					return item;
@@ -139,6 +144,12 @@ const Feed = ({ inforUser }) => {
 			);
 			setPosts(new Map(posts.entries()));
 			return;
+		} else if (action === 'create') {
+			posts.set('share', [data, ...posts.get('share')]);
+			setPostLength((pre) => pre + 1);
+			setPosts(new Map(posts.entries()));
+		} else {
+			console.log('data', data);
 		}
 	};
 	useEffect(() => {
@@ -190,7 +201,7 @@ const Feed = ({ inforUser }) => {
 					}
 				>
 					{posts.get('post')?.map((p) => (
-						<PostCard inforUser={inforUser} post={p} key={p.postId} newShare={getNewShare} />
+						<PostCard inforUser={inforUser} post={p} key={p.postId} newShare={getPostUpdate} />
 					))}
 					{posts.get('share')?.map((p) => (
 						<SharePostCard

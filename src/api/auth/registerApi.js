@@ -3,7 +3,7 @@ import { BASE_URL } from '../../context/apiCall';
 
 //register
 const RegisterApi = {
-	register: async (formData) => {
+	register: async ({ formData }) => {
 		const config = {
 			headers: { 'Content-Type': 'application/json' },
 		};

@@ -5,6 +5,7 @@ import postReducer, { initialPostState } from './postReducer';
 import axios from 'axios';
 import { BASE_URL } from '../apiCall';
 import { errorOptions } from '../../components/utils/toastStyle';
+import PostApi from '../../api/timeline/post/PostApi';
 
 const PostContext = createContext(initialPostState);
 
@@ -46,49 +47,45 @@ export const PostProvider = ({ children }) => {
 			});
 
 			toast.success('Đăng bài thành công', { id: toastId });
+			return data;
 		} catch (error) {
 			dispatch({
 				type: 'CREATE_POST_FAIL',
-				payload: error.response.data.message,
+				payload: error.response ? error.response.data.message : error.message,
 			});
-			toast.error("Có lỗi trong quá trình thực hiện.Vui lòng thử lại", { id: toastId });
+			toast.error('Có lỗi trong quá trình thực hiện.Vui lòng thử lại', { id: toastId });
 		}
 	};
 
 	// Chia sẻ bài post
-	const sharePost = async (content, postId, postGroupId) => {
+	const sharePost = async (e) => {
+		if (e.privacyLevel === '') e.privacyLevel = 'PUBLIC';
 		const toastId = toast.loading('Đang gửi yêu cầu...');
 		try {
 			dispatch({
 				type: 'CREATE_POST_REQUEST',
 			});
-
-			const formData = new FormData();
-			formData.append('content', content || '');
-			formData.append('postId', postId);
-			formData.append('postGroupId', postGroupId || 0);
-
 			const config = {
 				headers: {
 					Authorization: `Bearer ${user.accessToken}`,
-					'Content-Type': 'multipart/form-data',
+					'Content-Type': 'application/json',
 				},
 			};
 
-			const { data } = await axios.post(`${BASE_URL}/v1/share/create`, formData, config);
+			const { data } = await axios.post(`${BASE_URL}/v1/share/create`, e, config);
 
 			dispatch({
 				type: 'CREATE_POST_SUCCESS',
 				payload: data,
 			});
-
 			toast.success('Chia sẻ bài thành công', { id: toastId });
+			return data;
 		} catch (error) {
 			dispatch({
 				type: 'CREATE_POST_FAIL',
-				payload: error.response.data.message,
+				payload: error.response ? error.response.data.message : error.message,
 			});
-			toast.error(error.response.data.message, errorOptions);
+			toast.error(error.response ? error.response.data.message : error.message, { id: toastId });
 		}
 	};
 
@@ -98,23 +95,18 @@ export const PostProvider = ({ children }) => {
 			dispatch({
 				type: 'FETCH_POSTS_REQUEST',
 			});
-			const config = {
-				headers: {
-					Authorization: `Bearer ${user.accessToken}`,
-				},
-			};
-			const url = `${BASE_URL}/v1/post/${user.userId}/posts`;
-			const { data } = await axios.get(url, config);
+
+			const res = await PostApi.fetchPostsGroup(user, 1, 20);
 			dispatch({
 				type: 'FETCH_POSTS_SUCCESS',
-				payload: data,
+				payload: res,
 			});
 		} catch (error) {
 			dispatch({
 				type: 'FETCH_POSTS_FAIL',
-				payload: error.response.data.message,
+				payload: error?.response ? error.response.data.message : error.message,
 			});
-			toast.error(error.response.data.message, errorOptions);
+			toast.error(error?.response ? error.response.data.message : error.message, errorOptions);
 		}
 	};
 

@@ -7,9 +7,9 @@ import InputEmoji from 'react-input-emoji';
 import vietnamProvinces from '../../../vietnamProvinces.json';
 import noAvatar from '../../../assets/appImages/user.png';
 import usePost from '../../../context/post/PostContext';
+import { Select } from 'antd';
 
 const Share = ({ inforUser, newPosts }) => {
-	console.log('inforUserShare', inforUser);
 	const [location, setLocation] = useState('');
 	const [content, setContent] = useState('');
 	const [photos, setPhotos] = useState(null);
@@ -20,6 +20,9 @@ const Share = ({ inforUser, newPosts }) => {
 	const [picLoading, setPicLoading] = useState(false);
 	const { createPost, createLoading } = usePost();
 
+	useEffect(() => {
+		console.log(privacyLevel);
+	}, [privacyLevel]);
 	// Xử lý ảnh của bài post
 	const postDetails = (e) => {
 		const file = e.target.files[0];
@@ -72,7 +75,7 @@ const Share = ({ inforUser, newPosts }) => {
 				return;
 			}
 			// Gọi hàm createPost để tạo bài viết mới
-			await createPost(
+			const res = await createPost(
 				newPost.location,
 				newPost.content,
 				newPost.photos,
@@ -80,9 +83,8 @@ const Share = ({ inforUser, newPosts }) => {
 				newPost.privacyLevel,
 				newPost.postGroupId
 			);
-
 			// Sau khi createPost hoàn thành, gọi fetchPosts để cập nhật danh sách bài viết
-			newPosts(newPost);
+			newPosts(res.result);
 			// Xóa nội dung và ảnh đã chọn
 			setLocation('');
 			setContent('');
@@ -101,11 +103,7 @@ const Share = ({ inforUser, newPosts }) => {
 				<form className="shareWrapper" onSubmit={postSubmitHandler}>
 					<div className="shareTop">
 						<img className="shareProfileImg" src={inforUser?.avatar || noAvatar} alt="..." />
-						<InputEmoji
-							value={content}
-							onChange={setContent}
-							placeholder={`Bạn đang nghĩ gì ${inforUser?.userName} ?`}
-						/>
+						<InputEmoji value={content} onChange={setContent} placeholder={`Bạn đang nghĩ gì ?`} />
 					</div>
 					<hr className="shareHr" />
 					{picLoading && (
@@ -130,7 +128,7 @@ const Share = ({ inforUser, newPosts }) => {
 
 					<div className="shareBottom">
 						<div className="shareOptions">
-							<label htmlFor="file" className="shareOption">
+							<label htmlFor="file" className="shareOption" >
 								<PermMedia htmlColor="tomato" className="shareIcon" id="image--icon" />
 								<span className="shareOptionText">Hình ảnh</span>
 								<input
@@ -141,7 +139,7 @@ const Share = ({ inforUser, newPosts }) => {
 									onChange={postDetails}
 								/>
 							</label>
-							<label htmlFor="files" className="shareOption">
+							<label htmlFor="files" className="shareOption" style={{ flex: 1 }}>
 								<AttachFile htmlColor="brown" className="shareIcon" />
 								<span className="shareOptionText">Tệp</span>
 								<input
@@ -153,6 +151,27 @@ const Share = ({ inforUser, newPosts }) => {
 								/>
 							</label>
 
+							<div className="shareOption" id="sharePublic">
+								<label htmlFor="privacyLevel" className="shareOption-one" style={{
+									display: 'flex',
+									alignItems: 'center',
+									justifyContent: 'space-between',
+									width: '100%'
+								}}>
+									<Public htmlColor="black" className="shareIcon" />
+									<Select
+										id="privacyLevel"
+										defaultValue="PUBLIC"
+										style={{ width: 120 }}
+										onChange={(value) => setPrivacyLevel(value)}
+									>
+										<Select.Option value="PUBLIC">Công khai</Select.Option>
+										<Select.Option value="FRIENDS">Bạn bè</Select.Option>
+										<Select.Option value="PRIVATE">Chỉ mình tôi</Select.Option>
+									</Select>
+								</label>
+							</div>
+
 							<div className="shareOption">
 								<label htmlFor="loc" className="shareOption">
 									<Room htmlColor="green" className="shareIcon" />
@@ -163,21 +182,6 @@ const Share = ({ inforUser, newPosts }) => {
 												{province.name}
 											</option>
 										))}
-									</select>
-								</label>
-							</div>
-
-							<div className="shareOption" id="sharePublic">
-								<label htmlFor="privacyLevel" className="shareOption-one" style={{ display: 'flex' }}>
-									<Public htmlColor="black" className="shareIcon" />
-									<select
-										id="privacyLevel"
-										value={privacyLevel}
-										onChange={(e) => setPrivacyLevel(e.target.value)}
-									>
-										<option value="PUBLIC">Công khai</option>
-										<option value="PRIVATE">Chỉ mình tôi</option>
-										<option value="FRIENDS">Bạn bè</option>
 									</select>
 								</label>
 							</div>

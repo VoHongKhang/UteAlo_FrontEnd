@@ -3,7 +3,7 @@ import { CloseOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import useTheme from '../../../context/ThemeContext';
 import './SidebarGroup.css';
 import { useNavigate } from 'react-router-dom';
-import { Search, Settings, RssFeed, Explore, People, } from '@material-ui/icons';
+import { Search, Settings, RssFeed, Explore } from '@material-ui/icons';
 import PostGroupApi from '../../../api/postGroups/PostGroupApi';
 import { useEffect, useState, useRef } from 'react';
 import noAvatar from '../../../assets/appImages/user.png';
@@ -129,11 +129,6 @@ const SidebarGroup = ({ user }) => {
 			postGroupName: 'Khám phá',
 			avatarGroup: <Explore style={{ fontSize: '25px', margin: 'auto' }} />,
 			href: '/groups/discover',
-		},
-		{
-			postGroupName: 'Đã gửi lời mời',
-			avatarGroup: <People style={{ fontSize: '25px', margin: 'auto' }} />,
-			href: '/groups/list',
 		},
 	];
 

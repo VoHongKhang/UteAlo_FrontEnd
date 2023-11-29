@@ -23,13 +23,13 @@ import DiscoverGroup from '../components/groups/discover/DiscoverGroup';
 import SearchGroup from '../components/groups/searchGroup/searchGroup';
 import TimeLineGroup from '../components/groups/TimeLineGroup';
 import SearchResult from '../components/timeline/searchResult/searchResult';
-
+import PostDetail from '../components/timeline/post/PostDetail';
 
 const privateRoutes = [
 	{ path: '/profile/update/:userId', component: EditProfile },
 	{ path: '/groups/manager/:postGroupId', component: ManagerGroup },
 	{ path: '/groups/create', component: CreateGroup },
-	{ path: '/groups/discover', component: DiscoverGroup},
+	{ path: '/groups/discover', component: DiscoverGroup },
 	{ path: '/groups/:postGroupId', component: GroupDetail },
 	{ path: '/groups/searchGroup', component: SearchGroup },
 	{ path: '/groups/searchResult', component: SearchResult },
@@ -39,6 +39,7 @@ const privateRoutes = [
 	{ path: '/update/:userId', component: EditProfile },
 	{ path: '/', component: Timeline, topbar: Topbar, sidebar: Sidebar, rightbar: Rightbar },
 	{ path: '/:url', component: Timeline },
+	{ path: '/post/:postId', component: PostDetail },
 	{ path: '/groups/manager/:postGroupId/edit', component: SettingManagerGroup },
 	{ path: '/groups/manager/:postGroupId/member', component: MemberGroup },
 	{ path: '/groups/manager/:postGroupId/participant_requests', component: ParticipantRequests },

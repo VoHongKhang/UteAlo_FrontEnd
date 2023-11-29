@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './Feed.css';
 import PostCard from '../post/PostCard';
 import SharePostCard from '../post/SharePostCard';
@@ -9,9 +9,13 @@ import { Skeleton, Space, Typography } from 'antd';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import LogoUte from '../../../assets/icons/logo_UTE.png';
 import PostApi from '../../../api/timeline/post/PostApi';
+
 const Feed = ({ inforUser }) => {
+	const isMounted = useRef(true);
+
 	const { user: currentUser } = useAuth();
-	const [posts, setPosts] = useState(new Map());
+	const [listPost, setListPost] = useState([]);
+	const [sortedList, setSortedList] = useState([]);
 	const { theme } = useTheme();
 	const [hasMore, setHasMore] = useState({
 		posts: false,
@@ -20,153 +24,138 @@ const Feed = ({ inforUser }) => {
 	const [page, setPage] = useState(0);
 	const [postLength, setPostLength] = useState(0);
 
-	const loadMore = () => {
+	const loadMore = async () => {
 		const newPage = page + 1;
 		setPage(newPage);
-		if (hasMore.posts) {
-			const res = PostApi.fetchPostsGroup(currentUser, newPage, 20);
-			if (res) {
-				posts.set('post', [...posts.get('post'), ...res]);
-				setPostLength((pre) => pre + res.length);
-				if (res.length < 20) {
-					setHasMore({ ...hasMore, posts: false });
-				} else {
-					setHasMore({ ...hasMore, posts: true });
-				}
-				setPosts(new Map(posts.entries()));
-			}
-		} else if (hasMore.share) {
-			const response = PostApi.fetchPostsShare(currentUser, newPage, 20);
-			if (response) {
-				posts.set('share', [...posts.get('share'), ...response]);
-				setPostLength((pre) => pre + response.length);
-				if (response.length < 20) {
-					setHasMore({ ...hasMore, share: false });
-				} else {
-					setHasMore({ ...hasMore, share: true });
-				}
-				setPosts(new Map(posts.entries()));
-			}
-		}
-	};
-	// Lấy danh sách bài post
-	const fetchPosts = async () => {
-		try {
-			const res = await PostApi.fetchPostsGroup(currentUser, page, 20);
-			const response = await PostApi.fetchPostsShare(currentUser, page, 20);
-			console.log('res', res);
-			console.log('response', response);
-			console.log('length', response.length);
-			if (response) {
-				posts.set('share', response);
-				setPostLength((pre) => pre + response.length);
-				if (response.length < 20) {
-					setHasMore({ ...hasMore, share: false });
-				} else {
-					setHasMore({ ...hasMore, share: true });
-				}
-				setPosts(new Map(posts.entries()));
-			}
 
-			if (res) {
-				posts.set('post', res);
-				setPostLength((pre) => pre + res.length);
-				if (res.length < 20) {
-					setHasMore({ ...hasMore, posts: false });
-				} else {
-					setHasMore({ ...hasMore, posts: true });
+		try {
+			if (isMounted.current) {
+				const [res, response] = await Promise.all([
+					hasMore.posts && PostApi.fetchPostsTimeLine(currentUser, newPage, 20),
+					hasMore.share && PostApi.fetchPostsShareTimeLine(currentUser, newPage, 20),
+				]);
+
+				if (res) {
+					console.log('res', res);
+					setListPost((prevList) => [...prevList, ...res]);
+					setPostLength((prevLength) => prevLength + res.length);
+
+					if (res.length < 20) {
+						setHasMore({ ...hasMore, posts: false });
+					} else {
+						setHasMore({ ...hasMore, posts: true });
+					}
 				}
-				setPosts(new Map(posts.entries()));
+
+				if (response) {
+					console.log('response', response);
+					setListPost((prevList) => [...prevList, ...response]);
+					setPostLength((prevLength) => prevLength + response.length);
+
+					if (response.length < 20) {
+						setHasMore({ ...hasMore, share: false });
+					} else {
+						setHasMore({ ...hasMore, share: true });
+					}
+				}
 			}
 		} catch (error) {
 			console.log(error);
 		}
 	};
-	const getNewPost = (data) => {
-		posts.set('post', [data, ...posts.get('post')]);
-		setPostLength((pre) => pre + 1);
-		setPosts(new Map(posts.entries()));
+
+	const fetchPosts = async () => {
+		try {
+			const [res, response] = await Promise.all([
+				PostApi.fetchPostsTimeLine(currentUser, page, 20),
+				PostApi.fetchPostsShareTimeLine(currentUser, page, 20),
+			]);
+
+			if (response) {
+				console.log('response', response);
+				setListPost((prevList) => [...prevList, ...response]);
+				setPostLength((pre) => pre + response.length);
+				if (response.length < 20) {
+					setHasMore({ ...hasMore, share: false });
+				} else {
+					setHasMore({ ...hasMore, share: true });
+				}
+			}
+
+			if (res) {
+				console.log('res', res);
+				setListPost((prevList) => [...prevList, ...res]);
+				setPostLength((pre) => pre + res.length);
+				if (res.length < 20) {
+					setHasMore({ ...hasMore, posts: false });
+				} else {
+					setHasMore({ ...hasMore, posts: true });
+				}
+			}
+		} catch (error) {
+			console.log(error);
+		}
 	};
+
+	const getNewPost = (data) => {
+		setListPost((prevList) => [data, ...prevList]);
+		setPostLength((pre) => pre + 1);
+	};
+
 	const getPostUpdate = (data, action) => {
 		if (action === 'delete') {
-			console.log('data', data);
-			posts.set(
-				'post',
-				posts.get('post').filter((item) => item.postId !== data)
-			);
+			setListPost((prevList) => prevList.filter((item) => item.postId !== data));
 
-			//check bài share có postId trùng với data thì xóa
-			posts.set(
-				'share',
-				posts.get('share').filter((item) => item.postsResponse.postId !== data)
+			// Check bài share có postId trùng với data thì xóa
+			setListPost((prevList) =>
+				prevList.filter((item) => !item.postsResponse || item.postsResponse.postId !== data)
 			);
 			setPostLength((pre) => pre - 1);
-			setPosts(new Map(posts.entries()));
-			return;
 		} else if (action === 'update') {
-			posts.set(
-				'post',
-				posts.get('post').map((item) => {
-					if (item.postId === data.postId) {
-						return data;
-					}
-					return item;
-				})
-			);
-			setPosts(new Map(posts.entries()));
-			return;
+			setListPost((prevList) => prevList.map((item) => (item.postId === data.postId ? data : item)));
 		} else if (action === 'create') {
-			posts.set('share', [data, ...posts.get('share')]);
+			setListPost((prevList) => [data, ...prevList]);
 			setPostLength((pre) => pre + 1);
-			setPosts(new Map(posts.entries()));
-		} else {
-			console.log('data', data);
 		}
 	};
+
 	const getNewSharePost = (data, action) => {
 		if (action === 'delete') {
-			posts.set(
-				'share',
-				posts.get('share').filter((item) => item.shareId !== data)
-			);
+			setListPost((prevList) => prevList.filter((item) => item.shareId !== data));
 			setPostLength((pre) => pre - 1);
-			setPosts(new Map(posts.entries()));
-			return;
 		} else if (action === 'update') {
-			posts.set(
-				'share',
-				posts.get('share').map((item) => {
-					if (item.shareId === data.shareId) {
-						return data;
-					}
-					return item;
-				})
-			);
-			setPosts(new Map(posts.entries()));
-			return;
+			setListPost((prevList) => prevList.map((item) => (item.shareId === data.shareId ? data : item)));
 		} else if (action === 'create') {
-			posts.set('share', [data, ...posts.get('share')]);
+			setListPost((prevList) => [data, ...prevList]);
 			setPostLength((pre) => pre + 1);
-			setPosts(new Map(posts.entries()));
-		} else {
-			console.log('data', data);
 		}
 	};
+
 	useEffect(() => {
+		isMounted.current = true; // Component đã mounted
 		fetchPosts();
+		return () => {
+			isMounted.current = false; // Component sẽ unmounted
+		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [currentUser]);
+
 	useEffect(() => {
-		console.log('posts', posts);
+		// Sắp xếp listPost theo updatedAt từ sớm nhất đến muộn nhất
+		const sorted = [...listPost].sort((a, b) => new Date(b.updateAt) - new Date(a.updateAt));
+		setSortedList(sorted);
+		console.log('sorted', sorted);
+	}, [listPost]);
+
+	useEffect(() => {
+		console.log('listPost', listPost);
 		console.log(postLength);
 		console.log('hasMore', hasMore);
-	}, [hasMore, postLength, posts]);
+	}, [hasMore, postLength, listPost]);
 	return (
 		<div className="feed" style={{ color: theme.foreground, background: theme.background }}>
 			<div className="feedWrapper">
-				{/* {(!params.userId || params.userId === currentUser.userId) && ( */}
-				<Share inforUser={inforUser} newPosts={getNewPost} />
-				{/* )} */}
+				<Share inforUser={inforUser} newPosts={getNewPost} postGroupId={null} />
 				<InfiniteScroll
 					scrollableTarget="messages-history"
 					dataLength={postLength}
@@ -200,17 +189,27 @@ const Feed = ({ inforUser }) => {
 						</Space>
 					}
 				>
-					{posts.get('post')?.map((p) => (
-						<PostCard inforUser={inforUser} post={p} key={p.postId} newShare={getPostUpdate} />
-					))}
-					{posts.get('share')?.map((p) => (
-						<SharePostCard
-							inforUser={inforUser}
-							share={p}
-							key={p.shareId}
-							newSharePosts={getNewSharePost}
-						/>
-					))}
+					{sortedList?.map((p) => {
+						if (p.postId) {
+							return (
+								<PostCard
+									inforUser={inforUser}
+									post={p}
+									key={`post-${p.postId}`}
+									newShare={getPostUpdate}
+								/>
+							);
+						} else {
+							return (
+								<SharePostCard
+									inforUser={inforUser}
+									share={p}
+									key={`share-${p.shareId}`}
+									newSharePosts={getNewSharePost}
+								/>
+							);
+						}
+					})}
 				</InfiniteScroll>
 			</div>
 		</div>

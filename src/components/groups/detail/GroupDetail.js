@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PostCard from '../../timeline/post/PostCard';
 import useAuth from '../../../context/auth/AuthContext';
-import axios from 'axios';
-import { BASE_URL } from '../../../context/apiCall';
 import sampleProPic from '../../../assets/appImages/user.png';
 import noCover from '../../../assets/appImages/noCover.jpg';
 import { Search, Public, People, MoreHoriz, Visibility, Room, Lock } from '@material-ui/icons';
@@ -15,7 +13,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import PostGroupApi from '../../../api/postGroups/PostGroupApi';
 import './GroupDetail.css';
 import { useNavigate } from 'react-router-dom';
-import { Image, theme } from 'antd';
+import { Image, Space, Typography, theme } from 'antd';
 import { Modal, Select, Checkbox } from 'antd';
 import qrCode from '../../../assets/icons/qr-code/qr-code.png';
 import home from '../../../assets/icons/qr-code/home.png';
@@ -26,15 +24,148 @@ import InviteFriendApi from '../../../api/postGroups/inviteFriendApi';
 import noAvatar from '../../../assets/appImages/user.png';
 import SharePostCard from '../../timeline/post/SharePostCard';
 import { Skeleton } from 'antd';
-
+import InfiniteScroll from 'react-infinite-scroll-component';
+import LogoUte from '../../../assets/icons/logo_UTE.png';
+import { postDetail } from '../../../api/postGroups/postDetail';
 const GroupDetail = () => {
+	const isMounted = useRef(true);
 	const params = useParams();
 	const { user: currentUser } = useAuth();
-	const [posts, setPosts] = useState([]);
-	const [sharePosts, setSharePosts] = useState([]);
+	const [listPost, setListPost] = useState([]);
+	const [sortedList, setSortedList] = useState([]);
+	const [hasMore, setHasMore] = useState({
+		posts: false,
+		share: false,
+	});
+	const [page, setPage] = useState(0);
+	const [postLength, setPostLength] = useState(0);
+
+	const loadMore = async () => {
+		const newPage = page + 1;
+		setPage(newPage);
+
+		try {
+			if (isMounted.current) {
+				const [res, response] = await Promise.all([
+					hasMore.posts && postDetail.getListPostById(currentUser, params.postGroupId, newPage, 20),
+					hasMore.share && postDetail.getSharePostById(currentUser, params.postGroupId, newPage, 20),
+				]);
+
+				if (res) {
+					console.log('res', res);
+					setListPost((prevList) => [...prevList, ...res]);
+					setPostLength((prevLength) => prevLength + res.length);
+
+					if (res.length < 20) {
+						setHasMore({ ...hasMore, posts: false });
+					} else {
+						setHasMore({ ...hasMore, posts: true });
+					}
+				}
+
+				if (response) {
+					console.log('response', response);
+					setListPost((prevList) => [...prevList, ...response]);
+					setPostLength((prevLength) => prevLength + response.length);
+
+					if (response.length < 20) {
+						setHasMore({ ...hasMore, share: false });
+					} else {
+						setHasMore({ ...hasMore, share: true });
+					}
+				}
+			}
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	const fetchPosts = async () => {
+		console.log('fetchPosts');
+		try {
+			const [res, response] = await Promise.all([
+				postDetail.getListPostById(currentUser, params.postGroupId, page, 20),
+				postDetail.getSharePostById(currentUser, params.postGroupId, page, 20),
+			]);
+
+			if (response) {
+				console.log('response', response);
+				setListPost((prevList) => [...prevList, ...response]);
+				setPostLength((pre) => pre + response.length);
+				if (response.length < 20) {
+					setHasMore({ ...hasMore, share: false });
+				} else {
+					setHasMore({ ...hasMore, share: true });
+				}
+			}
+
+			if (res) {
+				console.log('res', res);
+				setListPost((prevList) => [...prevList, ...res]);
+				setPostLength((pre) => pre + res.length);
+				if (res.length < 20) {
+					setHasMore({ ...hasMore, posts: false });
+				} else {
+					setHasMore({ ...hasMore, posts: true });
+				}
+			}
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	const getNewPost = (data) => {
+		setListPost((prevList) => [data, ...prevList]);
+		setPostLength((pre) => pre + 1);
+	};
+
+	const getPostUpdate = (data, action) => {
+		if (action === 'delete') {
+			setListPost((prevList) => prevList.filter((item) => item.postId !== data));
+
+			// Check bài share có postId trùng với data thì xóa
+			setListPost((prevList) =>
+				prevList.filter((item) => !item.postsResponse || item.postsResponse.postId !== data)
+			);
+			setPostLength((pre) => pre - 1);
+		} else if (action === 'update') {
+			setListPost((prevList) => prevList.map((item) => (item.postId === data.postId ? data : item)));
+		} else if (action === 'create') {
+			setListPost((prevList) => [data, ...prevList]);
+			setPostLength((pre) => pre + 1);
+		}
+	};
+
+	const getNewSharePost = (data, action) => {
+		if (action === 'delete') {
+			setListPost((prevList) => prevList.filter((item) => item.shareId !== data));
+			setPostLength((pre) => pre - 1);
+		} else if (action === 'update') {
+			setListPost((prevList) => prevList.map((item) => (item.shareId === data.shareId ? data : item)));
+		} else if (action === 'create') {
+			setListPost((prevList) => [data, ...prevList]);
+			setPostLength((pre) => pre + 1);
+		}
+	};
+
+	useEffect(() => {
+		isMounted.current = true; // Component đã mounted
+		fetchPosts();
+		return () => {
+			isMounted.current = false; // Component sẽ unmounted
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [params.postGroupId]);
+
+	useEffect(() => {
+		// Sắp xếp listPost theo updatedAt từ sớm nhất đến muộn nhất
+		const sorted = [...listPost].sort((a, b) => new Date(b.updateAt) - new Date(a.updateAt));
+		setSortedList(sorted);
+		console.log('sorted', sorted);
+	}, [listPost]);
+
 	const navigate = useNavigate();
 	const [loading, setLoading] = useState(false);
-	const [visiblePosts, setVisiblePosts] = useState(3); // Số lượng bài viết hiển thị ban đầu
 	const [postGroup, setPostGroup] = useState([]);
 	const { token } = theme.useToken();
 	const [listFriends, setListFriends] = useState([]);
@@ -48,7 +179,10 @@ const GroupDetail = () => {
 		setSelectedFriends(selectedValues);
 		setIsFriendSelected(selectedValues.length > 0);
 	};
-
+	const [inforUser, setInforUser] = useState();
+	const getUser = (data) => {
+		setInforUser(data);
+	};
 	useEffect(() => {
 		const fetchGroup = async () => {
 			const res = await PostGroupApi.getGroup({ user: currentUser, postId: params.postGroupId });
@@ -56,51 +190,6 @@ const GroupDetail = () => {
 		};
 		fetchGroup();
 	}, [params, currentUser]);
-
-	// Lấy danh sách bài post
-	const fetchPosts = async () => {
-		try {
-			const config = {
-				headers: {
-					Authorization: `Bearer ${currentUser.accessToken}`,
-				},
-			};
-			setLoading(true);
-
-			const res = await axios.get(`${BASE_URL}/v1/groupPost/${params.postGroupId}/posts`, config);
-			setLoading(false);
-			setPosts(res.data.result);
-		} catch (error) {
-			console.log(error);
-		}
-	};
-
-	console.log(posts);
-	console.log(params.postGroupId);
-
-	// Lấy danh sách các bài share post
-	const fetchSharePosts = async () => {
-		try {
-			const config = {
-				headers: {
-					Authorization: `Bearer ${currentUser.accessToken}`,
-				},
-			};
-			setLoading(true);
-
-			const res = await axios.get(`${BASE_URL}/v1/groupPost/${params.postGroupId}/shares`, config);
-			setLoading(false);
-			setSharePosts(res.data.result);
-		} catch (error) {
-			console.log(error);
-		}
-	};
-
-	useEffect(() => {
-		fetchPosts();
-		fetchSharePosts();
-		//eslint-disable-next-line
-	}, []);
 
 	// Lấy danh sách bạn bè
 	const handlerSelectFriend = async () => {
@@ -126,27 +215,10 @@ const GroupDetail = () => {
 		}
 	};
 
-	// Xử lý nạp thêm bài viết khi cuộn xuống
-	useEffect(() => {
-		const handleScroll = () => {
-			if (window.innerHeight + window.scrollY >= document.documentElement.offsetHeight - 100) {
-				// Khi cuộn xuống gần cuối trang (khoảng cách 100 pixel)
-				setVisiblePosts((prevVisiblePosts) => prevVisiblePosts + 3); // Nạp thêm 5 bài viết
-			}
-		};
-
-		window.addEventListener('scroll', handleScroll);
-		return () => {
-			window.removeEventListener('scroll', handleScroll);
-		};
-	}, []);
-
 	// Model xuất hiện khi nhấn nút mời
 	const showInviteModal = () => {
 		setIsInviteModalVisible(true);
 	};
-
-	const visiblePostData = posts.slice(0, visiblePosts);
 
 	const listImage = [noCover, noCover, noCover, noCover];
 	const handleGroup = async (e) => {
@@ -210,7 +282,7 @@ const GroupDetail = () => {
 		<>
 			<Helmet title={`Nhóm ${postGroup.postGroupName} |UTEALO`} />
 			<Toaster />
-			<Topbar />
+			<Topbar dataUser={getUser} />
 			<div className="homeContainer">
 				<SidebarGroup user={currentUser} />
 				<div className="menu--post">
@@ -278,7 +350,7 @@ const GroupDetail = () => {
 											onClick={handleGroup}
 										>
 											<p>
-												{(postGroup?.roleGroup === 'Admin' || postGroup?.roleGroup === 'Deputy')
+												{postGroup?.roleGroup === 'Admin' || postGroup?.roleGroup === 'Deputy'
 													? 'Quản lý nhóm'
 													: postGroup?.roleGroup === 'Member'
 													? 'Đã Tham gia'
@@ -476,11 +548,69 @@ const GroupDetail = () => {
 							<div></div>
 						) : (
 							<div className="feed">
-								<div className="feedWrapper">
-									{(postGroup.roleGroup === 'Admin' || postGroup.roleGroup === 'Member' ||postGroup.roleGroup === 'Deputy') && (
-										<Share fetchPosts={fetchPosts} postGroupId={postGroup.postGroupId} />
+								<div className="feedWrapper" id="feed--group--scroll">
+									{(postGroup.roleGroup === 'Admin' ||
+										postGroup.roleGroup === 'Member' ||
+										postGroup.roleGroup === 'Deputy') && (
+										<Share newPosts={getNewPost} postGroupId={postGroup.postGroupId} />
 									)}
-									{visiblePostData.length === 0 ? (
+									<InfiniteScroll
+										scrollableTarget="feed--group--scroll"
+										dataLength={postLength}
+										next={loadMore}
+										hasMore={hasMore.posts || hasMore.share}
+										loader={
+											<Skeleton
+												style={{ marginTop: '30px' }}
+												active
+												avatar
+												paragraph={{
+													rows: 4,
+												}}
+											/>
+										}
+										endMessage={
+											<Space
+												direction="vertical"
+												style={{ width: 'fit-content', margin: '50px auto' }}
+												align="center"
+											>
+												<img className="iamge_end" src={LogoUte} alt="UTEALO" />
+												<Typography.Title level={4} style={{ margin: 0 }}>
+													Mạng xã hội UTEALO
+												</Typography.Title>
+
+												<Typography.Text type="secondary">
+													Nơi kết nối, chia sẻ và trao đổi thông tin giữa sinh viên và giảng
+													viên trường Đại học Sư phạm Kỹ thuật TP.HCM
+												</Typography.Text>
+											</Space>
+										}
+									>
+										{sortedList?.map((p) => {
+											if (p.postId) {
+												return (
+													<PostCard
+														inforUser={inforUser}
+														post={p}
+														key={`post-${p.postId}`}
+														newShare={getPostUpdate}
+													/>
+												);
+											} else {
+												return (
+													<SharePostCard
+														inforUser={inforUser}
+														share={p}
+														key={`share-${p.shareId}`}
+														newSharePosts={getNewSharePost}
+													/>
+												);
+											}
+										})}
+									</InfiniteScroll>
+
+									{/* {visiblePostData.length === 0 ? (
 										<>
 											<Skeleton
 												style={{ marginTop: '30px' }}
@@ -506,7 +636,7 @@ const GroupDetail = () => {
 									)}
 									{sharePosts.map((p) => (
 										<SharePostCard share={p} key={p.shareId} fetchSharePosts={fetchSharePosts} />
-									))}
+									))} */}
 								</div>
 							</div>
 						)}

@@ -9,7 +9,7 @@ import noAvatar from '../../../assets/appImages/user.png';
 import usePost from '../../../context/post/PostContext';
 import { Select } from 'antd';
 
-const Share = ({ inforUser, newPosts }) => {
+const Share = ({ inforUser, newPosts, postGroupId }) => {
 	const [location, setLocation] = useState('');
 	const [content, setContent] = useState('');
 	const [photos, setPhotos] = useState(null);
@@ -66,8 +66,8 @@ const Share = ({ inforUser, newPosts }) => {
 				content: content || '',
 				photos: photos || '',
 				files: files || '',
-				privacyLevel: privacyLevel || 'PUBLIC',
-				postGroupId: 0,
+				privacyLevel: postGroupId ? 'GROUP_MEMBERS' : privacyLevel || 'PUBLIC',
+				postGroupId: postGroupId || 0,
 			};
 
 			if (!newPost.content && !newPost.photos && !newPost.files) {
@@ -128,7 +128,7 @@ const Share = ({ inforUser, newPosts }) => {
 
 					<div className="shareBottom">
 						<div className="shareOptions">
-							<label htmlFor="file" className="shareOption" >
+							<label htmlFor="file" className="shareOption">
 								<PermMedia htmlColor="tomato" className="shareIcon" id="image--icon" />
 								<span className="shareOptionText">Hình ảnh</span>
 								<input
@@ -139,7 +139,7 @@ const Share = ({ inforUser, newPosts }) => {
 									onChange={postDetails}
 								/>
 							</label>
-							<label htmlFor="files" className="shareOption" style={{ flex: 1 }}>
+							<label htmlFor="files" className="shareOption" >
 								<AttachFile htmlColor="brown" className="shareIcon" />
 								<span className="shareOptionText">Tệp</span>
 								<input
@@ -150,28 +150,32 @@ const Share = ({ inforUser, newPosts }) => {
 									onChange={postFileDetails}
 								/>
 							</label>
-
-							<div className="shareOption" id="sharePublic">
-								<label htmlFor="privacyLevel" className="shareOption-one" style={{
-									display: 'flex',
-									alignItems: 'center',
-									justifyContent: 'space-between',
-									width: '100%'
-								}}>
-									<Public htmlColor="black" className="shareIcon" />
-									<Select
-										id="privacyLevel"
-										defaultValue="PUBLIC"
-										style={{ width: 120 }}
-										onChange={(value) => setPrivacyLevel(value)}
+							{postGroupId === null && (
+								<div className="shareOption" id="sharePublic">
+									<label
+										htmlFor="privacyLevel"
+										className="shareOption-one"
+										style={{
+											display: 'flex',
+											alignItems: 'center',
+											justifyContent: 'space-between',
+											width: '100%',
+										}}
 									>
-										<Select.Option value="PUBLIC">Công khai</Select.Option>
-										<Select.Option value="FRIENDS">Bạn bè</Select.Option>
-										<Select.Option value="PRIVATE">Chỉ mình tôi</Select.Option>
-									</Select>
-								</label>
-							</div>
-
+										<Public htmlColor="black" className="shareIcon" />
+										<Select
+											id="privacyLevel"
+											defaultValue="PUBLIC"
+											style={{ width: 120 }}
+											onChange={(value) => setPrivacyLevel(value)}
+										>
+											<Select.Option value="PUBLIC">Công khai</Select.Option>
+											<Select.Option value="FRIENDS">Bạn bè</Select.Option>
+											<Select.Option value="PRIVATE">Chỉ mình tôi</Select.Option>
+										</Select>
+									</label>
+								</div>
+							)}
 							<div className="shareOption">
 								<label htmlFor="loc" className="shareOption">
 									<Room htmlColor="green" className="shareIcon" />

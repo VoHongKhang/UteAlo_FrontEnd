@@ -13,7 +13,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import PostGroupApi from '../../../api/postGroups/PostGroupApi';
 import './GroupDetail.css';
 import { useNavigate } from 'react-router-dom';
-import { Image, Space, Typography, theme } from 'antd';
+import { Image, theme } from 'antd';
 import { Modal, Select, Checkbox } from 'antd';
 import qrCode from '../../../assets/icons/qr-code/qr-code.png';
 import home from '../../../assets/icons/qr-code/home.png';
@@ -25,7 +25,6 @@ import noAvatar from '../../../assets/appImages/user.png';
 import SharePostCard from '../../timeline/post/SharePostCard';
 import { Skeleton } from 'antd';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import LogoUte from '../../../assets/icons/logo_UTE.png';
 import { postDetail } from '../../../api/postGroups/postDetail';
 const GroupDetail = () => {
 	const isMounted = useRef(true);
@@ -130,10 +129,12 @@ const GroupDetail = () => {
 			setPostLength((pre) => pre - 1);
 		} else if (action === 'update') {
 			setListPost((prevList) => prevList.map((item) => (item.postId === data.postId ? data : item)));
-		} else if (action === 'create') {
-			setListPost((prevList) => [data, ...prevList]);
-			setPostLength((pre) => pre + 1);
 		}
+		// } else if (action === 'create') {
+		// 	console.log('data', data);
+		// 	setListPost((prevList) => [data, ...prevList]);
+		// 	setPostLength((pre) => pre + 1);
+		// }
 	};
 
 	const getNewSharePost = (data, action) => {
@@ -152,7 +153,8 @@ const GroupDetail = () => {
 		isMounted.current = true; // Component đã mounted
 		fetchPosts();
 		return () => {
-			isMounted.current = false; // Component sẽ unmounted
+			setListPost([]); // Component sẽ unmounted
+			isMounted.current = false;
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [params.postGroupId]);
@@ -162,6 +164,9 @@ const GroupDetail = () => {
 		const sorted = [...listPost].sort((a, b) => new Date(b.updateAt) - new Date(a.updateAt));
 		setSortedList(sorted);
 		console.log('sorted', sorted);
+		return () => {
+			setSortedList([]);
+		};
 	}, [listPost]);
 
 	const navigate = useNavigate();
@@ -187,6 +192,7 @@ const GroupDetail = () => {
 		const fetchGroup = async () => {
 			const res = await PostGroupApi.getGroup({ user: currentUser, postId: params.postGroupId });
 			setPostGroup(res.result);
+			console.log('res', res.result);
 		};
 		fetchGroup();
 	}, [params, currentUser]);
@@ -556,6 +562,7 @@ const GroupDetail = () => {
 									)}
 									<InfiniteScroll
 										scrollableTarget="feed--group--scroll"
+										className='feed__scroll'
 										dataLength={postLength}
 										next={loadMore}
 										hasMore={hasMore.posts || hasMore.share}
@@ -569,23 +576,7 @@ const GroupDetail = () => {
 												}}
 											/>
 										}
-										endMessage={
-											<Space
-												direction="vertical"
-												style={{ width: 'fit-content', margin: '50px auto' }}
-												align="center"
-											>
-												<img className="iamge_end" src={LogoUte} alt="UTEALO" />
-												<Typography.Title level={4} style={{ margin: 0 }}>
-													Mạng xã hội UTEALO
-												</Typography.Title>
-
-												<Typography.Text type="secondary">
-													Nơi kết nối, chia sẻ và trao đổi thông tin giữa sinh viên và giảng
-													viên trường Đại học Sư phạm Kỹ thuật TP.HCM
-												</Typography.Text>
-											</Space>
-										}
+										
 									>
 										{sortedList?.map((p) => {
 											if (p.postId) {
@@ -594,6 +585,7 @@ const GroupDetail = () => {
 														inforUser={inforUser}
 														post={p}
 														key={`post-${p.postId}`}
+														group={postGroup}
 														newShare={getPostUpdate}
 													/>
 												);

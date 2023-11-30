@@ -146,18 +146,13 @@ const Feed = ({ inforUser }) => {
 		setSortedList(sorted);
 		console.log('sorted', sorted);
 	}, [listPost]);
-
-	useEffect(() => {
-		console.log('listPost', listPost);
-		console.log(postLength);
-		console.log('hasMore', hasMore);
-	}, [hasMore, postLength, listPost]);
 	return (
 		<div className="feed" style={{ color: theme.foreground, background: theme.background }}>
 			<div className="feedWrapper">
 				<Share inforUser={inforUser} newPosts={getNewPost} postGroupId={null} />
 				<InfiniteScroll
 					scrollableTarget="messages-history"
+					className='feed__scroll'
 					dataLength={postLength}
 					next={loadMore}
 					hasMore={hasMore.posts || hasMore.share}

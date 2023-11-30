@@ -6,8 +6,7 @@ import '../post/PostCard.css';
 import sampleProPic from '../../../assets/appImages/user.png';
 import PostGroupApi from '../../../api/postGroups/PostGroupApi';
 import TextArea from 'antd/es/input/TextArea';
-import { Public, Room } from '@material-ui/icons';
-import vietnamProvinces from '../../../vietnamProvinces.json';
+import { Public } from '@material-ui/icons';
 export const ModalShare = ({ share, user, currentUser, visible, onClose, onShare, action }) => {
 	// #region action Share
 	const [group, setGroup] = useState([]);
@@ -15,8 +14,8 @@ export const ModalShare = ({ share, user, currentUser, visible, onClose, onShare
 	const [newShare, setNewShare] = useState({
 		content: '',
 		privacyLevel: 'PUBLIC',
-		postId: share.postsResponse.postId,
-		userId: user.userId,
+		postId: share?.postsResponse.postId,
+		userId: user?.userId,
 		postGroupId: '',
 		createAt: new Date().toISOString(),
 		updateAt: new Date().toISOString(),
@@ -62,7 +61,7 @@ export const ModalShare = ({ share, user, currentUser, visible, onClose, onShare
 		// Gọi hàm chia sẻ được truyền từ prop
 		if (action === 'sharePost') onShare(newShare);
 		else if (action === 'editSharePost') onShare(editShare);
-		else if (action === 'deleteSharePost') onShare(share.shareId);
+		else if (action === 'deleteSharePost') onShare(share?.shareId);
 
 		console.log(newShare);
 
@@ -147,24 +146,24 @@ export const ModalShare = ({ share, user, currentUser, visible, onClose, onShare
 					<div className="modal--body">
 						<Space direction="vertical" className="roleUser">
 							<span className="roleName">
-								{user.roleName === 'SinhVien'
+								{user?.roleName === 'SinhVien'
 									? 'Sinh viên'
-									: user.roleName === 'GianVien'
+									: user?.roleName === 'GianVien'
 									? 'Giảng viên'
-									: user.roleName === 'PhuHuynh'
+									: user?.roleName === 'PhuHuynh'
 									? 'Phụ huynh sinh viên'
-									: user.roleName === 'NhanVien'
+									: user?.roleName === 'NhanVien'
 									? 'Nhân viên'
 									: 'Admin'}
 							</span>
 						</Space>
 						<Space direction="vertical">
 							<div className="postTopLeft">
-								<Link to={`/profile/${user.userId}`}>
-									<img className="postProfileImg" src={user.avatar || sampleProPic} alt="..." />
+								<Link to={`/profile/${user?.userId}`}>
+									<img className="postProfileImg" src={user?.avatar || sampleProPic} alt="..." />
 								</Link>
 								<div className="postNameAndDateEdit">
-									<span className="postUsername">{user.userName}</span>
+									<span className="postUsername">{user?.userName}</span>
 									{share?.privacyLevel !== 'GROUP_MEMBERS' && (
 										<div style={{ display: 'flex', alignItems: 'center' }}>
 											<Public htmlColor="black" />
@@ -191,7 +190,7 @@ export const ModalShare = ({ share, user, currentUser, visible, onClose, onShare
 				</Modal>
 			) : action === 'sharePost' ? (
 				<Modal
-					title={listAction.share.title}
+					title={listAction.share?.title}
 					open={visible}
 					onCancel={onClose}
 					footer={[
@@ -206,12 +205,12 @@ export const ModalShare = ({ share, user, currentUser, visible, onClose, onShare
 					<div className="modal--body">
 						<Space direction="vertical">
 							<div className="postTopLeft">
-								<Link to={`/profile/${user.userId}`}>
-									<img className="postProfileImg" src={user.avatar || sampleProPic} alt="..." />
+								<Link to={`/profile/${user?.userId}`}>
+									<img className="postProfileImg" src={user?.avatar || sampleProPic} alt="..." />
 								</Link>
 
 								<div className="postNameAndDateEdit">
-									<span className="postUsername">{user.userName}</span>
+									<span className="postUsername">{user?.userName}</span>
 									<Cascader
 										options={options}
 										loadData={loadData}
@@ -233,70 +232,70 @@ export const ModalShare = ({ share, user, currentUser, visible, onClose, onShare
 
 						<Space direction="vertical" className="postShare--body">
 							<div className="modal--post--body">
-								<Link to={`/profile/${share.postsResponse.userId}`}>
+								<Link to={`/profile/${share?.postsResponse.userId}`}>
 									<img
 										className="postProfileImg"
-										src={share.postsResponse.avatar || sampleProPic}
+										src={share?.postsResponse.avatarUser || sampleProPic}
 										alt="..."
 									/>
 								</Link>
 								<div className="postNameAndDate">
-									<span className="postUsername">{share.postsResponse.userName}</span>
-									<span className="postDateShare">{formatTime(share.postsResponse.postTime)}</span>
+									<span className="postUsername">{share?.postsResponse.userName}</span>
+									<span className="postDateShare">{formatTime(share?.postsResponse.postTime)}</span>
 								</div>
 							</div>
 							<div className="postCenter">
-								{share.postsResponse.content && (
-									<span className="postText">{share.postsResponse.content}</span>
+								{share?.postsResponse.content && (
+									<span className="postText">{share?.postsResponse.content}</span>
 								)}
-								{share.postsResponse.files &&
-									share.postsResponse.files.toLowerCase().endsWith('.txt') && (
+								{share?.postsResponse.files &&
+									share?.postsResponse.files.toLowerCase().endsWith('.txt') && (
 										<div className="postFile">
 											<a
-												href={share.postsResponse.files}
+												href={share?.postsResponse.files}
 												target="_blank"
 												rel="noopener noreferrer"
 											>
-												{share.postsResponse.files.substr(
-													share.postsResponse.files.lastIndexOf('/') + 1
+												{share?.postsResponse.files.substr(
+													share?.postsResponse.files.lastIndexOf('/') + 1
 												)}
 											</a>
 										</div>
 									)}
-								{share.postsResponse.files &&
-									share.postsResponse.files.toLowerCase().endsWith('.docx') && (
+								{share?.postsResponse.files &&
+									share?.postsResponse.files.toLowerCase().endsWith('.docx') && (
 										<div className="postFile">
 											<a
-												href={share.postsResponse.files}
+												href={share?.postsResponse.files}
 												target="_blank"
 												rel="noopener noreferrer"
 											>
-												{share.postsResponse.files.substr(
-													share.postsResponse.files.lastIndexOf('/') + 1
+												{share?.postsResponse.files.substr(
+													share?.postsResponse.files.lastIndexOf('/') + 1
 												)}
 											</a>
 										</div>
 									)}
-								{share.postsResponse.files &&
-									share.postsResponse.files.toLowerCase().endsWith('.pdf') && (
+								{share?.postsResponse.files &&
+									share?.postsResponse.files.toLowerCase().endsWith('.pdf') && (
 										<div className="postFile">
 											<a
-												href={share.postsResponse.files}
+												href={share?.postsResponse.files}
 												target="_blank"
 												rel="noopener noreferrer"
 											>
-												{share.postsResponse.files.substr(
-													share.postsResponse.files.lastIndexOf('/') + 1
+												{share?.postsResponse.files.substr(
+													share?.postsResponse.files.lastIndexOf('/') + 1
 												)}
 											</a>
 										</div>
 									)}
-								{share.postsResponse.photos && (
+								{share?.postsResponse.photos && (
 									<Image
 										width="100%"
 										className="postImg"
-										src={share.postsResponse?.photos} // Sử dụng selectedPost.photos thay vì cố định URL như bạn đã đề cập
-										alt={share.postsResponse.content}
+										src={share?.postsResponse?.photos} // Sử dụng selectedPost.photos thay vì cố định URL như bạn đã đề cập
+										alt={share?.postsResponse.content}
 										style={{ objectFit: 'cover' }}
 									/>
 								)}

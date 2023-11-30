@@ -9,7 +9,8 @@ import { Skeleton } from 'antd';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PostApi from '../../../api/timeline/post/PostApi';
 
-const FeedOfUser = ({ inforUser }) => {
+const FeedOfUser = ({ inforUser, userProfile }) => {
+	console.log('userProfile', userProfile);
 	const isMounted = useRef(true);
 
 	const { user: currentUser } = useAuth();
@@ -29,10 +30,16 @@ const FeedOfUser = ({ inforUser }) => {
 
 		try {
 			if (isMounted.current) {
-				const [res, response] = await Promise.all([
-					hasMore.posts && PostApi.fetchPostsTimeLine(currentUser, newPage, 20),
-					hasMore.share && PostApi.fetchPostsShareTimeLine(currentUser, newPage, 20),
-				]);
+				const [res, response] =
+					userProfile === inforUser.userId
+						? await Promise.all([
+								hasMore.posts && PostApi.getPostInProfile(currentUser, newPage, 20),
+								hasMore.share && PostApi.getShareInProfile(currentUser, newPage, 20),
+						  ])
+						: await Promise.all([
+								hasMore.posts && PostApi.getPostUserInProfile(currentUser, userProfile, newPage, 20),
+								hasMore.share && PostApi.getShareUserInProfile(currentUser, userProfile, newPage, 20),
+						  ]);
 
 				if (res) {
 					console.log('res', res);
@@ -65,10 +72,16 @@ const FeedOfUser = ({ inforUser }) => {
 
 	const fetchPosts = async () => {
 		try {
-			const [res, response] = await Promise.all([
-				PostApi.fetchPostsTimeLine(currentUser, page, 20),
-				PostApi.fetchPostsShareTimeLine(currentUser, page, 20),
-			]);
+			let [res, response] =
+				userProfile === inforUser.userId
+					? await Promise.all([
+							PostApi.getPostInProfile(currentUser, page, 20),
+							PostApi.getShareInProfile(currentUser, page, 20),
+					  ])
+					: await Promise.all([
+							PostApi.getPostUserInProfile(currentUser, userProfile, page, 20),
+							PostApi.getShareUserInProfile(currentUser, userProfile, page, 20),
+					  ]);
 
 			if (response) {
 				console.log('response', response);
@@ -133,11 +146,13 @@ const FeedOfUser = ({ inforUser }) => {
 	useEffect(() => {
 		isMounted.current = true; // Component đã mounted
 		fetchPosts();
+
 		return () => {
-			isMounted.current = false; // Component sẽ unmounted
+			setListPost([]); // Component sẽ unmounted
+			isMounted.current = false;
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [currentUser]);
+	}, [userProfile, currentUser]);
 
 	useEffect(() => {
 		// Sắp xếp listPost theo updatedAt từ sớm nhất đến muộn nhất
@@ -153,8 +168,8 @@ const FeedOfUser = ({ inforUser }) => {
 	}, [hasMore, postLength, listPost]);
 	return (
 		<div className="feed" style={{ color: theme.foreground, background: theme.background }}>
-			<div className="feedWrapper">
-				<Share inforUser={inforUser} newPosts={getNewPost} postGroupId={null} />
+			{userProfile === inforUser.userId && <Share inforUser={inforUser} newPosts={getNewPost} />}
+			<div className="feedUser">
 				<InfiniteScroll
 					scrollableTarget="messages-history"
 					dataLength={postLength}

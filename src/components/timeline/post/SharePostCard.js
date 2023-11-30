@@ -474,6 +474,7 @@ const SharePostCard = ({ inforUser, share, newSharePosts }) => {
 														: null}
 													{share.postsResponse?.userName}
 												</span>
+
 												<span
 													className="postDate"
 													onClick={() => handleButtonClick(share.postsResponse)}
@@ -483,14 +484,18 @@ const SharePostCard = ({ inforUser, share, newSharePosts }) => {
 											</div>
 										</div>
 									</div>
-									<div className="postLoAndName">
-										{share.postsResponse?.location && (
-											<span className="postLocation">
-												<Room />
-												{share.postsResponse?.location}
-											</span>
-										)}
-									</div>
+
+									<>
+										<div className="postLoAndName">
+											{share.postsResponse?.location && (
+												<span className="postLocation">
+													<Room />
+													{share.postsResponse?.location}
+												</span>
+											)}
+										</div>
+									</>
+
 									{share.postsResponse?.privacyLevel &&
 										(share.postsResponse?.privacyLevel === 'PUBLIC' ? (
 											<div className="postPrivacyLevel">

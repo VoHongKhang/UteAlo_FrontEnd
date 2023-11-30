@@ -34,6 +34,7 @@ const Profile = () => {
 	const { theme } = useTheme();
 
 	const [listImage, setListImage] = useState([]);
+	const [useInParams, setUseInParams] = useState({});
 
 	const [listImageFriend, setListImageFriend] = useState([]);
 	const [status, setStatus] = useState('');
@@ -166,6 +167,8 @@ const Profile = () => {
 				},
 			};
 			const getStatus = await axios.get(`${BASE_URL}/v1/friend/status/${params.userId}`, config);
+			const res = await axios.get(`${BASE_URL}/v1/user/profile/${params.userId}`, config);
+			setUseInParams(res.data.result);
 			setStatus(getStatus.data.message);
 		};
 		fetchUsers();
@@ -214,9 +217,9 @@ const Profile = () => {
 				<div className="profileRight">
 					<div className="profileRightTop">
 						<div className="profileCover" style={{ color: theme.foreground, background: theme.background }}>
-							<img className="profileCoverImg" src={user.background || noCover} alt="..." />
+							<img className="profileCoverImg" src={useInParams?.background || noCover} alt="..." />
 
-							<img className="profileUserImg" src={user.avatar || sampleProPic} alt="..." />
+							<img className="profileUserImg" src={useInParams?.avatar || sampleProPic} alt="..." />
 							{params.userId === user.userId && (
 								<Link to={`/update/${currentUser.userId}`}>
 									<div className="profile-edit-icon">
@@ -229,23 +232,23 @@ const Profile = () => {
 						</div>
 
 						<div className="profileInfo" style={{ color: theme.foreground, background: theme.background }}>
-							<h4 className="profileInfoName">{user.userName}</h4>
-							<p className="profileInfoDesc">Giới thiệu: {user.about || '----'}</p>
+							<h4 className="profileInfoName">{useInParams?.userName}</h4>
+							<p className="profileInfoDesc">Giới thiệu: {useInParams?.about || '----'}</p>
 							<small className="profileInfoDesc">
 								Ngày đăng nhập:{' '}
 								{(
 									<em>
-										<Moment format="YYYY/MM/DD">{user?.createdAt}</Moment>
+										<Moment format="YYYY/MM/DD">{useInParams?.createdAt}</Moment>
 									</em>
 								) || '----'}
 							</small>
 						</div>
-						{params.userId !== user.userId && (
+						{params.userId !== currentUser.userId && (
 							<Space className="button--space">
 								<Button type="default" onClick={handleButtonFriend}>
 									{status}
 								</Button>
-								<Button type="primary" onClick={() => navigate(`/message/${currentUser.userId}`)}>
+								<Button type="primary" onClick={() => navigate(`/message/${useInParams?.userId}`)}>
 									Message
 								</Button>
 							</Space>
@@ -320,11 +323,11 @@ const Profile = () => {
 								<div className="textTieuSu">Thêm tiểu sử</div>
 								<div className="textDenTu">
 									<img src={userFrom} alt="Icon" className="icon" />
-									Đến từ {user?.address}
+									Đến từ {useInParams?.address}
 								</div>
 								<div className="textDenTu">
 									<img src={userFollow} alt="Icon" className="icon" />
-									Có {user.friends?.length} người theo dõi
+									Có {useInParams?.friends?.length} người theo dõi
 								</div>
 								<div className="textChinhSua">Chỉnh sửa chi tiết</div>
 								<div className="textChinhSua">Thêm sở thích</div>
@@ -372,7 +375,7 @@ const Profile = () => {
 								</div>
 							</div>
 						</div>
-						<FeedOfUser inforUser={user} />
+						{params.userId && <FeedOfUser inforUser={user} userProfile={params.userId} />}
 					</div>
 				</div>
 			</div>

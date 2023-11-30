@@ -140,6 +140,7 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 			} else if (data?.postGroupId) {
 				stompClient.subscribe('/chatroom/room/' + data?.postGroupId, onMessageReceived);
 			}
+			
 		};
 		// kieerm tra data !== {} thi moi chay
 		if (data.userId || data.postGroupId) {

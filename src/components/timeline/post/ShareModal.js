@@ -18,7 +18,7 @@ export const ShareModal = ({ post, user, currentUser, visible, onClose, onShare,
 		files: null,
 	});
 	const [newShare, setNewShare] = useState({
-		postId: post.postId,
+		postId: post?.postId,
 		postGroupId: 0,
 		privacyLevel: '',
 		content: '',
@@ -66,7 +66,7 @@ export const ShareModal = ({ post, user, currentUser, visible, onClose, onShare,
 		// Gọi hàm chia sẻ được truyền từ prop
 		if (action === 'sharePost') onShare(newShare);
 		else if (action === 'editPost') onShare(editPost);
-		else if (action === 'deletePost') onShare(post.postId);
+		else if (action === 'deletePost') onShare(post?.postId);
 
 		console.log(newShare);
 
@@ -160,12 +160,12 @@ export const ShareModal = ({ post, user, currentUser, visible, onClose, onShare,
 					<div className="modal--body">
 						<Space direction="vertical">
 							<div className="postTopLeft">
-								<Link to={`/profile/${user.userId}`}>
-									<img className="postProfileImg" src={user.avatar || sampleProPic} alt="..." />
+								<Link to={`/profile/${user?.userId}`}>
+									<img className="postProfileImg" src={user?.avatar || sampleProPic} alt="..." />
 								</Link>
 
 								<div className="postNameAndDateEdit">
-									<span className="postUsername">{user.userName}</span>
+									<span className="postUsername">{user?.userName}</span>
 									<Cascader
 										options={options}
 										loadData={loadData}
@@ -187,43 +187,43 @@ export const ShareModal = ({ post, user, currentUser, visible, onClose, onShare,
 
 						<Space direction="vertical" className="postShare--body">
 							<div className="modal--post--body">
-								<Link to={`/profile/${post.userId}`}>
-									<img className="postProfileImg" src={post.avatar || sampleProPic} alt="..." />
+								<Link to={`/profile/${post?.userId}`}>
+									<img className="postProfileImg" src={post?.avatar || sampleProPic} alt="..." />
 								</Link>
 								<div className="postNameAndDate">
-									<span className="postUsername">{post.userName}</span>
-									<span className="postDateShare">{formatTime(post.postTime)}</span>
+									<span className="postUsername">{post?.userName}</span>
+									<span className="postDateShare">{formatTime(post?.postTime)}</span>
 								</div>
 							</div>
 							<div className="postCenter">
-								{post.content && <span className="postText">{post.content}</span>}
-								{post.files && post.files.toLowerCase().endsWith('.txt') && (
+								{post?.content && <span className="postText">{post?.content}</span>}
+								{post?.files && post?.files.toLowerCase().endsWith('.txt') && (
 									<div className="postFile">
-										<a href={post.files} target="_blank" rel="noopener noreferrer">
-											{post.files.substr(post.files.lastIndexOf('/') + 1)}
+										<a href={post?.files} target="_blank" rel="noopener noreferrer">
+											{post?.files.substr(post?.files.lastIndexOf('/') + 1)}
 										</a>
 									</div>
 								)}
-								{post.files && post.files.toLowerCase().endsWith('.docx') && (
+								{post?.files && post?.files.toLowerCase().endsWith('.docx') && (
 									<div className="postFile">
-										<a href={post.files} target="_blank" rel="noopener noreferrer">
-											{post.files.substr(post.files.lastIndexOf('/') + 1)}
+										<a href={post?.files} target="_blank" rel="noopener noreferrer">
+											{post?.files.substr(post?.files.lastIndexOf('/') + 1)}
 										</a>
 									</div>
 								)}
-								{post.files && post.files.toLowerCase().endsWith('.pdf') && (
+								{post?.files && post?.files.toLowerCase().endsWith('.pdf') && (
 									<div className="postFile">
-										<a href={post.files} target="_blank" rel="noopener noreferrer">
-											{post.files.substr(post.files.lastIndexOf('/') + 1)}
+										<a href={post?.files} target="_blank" rel="noopener noreferrer">
+											{post?.files.substr(post?.files.lastIndexOf('/') + 1)}
 										</a>
 									</div>
 								)}
-								{post.photos && (
+								{post?.photos && (
 									<Image
 										width="100%"
 										className="postImg"
 										src={post?.photos} // Sử dụng selectedPost.photos thay vì cố định URL như bạn đã đề cập
-										alt={post.content}
+										alt={post?.content}
 										style={{ objectFit: 'cover' }}
 									/>
 								)}
@@ -248,24 +248,24 @@ export const ShareModal = ({ post, user, currentUser, visible, onClose, onShare,
 					<div className="modal--body">
 						<Space direction="vertical" className="roleUser">
 							<span className="roleName">
-								{post.roleName === 'SinhVien'
+								{post?.roleName === 'SinhVien'
 									? 'Sinh viên'
-									: post.roleName === 'GianVien'
+									: post?.roleName === 'GianVien'
 									? 'Giảng viên'
-									: post.roleName === 'PhuHuynh'
+									: post?.roleName === 'PhuHuynh'
 									? 'Phụ huynh sinh viên'
-									: post.roleName === 'NhanVien'
+									: post?.roleName === 'NhanVien'
 									? 'Nhân viên'
 									: 'Admin'}
 							</span>
 						</Space>
 						<Space direction="vertical">
 							<div className="postTopLeft">
-								<Link to={`/profile/${user.userId}`}>
-									<img className="postProfileImg" src={user.avatar || sampleProPic} alt="..." />
+								<Link to={`/profile/${user?.userId}`}>
+									<img className="postProfileImg" src={user?.avatar || sampleProPic} alt="..." />
 								</Link>
 								<div className="postNameAndDateEdit">
-									<span className="postUsername">{user.userName}</span>
+									<span className="postUsername">{user?.userName}</span>
 									{post?.privacyLevel !== 'GROUP_MEMBERS' && (
 										<>
 											<Public htmlColor="black" />

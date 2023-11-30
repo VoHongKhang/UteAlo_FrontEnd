@@ -6,8 +6,9 @@ import Topbar from '../../timeline/topbar/Topbar';
 import '../../friend/friendRequest/friendRequest.css';
 import useAuth from '../../../context/auth/AuthContext';
 import SidebarGroup from '../sidebar/SidebarGroup';
+import './GroupCard.css';
 const DiscoverGroup = () => {
-	const {user: currentUser} = useAuth();
+	const { user: currentUser } = useAuth();
 	const [type, setType] = useState('friend');
 	const [title, setTitle] = useState('Bạn bè');
 	const changeType = (key) => {
@@ -39,21 +40,20 @@ const DiscoverGroup = () => {
 			type: 'sent',
 			title: 'Đã gửi lời mời vào nhóm',
 			Icon: require('@ant-design/icons').UserOutlined,
-		}
+		},
 	];
 	return (
 		<>
 			<Helmet title={`${title}`} />
 			<Topbar />
 			<div className="homeContainer">
-			<SidebarGroup user={currentUser} />
-				
+				<SidebarGroup user={currentUser} />
 
 				<div className="centerbar">
-					<ListDiscover currentUser ={currentUser} title={title} type={type} />
+					<ListDiscover currentUser={currentUser} title={title} type={type} />
 				</div>
 
-				<div className="leftbar">
+				<div className="leftbar leftbar--discover">
 					<Card title="Danh sách" headStyle={{ padding: '0 16px' }} bodyStyle={{ padding: 8 }}>
 						<Menu
 							mode="vertical"

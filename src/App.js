@@ -20,6 +20,7 @@ export default function App() {
 				var payloadData = JSON.parse(data.body);
 				console.log('payloadData', payloadData);
 			});
+
 		};
 		if (currentUser) {
 			let Sock = new SockJS('http://localhost:8089/ws');
@@ -40,6 +41,11 @@ export default function App() {
 				console.log('send');
 			}, 5000);
 		}
+		return () => {
+			if (stompClient) {
+				stompClient.disconnect();
+			}
+		};
 	}, [currentUser]);
 
 	return (

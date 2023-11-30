@@ -22,7 +22,7 @@ import { ShareModal } from './ShareModal';
 import classnames from 'classnames';
 import { formatTime } from '../../utils/CommonFuc';
 import PostModal from '../../utils/PostModal';
-const PostCard = ({ inforUser, post, newShare, modalDetail = 0 }) => {
+const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 	const navigate = useNavigate();
 
 	const [isModalVisible, setModalVisible] = useState(false);
@@ -238,12 +238,17 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0 }) => {
 
 	//Chia sẻ bài viết
 	const sharePostHandler = async (e) => {
-		try {
-			const res = await sharePost(e);
-			newShare(res.result, 'create');
-		} catch (error) {
-			console.error(error);
-			toast.error('Có lỗi xảy ra khi tạo bài viết.');
+		if (group && e.postGroupId === group.postGroupId) {
+			toast.error('Không thể chia sẻ bài viết trong chính nhóm này!');
+			return;
+		} else {
+			try {
+				const res = await sharePost(e);
+				newShare(res.result, 'create');
+			} catch (error) {
+				console.error(error);
+				toast.error('Có lỗi xảy ra khi tạo bài viết.');
+			}
 		}
 	};
 
@@ -420,7 +425,7 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0 }) => {
 									</div>
 								) : null)}
 						</div>
-						{modalDetail === 0 && (
+						{(modalDetail === 0 || modalDetail ===3) && (
 							<div className="comment" id="postTopRight">
 								<IconButton aria-describedby="simple-popover" onClick={(e) => handleClick(e)}>
 									<MoreHoriz />
@@ -441,7 +446,7 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0 }) => {
 									}}
 								>
 									<div>
-										{post?.privacyLevel !== 'PRIVATE' && (
+										{post?.privacyLevel !== 'PRIVATE' && group?.groupType !== 'Private' && (
 											<Typography
 												className="poper--member--item"
 												onClick={() => handleOpenConfirmation('sharePost')}

@@ -124,5 +124,87 @@ const PostApi = {
 			throw new Error(error?.response ? error.response.data.message : error.message);
 		}
 	},
+	getPostInAllGroup: async ({ user, page, size }) => {
+		try {
+			const config = {
+				headers: {
+					Authorization: `Bearer ${user.accessToken}`,
+				},
+			};
+			const res = await axios.get(`${BASE_URL}/v1/groupPost/posts?page=${page}&size=${size}`, config);
+			return res.data.result;
+		} catch (error) {
+			throw new Error(error?.response ? error.response.data.message : error.message);
+		}
+	},
+	getShareInAllGroup: async ({ user, page, size }) => {
+		try {
+			const config = {
+				headers: {
+					Authorization: `Bearer ${user.accessToken}`,
+				},
+			};
+			const res = await axios.get(`${BASE_URL}/v1/share/inGroup?page=${page}&size=${size}`, config);
+			return res.data.result;
+		} catch (error) {
+			throw new Error(error?.response ? error.response.data.message : error.message);
+		}
+	},
+	getShareInProfile: async (user, page, size) => {
+		try {
+			const config = {
+				headers: {
+					Authorization: `Bearer ${user.accessToken}`,
+				},
+			};
+			const res = await axios.get(`${BASE_URL}/v1/share/post?page=${page}&size=${size}`, config);
+			return res.data.result;
+		} catch (error) {
+			throw new Error(error?.response ? error.response.data.message : error.message);
+		}
+	},
+	getPostInProfile: async (user, page, size) => {
+		try {
+			const config = {
+				headers: {
+					Authorization: `Bearer ${user.accessToken}`,
+				},
+			};
+			const res = await axios.get(`${BASE_URL}/v1/post/user?page=${page}&size=${size}`, config);
+			return res.data.result;
+		} catch (error) {
+			throw new Error(error?.response ? error.response.data.message : error.message);
+		}
+	},
+	getPostUserInProfile: async (user, userId, page, size) => {
+		try {
+			const config = {
+				headers: {
+					Authorization: `Bearer ${user.accessToken}`,
+				},
+			};
+			console.log('userId', userId);
+			const res = await axios.get(`${BASE_URL}/v1/post/user/${userId}?page=${page}&size=${size}`, config);
+			console.log('res', res);
+			return res.data.result;
+		} catch (error) {
+			throw new Error(error?.response ? error.response.data.message : error.message);
+		}
+	},
+	getShareUserInProfile: async (user, userId, page, size) => {
+		try {
+			const config = {
+				headers: {
+					Authorization: `Bearer ${user.accessToken}`,
+				},
+			};
+
+			const res = await axios.get(`${BASE_URL}/v1/share/${userId}/post?page=${page}&size=${size}`, config);
+			console.log('res', res);
+			return res.data.result;
+		} catch (error) {
+			throw new Error(error?.response ? error.response.data.message : error.message);
+		}
+	},
 };
 export default PostApi;

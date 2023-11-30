@@ -26,7 +26,7 @@
 
 .profileCoverImg {
 	height: 260px;
-	width: 76%;
+	width: 80%;
 	display: block;
 	text-align: center;
 	margin: auto;
@@ -106,7 +106,7 @@
 
 .profileRightBottom {
 	display: flex;
-	width: 74%;
+	width: 80%;
 	margin: auto;
 	min-height: 100vh;
 }
@@ -124,7 +124,6 @@
 	top: 0;
 	height: 100%;
 	padding-bottom: 40px;
-	margin-left: 40px;
 }
 
 .profileInfor {

@@ -7,6 +7,7 @@ import '../../friend/friendRequest/friendRequest.css';
 import useAuth from '../../../context/auth/AuthContext';
 import SidebarGroup from '../sidebar/SidebarGroup';
 import './GroupCard.css';
+import { Toaster } from 'react-hot-toast';
 const DiscoverGroup = () => {
 	const { user: currentUser } = useAuth();
 	const [type, setType] = useState('friend');
@@ -45,6 +46,7 @@ const DiscoverGroup = () => {
 	return (
 		<>
 			<Helmet title={`${title}`} />
+			<Toaster />
 			<Topbar />
 			<div className="homeContainer">
 				<SidebarGroup user={currentUser} />

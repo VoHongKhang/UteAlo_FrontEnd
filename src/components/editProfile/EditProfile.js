@@ -1,299 +1,303 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './EditProfile.css';
 import '../profile/Profile.css';
 import noCover from '../../assets/appImages/noCover.jpg';
 import sampleProPic from '../../assets/appImages/user.png';
 import Topbar from '../timeline/topbar/Topbar';
-import useAuth from '../../context/auth/AuthContext';
-import { BASE_URL } from '../../context/apiCall';
-import axios from 'axios';
-import useProfile from '../../context/profile/ProfileContext';
-import { Box, CircularProgress } from '@material-ui/core';
 import { Toaster } from 'react-hot-toast';
 import { Helmet } from 'react-helmet';
 import useTheme from '../../context/ThemeContext';
 import toast from 'react-hot-toast';
-import { errorOptions } from '../../components/utils/toastStyle';
-
+import useProfile from '../../context/profile/ProfileContext';
+import { Button, Collapse, Image, Modal, Space, Tooltip } from 'antd';
+import { Camera, Cancel, Edit, Settings } from '@material-ui/icons';
+import Moment from 'react-moment';
+import ChangePassword from './ChangePassword';
+import EditUser from './EditUser';
+import moment from 'moment';
+import ChangePasswordApi from '../../api/auth/ChangePasswordApi';
+import useAuth from '../../context/auth/AuthContext';
 const EditProfile = () => {
-	const [user, setUser] = useState({});
-
-	// from context
-	const { user: currentUser } = useAuth();
-	const { editUser, loading, updateUserAvatar, updateUserBackground } = useProfile();
+	const { editUser, updateUserAvatar, updateUserBackground } = useProfile();
 	const { theme } = useTheme();
+	const { user: currentUser } = useAuth();
+	const [profileUser, setProfileUser] = useState([]);
+	const [photosUrl, setPhotosUrl] = useState();
+	const [photos, setPhotos] = useState(null);
+	const [targetPhoto, setTargetPhoto] = useState(null);
+	const hanldeEditPhoto = async () => {
+		if (targetPhoto === 'fileAvatar') {
+			try {
+				// trong quá trình thực thi thì không cho phép tác động gì hết
+				await updateUserAvatar(photos);
 
-	// all states for user update fields
-	const [fullName, setFullName] = useState();
-	const [about, setAbout] = useState();
-	const [address, setAddress] = useState();
-	const [phone, setPhone] = useState();
-	const [gender, setGender] = useState();
-	const [dateOfBirth, setDateOfBirth] = useState();
-	const [avatar, setAvatar] = useState();
-	const [background, setBackground] = useState();
-
-	// get user details
-	useEffect(() => {
-		const fetchUsers = async () => {
-			const config = {
-				headers: {
-					Authorization: `Bearer ${currentUser.accessToken}`,
-				},
-			};
-			const res = await axios.get(`${BASE_URL}/v1/user/profile`, config);
-			setUser(res.data.result);
-		};
-		fetchUsers();
-	}, [currentUser.accessToken]);
-
-	useEffect(() => {
-		setFullName(user.userName);
-		setAbout(user.about);
-		setAddress(user.address);
-		setPhone(user.phone);
-		setGender(user.gender);
-		setDateOfBirth(user.dateOfBirth);
-	}, [user.userName, user.about, user.address, user.phone, user.gender, user.dateOfBirth]);
-
-
-
-	
-	useEffect(() => {
-		// Chuyển đổi chuỗi ngày giờ thành đối tượng Date và kiểm tra nếu không hợp lệ
-		const dateOfBirthString = user.dateOfBirth; // Mặc định nếu user.dateOfBirth là null hoặc undefined
-		const dateObject = new Date(dateOfBirthString);
-		if (!isNaN(dateObject.getTime())) {
-		  const formattedDate = dateObject.toISOString().split('T')[0];
-		  setDateOfBirth(formattedDate);
-		} 
-	  }, [user.dateOfBirth]);
-	
-
-	const [selectedAvatarUrl, setSelectedAvatarUrl] = useState(user.avatar ? user.avatar : sampleProPic);
-	const [selectedBackgroundUrl, setSelectedBackgroundUrl] = useState(user.background ? user.background : noCover);
-
-	useEffect(() => {
-		// Kiểm tra nếu user.avatar có giá trị, thì cập nhật selectedAvatarUrl
-		if (user.avatar) {
-			setSelectedAvatarUrl(user.avatar);
+				setProfileUser({ ...profileUser, avatar: photosUrl });
+				setPhotos(null);
+			} catch (err) {
+				console.log(err);
+			}
 		}
-		// Kiểm tra nếu user.background có giá trị, thì cập nhật selectedAvatarUrl
-		if (user.background) {
-			setSelectedBackgroundUrl(user.background);
-		}
-	}, [user.avatar, user.background]);
 
-	// update user profile
-	const updateProfileHandler = (e) => {
-		e.preventDefault();
-		editUser(fullName, about, address, phone, gender, dateOfBirth);
-	};
+		if (targetPhoto === 'fileBackgroup') {
+			try {
+				await updateUserBackground(photos);
 
-	// update user avatar
-	const updateAvatarHandler = async (e) => {
-		e.preventDefault();
-		if (!avatar) {
-			toast.error('Please Select an Image!', errorOptions);
-			return; // Ngăn việc tiếp tục xử lý nếu không có tệp ảnh
-		}
-		// Kiểm tra kích thước tệp ảnh
-		if (avatar.size > 1024 * 1024) {
-			// 1MB = 1024 * 1024 bytes
-			toast.error('Image must not exceed 1MB!', errorOptions);
-			return; // Ngăn việc tiếp tục xử lý nếu kích thước vượt quá 1MB
-		}
-		if (avatar) {
-			await updateUserAvatar(avatar);
+				setProfileUser({ ...profileUser, background: photosUrl });
+				setPhotos(null);
+			} catch (err) {
+				console.log(err);
+			}
 		}
 	};
-
-	const handleFileInputChange = (e) => {
+	const openModal = (e) => {
 		const file = e.target.files[0];
-		setAvatar(file);
-		setSelectedAvatarUrl(URL.createObjectURL(file)); // Đặt URL hình ảnh avatar đã chọn
-	};
-
-	
-
-	// update user background
-	const updateBackgroundHandler = async (e) => {
-		e.preventDefault();
-		if (!background) {
-			toast.error('Please Select an Image!', errorOptions);
-			return; // Ngăn việc tiếp tục xử lý nếu không có tệp ảnh
+		setTargetPhoto(e.target.id);
+		if (file === undefined) {
+			toast.error('Please Select an Image!');
+			return;
 		}
-		// Kiểm tra kích thước tệp ảnh
-		if (background.size > 1024 * 1024) {
-			// 1MB = 1024 * 1024 bytes
-			toast.error('Image must not exceed 1MB!', errorOptions);
-			return; // Ngăn việc tiếp tục xử lý nếu kích thước vượt quá 1MB
-		}
-		if (background) {
-			await updateUserBackground(background);
+		if (file.type === 'image/jpeg' || file.type === 'image/png') {
+			setPhotos(file);
+			setPhotosUrl(URL.createObjectURL(file));
+		} else {
+			toast.error('Please select an image with png/jpg type');
 		}
 	};
-
-	const handleFileBackgroundInputChange = (e) => {
-		const file = e.target.files[0];
-		setBackground(file);
-		setSelectedBackgroundUrl(URL.createObjectURL(file)); // Đặt URL hình nền đã chọn
+	const getUserInfor = (data) => {
+		setProfileUser(data);
+		console.log(data);
 	};
-
-
-
+	const [visibleModalUpdate, setVisibleModalUpdate] = useState({
+		visible: false,
+		type: '',
+	});
+	const openModalUpdate = (e) => {
+		setVisibleModalUpdate({ visible: true, type: e });
+	};
+	const items = [
+		{
+			key: '1',
+			label: (
+				<div className="title--collapse">
+					<span>Thông tin cá nhân của bạn</span>
+					<Tooltip title="Chỉnh sửa thông tin cá nhân" placement="top">
+						<Settings
+							htmlColor="#65676B"
+							className="icon--setting"
+							onClick={() => openModalUpdate('infor')}
+						/>
+					</Tooltip>
+				</div>
+			),
+			children: (
+				<div className="collapse--content">
+					<span>Tên người dùng: {profileUser.userName}</span>
+					<span>Địa chỉ: {profileUser.address || 'Chưa có thông tin'}</span>
+					<span>
+						Giới tính:{' '}
+						{profileUser.gender === 'MALE'
+							? 'Nam giới'
+							: profileUser.gender === 'FEMALE'
+							? 'Nữ giới'
+							: 'Khác'}
+					</span>
+					<span>Số điện thoại: {profileUser.phone || 'Chưa có thông tin'}</span>
+					<span>
+						Ngày sinh:
+						{profileUser.dayOfBirth === null ? (
+							'Chưa có thông tin'
+						) : (
+							<Moment format="DD/MM/YYYY">{profileUser?.dayOfBirth}</Moment>
+						)}
+					</span>
+				</div>
+			),
+		},
+		{
+			key: '2',
+			label: (
+				<div className="title--collapse">
+					<span>Thông tin tài khoản của bạn</span>
+					<Tooltip title="Đổi mật khẩu" placement="top">
+						<Settings
+							htmlColor="#65676B"
+							className="icon--setting"
+							onClick={() => openModalUpdate('pwd')}
+						/>
+					</Tooltip>
+				</div>
+			),
+			children: (
+				<div className="collapse--content">
+					<span>Địa chỉ email: {profileUser.email}</span>
+				</div>
+			),
+		},
+	];
+	const updateUser = async (data) => {
+		const res = await editUser({
+			fullName: data.userName,
+			address: data.address,
+			phone: data.phone,
+			gender: data.gender,
+			dateOfBirth: moment(data.dateOfBirth).toDate(),
+		});
+		if (res.success) {
+			setProfileUser(res.result);
+		}
+	};
+	const updatePassword = async (data) => {
+		const toastId = toast.loading('Đang thay đổi mật khẩu...');
+		try {
+			const res = await ChangePasswordApi.changePassword(data, currentUser);
+			if (res.success) {
+				toast.success('Đổi mật khẩu thành công! Vui lòng đăng nhập lại', { id: toastId });
+				setVisibleModalUpdate({ visible: false, type: '' });
+				setTimeout(() => {
+					toast.success('Hệ thống sẽ chuyển hướng trang trong 3s', { id: toastId });
+				}, 1000);
+				setTimeout(() => {
+					localStorage.removeItem('userInfo');
+					window.location.href = '/login';
+				}, 4000);
+			}
+		} catch (err) {
+			toast.error(err.message, { id: toastId });
+		}
+	};
 	return (
 		<>
 			<Helmet title="Edit profile | UTEALO" />
 			<Toaster />
-			<Topbar />
-			<div className="profile" style={{ color: theme.foreground, background: theme.background }}>
-				<div className="profileRight">
-					<div className="profileRightTop">
-						<div className="profileCover">
-							<form onSubmit={updateBackgroundHandler} className="formAvatar">
-								<label htmlFor="background" className="profileImageLabel">
-									<img className="profileCoverImg" src={selectedBackgroundUrl} alt="..." />
+			<Topbar dataUser={getUserInfor} />
+			{profileUser && (
+				<div style={{ color: theme.foreground, background: theme.background }}>
+					<div className="header--group">
+						<div className="groupCover" style={{ color: theme.foreground, background: theme.background }}>
+							{profileUser.background !== null ? (
+								<Image
+									hoverable
+									cover
+									width="100%"
+									className="ManagerGroup--groupCoverImg"
+									src={profileUser.background} // Sử dụng selectedPost.photos thay vì cố định URL như bạn đã đề cập
+									alt={'backgroup'}
+									style={{ objectFit: 'cover', background: theme.background }}
+								/>
+							) : (
+								<img className="groupCoverImg" src={noCover} alt="..." />
+							)}
+							<div className="contaner--avatar">
+								{profileUser.avatar !== null ? (
+									<Image
+										hoverable
+										cover
+										width="100%"
+										className="groupUserImg"
+										src={profileUser.avatar} // Sử dụng selectedPost.photos thay vì cố định URL như bạn đã đề cập
+										alt={'backgroup'}
+										style={{
+											objectFit: 'cover',
+											background: theme.background,
+											top: '-55px',
+										}}
+									/>
+								) : (
+									<img className="groupUserImg" src={sampleProPic} alt="..." />
+								)}
+								<label htmlFor="fileAvatar" className="edit--group--avatar">
+									<Camera htmlColor="#65676B" />
 									<input
+										style={{ display: 'none' }}
 										type="file"
+										id="fileAvatar"
 										accept=".png, .jpeg, .jpg"
-										id="background" // Đặt id để liên kết với htmlFor
-										onChange={handleFileBackgroundInputChange}
-										style={{ display: 'none' }} // Ẩn input
+										onChange={openModal}
 									/>
 								</label>
-								<div className="editBackground-btnBox">
-									<button type="submit" className="editProfileBackground-btn">
-										Update Background
-									</button>
-								</div>
-							</form>
-
-							<form onSubmit={updateAvatarHandler} className="formAvatar">
-								<label htmlFor="avatar" className="profileImageLabel">
-									<img className="profileUserImg" src={selectedAvatarUrl} alt="..." />
-									<input
-										type="file"
-										accept=".png, .jpeg, .jpg"
-										id="avatar" // Đặt id để liên kết với htmlFor
-										onChange={handleFileInputChange}
-										style={{ display: 'none' }} // Ẩn input
-									/>
-								</label>
-								<div className="editAvatar-btnBox">
-									<button type="submit" className="editProfile-btn">
-										Cập nhật Avatar
-									</button>
-								</div>
-							</form>
-						</div>
-						{loading && (
-							<Box display="flex" justifyContent="center" sx={{ my: 2 }}>
-								<CircularProgress color="secondary" />
-							</Box>
-						)}
-						<section className="editProfile-container">
-							<div className="editProfile-box">
-								<h3 className="editProfile-heading">Update Profile</h3>
-								<form onSubmit={updateProfileHandler}>
-									<div className="editProfile-container-main">
-										<div className="editProfile-container-left">
-											<label htmlFor="about">Full Name</label>
-											<input
-												className="editProfile-input"
-												type="text"
-												value={fullName}
-												onChange={(e) => setFullName(e.target.value)}
-												required
-											/>
-											<label htmlFor="about">Bio</label>
-											<input
-												className="editProfile-input"
-												type="text"
-												placeholder={user?.about ? user?.about : 'Describe yourself....'}
-												value={about}
-												onChange={(e) => setAbout(e.target.value)}
-												required
-											/>
-											<label htmlFor="about">Address</label>
-											<input
-												className="editProfile-input"
-												gender
-												type="text"
-												placeholder={user?.address ? user?.address : 'Which address....'}
-												value={address}
-												onChange={(e) => setAddress(e.target.value)}
-												required
-											/>
-										</div>
-
-										<div className="editProfile-container-right">
-											<label htmlFor="about">Phone</label>
-											<input
-												className="editProfile-input"
-												type="text"
-												placeholder={user?.phone ? user?.phone : 'Which phone....'}
-												value={phone}
-												onChange={(e) => setPhone(e.target.value)}
-												required
-											/>
-											<label htmlFor="about">Gender</label>
-											<div className="editProfile-input">
-												<label className="radio-label">
-													<input
-														type="radio"
-														value="MALE"
-														name="gender"
-														checked={gender === 'MALE'}
-														onChange={(e) => setGender(e.target.value)}
-													/>
-													MALE
-												</label>
-												<label className="radio-label">
-													<input
-														type="radio"
-														value="FEMALE"
-														name="gender"
-														checked={gender === 'FEMALE'}
-														onChange={(e) => setGender(e.target.value)}
-													/>
-													FEMALE
-												</label>
-												<label className="radio-label">
-													<input
-														type="radio"
-														value="OTHER"
-														name="gender"
-														checked={gender === 'OTHER'}
-														onChange={(e) => setGender(e.target.value)}
-													/>
-													OTHER
-												</label>
-											</div>
-											<div className="editProfile-input">
-												<label htmlFor="dateOfBirth">Date of Birth</label>
-												<input
-													id="dateOfBirth"
-													className="custom-datepicker"
-													type="date"
-													placeholder="Date of birth...."
-													value={dateOfBirth}
-													onChange={(e) => setDateOfBirth(e.target.value)}
-												/>
-											</div>
-										</div>
-									</div>
-									<div className="editProfile-btnBox">
-										<button type="submit" className="editProfile-btn">
-											Update Profile
-										</button>
-									</div>
-								</form>
 							</div>
-						</section>
+
+							<div className="edit--group--cover">
+								<label htmlFor="fileBackgroup" className="button--edit">
+									<Edit htmlColor="#65676B" className="icon--edit" />
+									<span>Chỉnh sửa</span>
+									<input
+										style={{ display: 'none' }}
+										type="file"
+										id="fileBackgroup"
+										accept=".png, .jpeg, .jpg"
+										onChange={openModal}
+									/>
+								</label>
+							</div>
+						</div>
+						<div className="group--contanier--top">
+							<div className="group--detail">
+								<span className="group--name">{profileUser.userName}</span>
+							</div>
+						</div>
+						{photos && (
+							//Mở modal hiển thị hình ảnh đó và 2 nút lưu hoặc hủy
+							<div className="modal--group--avatar">
+								<div className="modal--group--avatar--content">
+									<div className="modal--group--avatar--header">
+										<span className="modal--group--avatar--title">Thay đổi ảnh</span>
+										<span className="modal--group--avatar--close" onClick={() => setPhotos(null)}>
+											<Cancel htmlColor="#65676B" className="icon--close" />
+										</span>
+									</div>
+									<div className="modal--group--avatar--body">
+										<div className="modal--group--avatar--body--img">
+											<img src={photosUrl} alt="..." />
+										</div>
+										<Space>
+											<Button className="button--cancel" onClick={() => setPhotos(null)}>
+												Hủy
+											</Button>
+											<Button type="primary" className="button--save" onClick={hanldeEditPhoto}>
+												Lưu
+											</Button>
+										</Space>
+									</div>
+								</div>
+							</div>
+						)}
+					</div>
+					<div className="update--user">
+						<Collapse
+							className="collapse--update"
+							items={items}
+							collapsible="icon"
+							defaultActiveKey={['1']}
+						/>
 					</div>
 				</div>
-			</div>
+			)}
+			{visibleModalUpdate?.visible && (
+				<Modal
+					title={visibleModalUpdate.type === 'infor' ? 'Chỉnh sửa thông tin cá nhân' : 'Đổi mật khẩu'}
+					centered
+					open={visibleModalUpdate?.visible}
+					onCancel={() => setVisibleModalUpdate({ visible: false, type: '' })}
+					footer={null}
+					width={visibleModalUpdate.type === 'infor' ? 500 : 400}
+				>
+					<>
+						{visibleModalUpdate.type === 'infor' ? (
+							<EditUser
+								profileUser={profileUser}
+								updateUser={updateUser}
+								setVisibleModalUpdate={setVisibleModalUpdate}
+							/>
+						) : (
+							<ChangePassword
+								updatePassword={updatePassword}
+								setVisibleModalUpdate={setVisibleModalUpdate}
+							/>
+						)}
+					</>
+				</Modal>
+			)}
 		</>
 	);
 };

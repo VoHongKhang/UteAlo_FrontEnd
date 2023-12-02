@@ -103,35 +103,38 @@ const Rightbar = ({ user }) => {
 						renderItem={(item) => (
 							<List.Item style={{ padding: '4px 0' }}>
 								{list.title === 'Yêu cầu kết bạn' ? (
-									<Space align="center" style={{ width: '100%' }}>
-										<Link to={`/profile/${item.userId}`}>
-											<img
-												src={item?.avatar ? item?.avatar : noAvatar}
-												alt="..."
-												className="topbarImg"
-											/>
-										</Link>
-										<Typography.Text className="username_fq" strong>
-											{item.username}
-										</Typography.Text>
+									<Space className='friendRequest'>
+										<div className="friendRequest--avatar">
+											<Link to={`/profile/${item.userId}`}>
+												<img
+													src={item?.avatar ? item?.avatar : noAvatar}
+													alt="..."
+													className="topbarImg"
+												/>
+											</Link>
+											<Typography.Text className="username_fq" strong>
+												{item.username}
+											</Typography.Text>
+										</div>
+										<div className="friendRequest--button">
+											<Button
+												type="primary"
+												size="small"
+												style={{ float: 'right', margin: '0 4px' }}
+												onClick={() => handlerAccept(item)}
+											>
+												Chấp nhận
+											</Button>
 
-										<Button
-											type="primary"
-											size="small"
-											style={{ float: 'right', margin: '0 4px' }}
-											onClick={() => handlerAccept(item)}
-										>
-											Chấp nhận
-										</Button>
-
-										<Button
-											type="default"
-											size="small"
-											style={{ float: 'right', margin: '0 4px' }}
-											onClick={() => handlerDeny(item)}
-										>
-											Từ chối
-										</Button>
+											<Button
+												type="default"
+												size="small"
+												style={{ float: 'right', margin: '0 4px' }}
+												onClick={() => handlerDeny(item)}
+											>
+												Từ chối
+											</Button>
+										</div>
 									</Space>
 								) : (
 									<Button type="text" block style={{ height: 'auto', padding: '2px' }}>

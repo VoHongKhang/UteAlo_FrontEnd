@@ -1,15 +1,17 @@
 import { Group, Message, MoreHoriz } from '@material-ui/icons';
-import { Button } from 'antd';
+import { Button, Typography } from 'antd';
 import Search from 'antd/es/input/Search';
 import sampleProPic from '../../assets/appImages/user.png';
 import { useEffect, useState } from 'react';
 import GetFriendApi from '../../api/profile/friend/getFriendApi';
 import toast from 'react-hot-toast';
-import { BottomNavigation, BottomNavigationAction } from '@material-ui/core';
+import { BottomNavigation, BottomNavigationAction, Popover } from '@material-ui/core';
 import PostGroupApi from '../../api/postGroups/PostGroupApi';
-
+import { useNavigate } from 'react-router-dom';
 const SidebarChat = ({ user, onChangeMessage }) => {
+	const navigate = useNavigate();
 	const [friend, setFriend] = useState();
+
 	const [group, setGroup] = useState();
 	const [isGroup, setIsGroup] = useState(0);
 	const [selectItem, setSelectItem] = useState(null);
@@ -68,12 +70,51 @@ const SidebarChat = ({ user, onChangeMessage }) => {
 		};
 		fetchData();
 	}, [user]);
+
+	const [anchorEl, setAnchorEl] = useState(null);
+	const handleClick = (event) => {
+		setAnchorEl(event.currentTarget);
+	};
+	const handleClose = () => {
+		setAnchorEl(null);
+	};
+	const underDev = () => {
+		toast.error('Chức năng đang được phát triển');
+		setAnchorEl(null);
+	};
 	return (
 		<div className="sidebar--chat">
 			<div className="header--chat">
 				<div className="header--chat--infor">
 					<span>Tin nhắn</span>
-					<Button type="default" icon={<MoreHoriz />} />
+					<Button
+						type="default"
+						icon={<MoreHoriz />}
+						aria-describedby="simple-popover"
+						onClick={handleClick}
+					/>
+					<Popover
+						id="simple-popover"
+						open={Boolean(anchorEl)}
+						className="popper--member"
+						anchorEl={anchorEl}
+						onClose={handleClose}
+						anchorOrigin={{
+							vertical: 'bottom',
+							horizontal: 'right',
+						}}
+						transformOrigin={{
+							vertical: 'top',
+							horizontal: 'right',
+						}}
+					>
+						<Typography className="title--popper" onClick={() => navigate('/groups/create')}>
+							Tạo nhóm mới
+						</Typography>
+						<Typography className="title--popper" onClick={() => underDev()}>
+							Gửi tin nhắn đến nhiều người
+						</Typography>
+					</Popover>
 				</div>
 				<Search className="search--friend--message" placeholder="tìm kiếm bạn bè" />
 				<BottomNavigation
@@ -98,7 +139,7 @@ const SidebarChat = ({ user, onChangeMessage }) => {
 							id={item.userId}
 						>
 							<div className="avatar--message--sidebar">
-								<img src={item?.avatar||sampleProPic} alt="avatar" />
+								<img src={item?.avatar || sampleProPic} alt="avatar" />
 							</div>
 							<div className="infor--message--sidebar">
 								<div className="name--message--sidebar">{item.username}</div>

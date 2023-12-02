@@ -93,7 +93,7 @@ const Sidebar = () => {
 		<Space
 			className="sidebar"
 			direction="vertical"
-			style={{ overflow: 'auto', color: theme.foreground, background: theme.background }}
+			style={{ color: theme.foreground, background: theme.background }}
 		>
 			{lists.map((list, index) => (
 				<List

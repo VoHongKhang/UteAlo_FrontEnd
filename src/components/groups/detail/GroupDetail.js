@@ -13,7 +13,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import PostGroupApi from '../../../api/postGroups/PostGroupApi';
 import './GroupDetail.css';
 import { useNavigate } from 'react-router-dom';
-import { Image, theme } from 'antd';
+import { Image, Typography, theme } from 'antd';
 import { Modal, Select, Checkbox } from 'antd';
 import qrCode from '../../../assets/icons/qr-code/qr-code.png';
 import home from '../../../assets/icons/qr-code/home.png';
@@ -26,12 +26,14 @@ import SharePostCard from '../../timeline/post/SharePostCard';
 import { Skeleton } from 'antd';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { postDetail } from '../../../api/postGroups/postDetail';
+import { Popover } from '@material-ui/core';
 const GroupDetail = () => {
 	const isMounted = useRef(true);
 	const params = useParams();
 	const { user: currentUser } = useAuth();
 	const [listPost, setListPost] = useState([]);
 	const [sortedList, setSortedList] = useState([]);
+	const [popoverItem, setPopoverItem] = useState(null);
 	const [hasMore, setHasMore] = useState({
 		posts: false,
 		share: false,
@@ -188,6 +190,10 @@ const GroupDetail = () => {
 	const getUser = (data) => {
 		setInforUser(data);
 	};
+	const [anchorEl, setAnchorEl] = useState(null);
+	const handleClose = () => {
+		setAnchorEl(null);
+	};
 	useEffect(() => {
 		const fetchGroup = async () => {
 			const res = await PostGroupApi.getGroup({ user: currentUser, postId: params.postGroupId });
@@ -246,13 +252,19 @@ const GroupDetail = () => {
 					});
 				break;
 			case 'Đã Tham gia':
+				setAnchorEl(e.currentTarget);
+				setPopoverItem('Đã Tham gia');
 				break;
 			case 'Quản lý nhóm':
 				navigate(`/groups/manager/${params.postGroupId}`);
 				break;
 			case 'Chờ xác nhận':
+				setAnchorEl(e.currentTarget);
+				setPopoverItem('Chờ xác nhận');
 				break;
 			case 'Chấp nhận lời mời':
+				setAnchorEl(e.currentTarget);
+				setPopoverItem('Chấp nhận lời mời');
 				break;
 			default:
 				break;
@@ -283,7 +295,124 @@ const GroupDetail = () => {
 			borderRadius: borderStyles,
 		};
 	}
+	const leaveGroup = async () => {
+		const toastId = toast.loading('Đang rời khỏi nhóm...');
 
+		await PostGroupApi.leaveGroup({ token: currentUser.accessToken, postGroupId: params.postGroupId })
+			.then((res) => {
+				toast.success('Rời khỏi nhóm thành công!', { id: toastId });
+				//reload trang
+				console.log('res', { ...postGroup, roleGroup: res.result });
+				setPostGroup({ ...postGroup, roleGroup: res.result });
+				console.log('postGroup', postGroup);
+			})
+			.catch((error) => {
+				toast.error(error.message || error.toString(), { id: toastId });
+			});
+	};
+	const openModalGroup = () => {
+		setAnchorEl(null);
+		Modal.confirm({
+			title: 'Bạn có chắc muốn rời khỏi nhóm này?',
+			icon: '',
+			okText: 'Đồng ý',
+			cancelText: 'Hủy',
+			onOk: () => {
+				leaveGroup();
+			},
+		});
+	};
+	const cancelLegage = async () => {
+		const toastId = toast.loading('Đang hủy yêu cầu tham gia nhóm...');
+		await PostGroupApi.cancelJoinGroupRequest({
+			token: currentUser.accessToken,
+			postGroupId: params.postGroupId,
+		})
+			.then((res) => {
+				toast.success('Hủy yêu cầu tham gia nhóm thành công!', { id: toastId });
+				
+				//reload trang
+				console.log('res', { ...postGroup, roleGroup: res.result });
+				setPostGroup({ ...postGroup, roleGroup: res.result });
+				console.log('postGroup', postGroup);
+			})
+			.catch((error) => {
+				toast.error(error.message || error.toString(), { id: toastId });
+			});
+	};
+	const cancelInvite = async () => {
+		const toastId = toast.loading('Đang từ chối lời mời vào nhóm..');
+		await PostGroupApi.declineJoinGroupRequest({
+			token: currentUser.accessToken,
+			postGroupId: params.postGroupId,
+		})
+			.then((res) => {
+				toast.success('Từ chối lời mời tham gia nhóm thành công!', { id: toastId });
+				//reload trang
+
+				console.log('res', { ...postGroup, roleGroup: res.result });
+				setPostGroup({ ...postGroup, roleGroup: res.result });
+				console.log('postGroup', postGroup);
+			})
+			.catch((error) => {
+				toast.error(error.message || error.toString(), { id: toastId });
+			});
+	};
+	const openCancelInviteModal = () => {
+		setAnchorEl(null);
+		Modal.confirm({
+			title: 'Bạn có chắc muốn hủy lời mời tham gia nhóm này?',
+			icon: '',
+			okText: 'Đồng ý',
+			cancelText: 'Hủy',
+			onOk: () => {
+				cancelInvite();
+			},
+		});
+	};
+	const acceptInvite = async () => {
+		const toastId = toast.loading('Đang chấp nhận lời mời tham gia nhóm...');
+		await PostGroupApi.acceptJoinGroupRequest({
+			token: currentUser.accessToken,
+			postGroupId: params.postGroupId,
+		})
+			.then((res) => {
+				toast.success('Chấp nhận lời mời tham gia nhóm thành công!', { id: toastId });
+				//reload trang
+
+				console.log('res', { ...postGroup, roleGroup: res.result });
+				setPostGroup({ ...postGroup, roleGroup: res.result });
+				console.log('postGroup', postGroup);
+			})
+			.catch((error) => {
+				toast.error(error.message || error.toString(), { id: toastId });
+			});
+	};
+	const openAcceptInviteModal = () => {
+		setAnchorEl(null);
+		Modal.confirm({
+			title: 'Bạn có chắc muốn chấp nhận lời mời tham gia nhóm này?',
+			icon: '',
+			okText: 'Đồng ý',
+			cancelText: 'Hủy',
+			onOk: () => {
+				acceptInvite();
+			},
+		});
+	};
+
+	const openCancelLegageModal = () => {
+		setAnchorEl(null);
+		Modal.confirm({
+			title: 'Bạn có chắc muốn hủy yêu cầu tham gia nhóm này?',
+			icon: '',
+			okText: 'Đồng ý',
+			cancelText: 'Hủy',
+			onOk: () => {
+				cancelLegage();
+			},
+		});
+	};
 	return (
 		<>
 			<Helmet title={`Nhóm ${postGroup.postGroupName} |UTEALO`} />
@@ -354,6 +483,7 @@ const GroupDetail = () => {
 											variant="contained"
 											className="group--button-joined"
 											onClick={handleGroup}
+											aria-describedby="simple-popover"
 										>
 											<p>
 												{postGroup?.roleGroup === 'Admin' || postGroup?.roleGroup === 'Deputy'
@@ -365,6 +495,75 @@ const GroupDetail = () => {
 													: 'Chấp nhận lời mời'}
 											</p>
 										</button>
+										<Popover
+											id="simple-popover"
+											className="popover--list"
+											anchorOrigin={{
+												vertical: 'bottom',
+												horizontal: 'right',
+											}}
+											transformOrigin={{
+												vertical: 'top',
+												horizontal: 'right',
+											}}
+											anchorEl={anchorEl}
+											onClose={handleClose}
+											open={Boolean(anchorEl)}
+										>
+											{popoverItem === 'Đã Tham gia' && (
+												<>
+													<Typography
+														className="title--popper"
+														onClick={() => openModalGroup()}
+													>
+														Rời khỏi nhóm
+													</Typography>
+												</>
+											)}
+											{popoverItem === 'Chờ xác nhận' && (
+												<>
+													<Typography
+														className="title--popper"
+														onClick={() => {
+															openCancelLegageModal();
+														}}
+													>
+														Hủy yêu cầu tham gia
+													</Typography>
+												</>
+											)}
+											{popoverItem === 'Chấp nhận lời mời' && (
+												<>
+													<Typography
+														className="title--popper"
+														onClick={() => {
+															openAcceptInviteModal();
+														}}
+													>
+														Chấp nhận lời mời
+													</Typography>
+													<Typography
+														className="title--popper"
+														onClick={() => {
+															openCancelInviteModal();
+														}}
+													>
+														Từ chối lời mời
+													</Typography>
+												</>
+											)}
+
+											<Typography
+												className="title--popper"
+												onClick={() => {
+													toast.error('Chức năng đang phát triển');
+													setAnchorEl(null);
+												}}
+											>
+												Hủy theo dõi nhóm
+											</Typography>
+										</Popover>
+
 										{(postGroup?.roleGroup === 'Admin' || postGroup?.roleGroup === 'Member') && (
 											<button
 												variant="contained"
@@ -562,7 +761,7 @@ const GroupDetail = () => {
 									)}
 									<InfiniteScroll
 										scrollableTarget="feed--group--scroll"
-										className='feed__scroll'
+										className="feed__scroll"
 										dataLength={postLength}
 										next={loadMore}
 										hasMore={hasMore.posts || hasMore.share}
@@ -576,7 +775,6 @@ const GroupDetail = () => {
 												}}
 											/>
 										}
-										
 									>
 										{sortedList?.map((p) => {
 											if (p.postId) {

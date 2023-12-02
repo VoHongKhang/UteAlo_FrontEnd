@@ -1,146 +1,192 @@
 .editProfile-container {
-  box-shadow: 
-    10px 10px 15px 5px rgba(0, 0, 0, 0.1),
-    10px 10px 15px 5px rgba(0, 0, 0, 0.1);
-  height: max-content;
-  width: 600px;
-  margin: 25px auto;
-  padding: 2px 0;
-  border-radius: 5px;
+	box-shadow: 10px 10px 15px 5px rgba(0, 0, 0, 0.1), 10px 10px 15px 5px rgba(0, 0, 0, 0.1);
+	height: max-content;
+	width: 600px;
+	margin: 25px auto;
+	padding: 2px 0;
+	border-radius: 5px;
 }
 
 .editProfile-box {
-  margin: 50px;
+	margin: 50px;
 }
 
 .editProfile-heading {
-  text-align: center;
+	text-align: center;
 }
 
 .editProfile-input {
-  display: block;
-  margin: 20px auto;
-  padding: 10px;
-  width: 100%;
+	display: block;
+	margin: 20px auto;
+	padding: 10px;
+	width: 100%;
 }
 
 .editProfileFile-input {
-  margin: 10px 0;
+	margin: 10px 0;
 }
 
 .editProfile-label {
-  font-size: 14px;
-  font-weight: 500;
+	font-size: 14px;
+	font-weight: 500;
 }
 
 .editProfile-btnBox {
-  margin: 10px 0;
-  text-align: center;
+	margin: 10px 0;
+	text-align: center;
 }
 
-
-
 .editProfileBackground-btn {
-  padding: 12px;
-  cursor: pointer;
-  background: #abadb5;
-  color: white;
-  font-weight: 500;
-  border: none;
-  border-radius: 5px;
-  margin-left: 177px;
-  margin-top: -15px;
+	padding: 12px;
+	cursor: pointer;
+	background: #abadb5;
+	color: white;
+	font-weight: 500;
+	border: none;
+	border-radius: 5px;
+	margin-left: 177px;
+	margin-top: -15px;
 }
 
 .editProfile-btn {
-  padding: 12px;
-  cursor: pointer;
-  background: #abadb5;
-  color: white;
-  font-weight: 500;
-  border: none;
-  border-radius: 5px;
+	padding: 12px;
+	cursor: pointer;
+	background: #abadb5;
+	color: white;
+	font-weight: 500;
+	border: none;
+	border-radius: 5px;
 }
 
 .profilePicPreview {
-  word-wrap: break-word;
+	word-wrap: break-word;
 }
-
 
 .editAvatar-btnBox {
-  margin: 10px 0;
-  text-align: center;
-  margin-top: 54px;
+	margin: 10px 0;
+	text-align: center;
+	margin-top: 54px;
 }
 
-
-
 .editProfile-input {
-  display: flex;
-  flex-direction: column;
+	display: flex;
+	flex-direction: column;
 }
 
 .radio-label {
-  margin-bottom: 10px; /* Khoảng cách giữa các nút radio */
-  display: flex;
-  align-items: center;
+	margin-bottom: 10px; /* Khoảng cách giữa các nút radio */
+	display: flex;
+	align-items: center;
 }
 
 .radio-label input {
-  margin-right: 5px; /* Khoảng cách giữa nút radio và văn bản */
+	margin-right: 5px; /* Khoảng cách giữa nút radio và văn bản */
 }
 
 /* Loại bỏ ô trống dư phía sau "FEMALE" */
 .radio-label:last-child {
-  margin-right: 0;
+	margin-right: 0;
 }
-
 
 /* Định dạng input date */
 .custom-datepicker {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 16px;
+	padding: 10px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	font-size: 16px;
 }
 
 /* Định dạng placeholder */
 .custom-datepicker::placeholder {
-  color: #888;
+	color: #888;
 }
 
 /* Định dạng input khi được focus */
 .custom-datepicker:focus {
-  outline: none;
-  border-color: #007BFF;
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+	outline: none;
+	border-color: #007bff;
+	box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
 }
 
 .editProfile-container-main {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
+	display: flex;
+	justify-content: space-between;
+	margin-top: 20px;
 }
 
 .profileUserImg {
-  cursor: pointer;
+	cursor: pointer;
 }
 
 .profileCoverImg {
-  cursor: pointer;
+	cursor: pointer;
 }
 
 .editBackground-btnBox {
-  margin-top: -24px;
+	margin-top: -24px;
 }
 
 .dateOfBirth {
-  margin-top: -28px;
+	margin-top: -28px;
 }
 
 .custom-datepicker {
-  margin-top: 10px;
+	margin-top: 10px;
 }
 
-
-
+.ManagerGroup--groupCoverImg {
+	height: 320px !important;
+	display: block;
+	object-fit: cover;
+}
+.contaner--avatar {
+	position: relative;
+	height: 150px;
+}
+.contaner--avatar .groupUserImg {
+	bottom: 0;
+	top: -30%;
+	cursor: pointer;
+}
+.edit--group--cover {
+	position: absolute;
+	bottom: 10%;
+	right: 1%;
+	cursor: pointer;
+}
+.header--group {
+	width: 100%;
+}
+.edit--group--avatar {
+	left: 21% !important;
+}
+.group--contanier--top {
+	margin-left: 25% !important;
+}
+.collapse--content {
+	display: flex;
+	align-items: self-start;
+	flex-direction: column;
+}
+.title--collapse {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 100%;
+}
+.icon--setting {
+	cursor: pointer;
+}
+.update--user {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+}
+.collapse--update {
+	margin: 20px 0px;
+	width: 50%;
+}
+.modal--group--avatar {
+	z-index: 9999;
+}

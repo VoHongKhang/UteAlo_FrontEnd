@@ -35,7 +35,7 @@ const ListDiscover = ({ currentUser, type, title = 'Danh sách nhóm' }) => {
 					itemLayout="horizontal"
 					dataSource={friendFetcher.data}
 					loading={friendFetcher.fetching}
-					grid={{ gutter: 16, column: 3 }}
+					grid={{ gutter: 16, column: 2 }}
 					renderItem={(user) => (
 						<List.Item>
 							<GroupCard user={user} type={type} />

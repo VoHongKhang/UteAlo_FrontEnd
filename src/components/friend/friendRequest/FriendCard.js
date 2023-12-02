@@ -160,20 +160,20 @@ const FriendCard = ({ user, type }) => {
 					</Link>
 				</Tooltip>,
 				<Tooltip key="message" title="Nhắn tin">
-					<Button
-						icon={<HiChatBubbleOvalLeft />}
-						onClick={() => handleFriend({ tempt: 'chat', relationship: 'friend' })}
-						disabled={false}
-						loading={loading.chat}
-					/>
+					<Link to={`/message/${user.userId}`}>
+						<Button icon={<HiChatBubbleOvalLeft />} />
+					</Link>
 				</Tooltip>,
-				<Dropdown key="more" menu={{ items: dropdownItems }} arrow disabled={false} trigger={['click']}>
-					<Button
-						icon={<HiDotsHorizontal />}
-						disabled={false}
-						loading={Object.keys(loading).some((item) => item !== 'chat' && loading[item])} // loading doesn't include chat
-					/>
-				</Dropdown>,
+				<Tooltip key="more" title="Xem thêm">
+					<Dropdown key="more" menu={{ items: dropdownItems }} arrow disabled={false} trigger={['click']}>
+						<Button
+							icon={<HiDotsHorizontal />}
+							disabled={false}
+							loading={Object.keys(loading).some((item) => item !== 'chat' && loading[item])} // loading doesn't include chat
+						/>
+					</Dropdown>
+					,
+				</Tooltip>,
 			]}
 			bodyStyle={{ padding: 12 }}
 		>

@@ -22,7 +22,8 @@ const Share = ({ inforUser, newPosts, postGroupId }) => {
 
 	useEffect(() => {
 		console.log(privacyLevel);
-	}, [privacyLevel]);
+		console.log('postGroupId', postGroupId);
+	}, [privacyLevel, postGroupId]);
 	// Xử lý ảnh của bài post
 	const postDetails = (e) => {
 		const file = e.target.files[0];
@@ -139,7 +140,7 @@ const Share = ({ inforUser, newPosts, postGroupId }) => {
 									onChange={postDetails}
 								/>
 							</label>
-							<label htmlFor="files" className="shareOption" >
+							<label htmlFor="files" className="shareOption">
 								<AttachFile htmlColor="brown" className="shareIcon" />
 								<span className="shareOptionText">Tệp</span>
 								<input
@@ -150,7 +151,7 @@ const Share = ({ inforUser, newPosts, postGroupId }) => {
 									onChange={postFileDetails}
 								/>
 							</label>
-							{postGroupId === null && (
+							{(postGroupId === null || postGroupId === undefined) && (
 								<div className="shareOption" id="sharePublic">
 									<label
 										htmlFor="privacyLevel"

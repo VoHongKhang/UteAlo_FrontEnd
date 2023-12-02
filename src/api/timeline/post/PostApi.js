@@ -150,33 +150,9 @@ const PostApi = {
 			throw new Error(error?.response ? error.response.data.message : error.message);
 		}
 	},
-	getShareInProfile: async (user, page, size) => {
-		try {
-			const config = {
-				headers: {
-					Authorization: `Bearer ${user.accessToken}`,
-				},
-			};
-			const res = await axios.get(`${BASE_URL}/v1/share/post?page=${page}&size=${size}`, config);
-			return res.data.result;
-		} catch (error) {
-			throw new Error(error?.response ? error.response.data.message : error.message);
-		}
-	},
-	getPostInProfile: async (user, page, size) => {
-		try {
-			const config = {
-				headers: {
-					Authorization: `Bearer ${user.accessToken}`,
-				},
-			};
-			const res = await axios.get(`${BASE_URL}/v1/post/user?page=${page}&size=${size}`, config);
-			return res.data.result;
-		} catch (error) {
-			throw new Error(error?.response ? error.response.data.message : error.message);
-		}
-	},
 	getPostUserInProfile: async (user, userId, page, size) => {
+		console.log('user', user);
+		console.log('userId', userId);
 		try {
 			const config = {
 				headers: {
@@ -192,6 +168,8 @@ const PostApi = {
 		}
 	},
 	getShareUserInProfile: async (user, userId, page, size) => {
+		console.log('user', user);
+		console.log('userId', userId);
 		try {
 			const config = {
 				headers: {

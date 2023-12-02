@@ -14,7 +14,8 @@ export const ProfileProvider = ({ children }) => {
 	const { user: loggedUser } = useAuth();
 
 	// update user req
-	const editUser = async (fullName, about, address, phone, gender, dateOfBirth) => {
+	const editUser = async ({ fullName, about, address, phone, gender, dateOfBirth }) => {
+		const toastId = toast.loading('Updating profile...');
 		try {
 			dispatch({
 				type: 'UPDATE_USER_REQUEST',
@@ -34,21 +35,23 @@ export const ProfileProvider = ({ children }) => {
 				type: 'UPDATE_USER_SUCCESS',
 				payload: data,
 			});
-			toast.success('Profile updated successfully', successOptions);
-      // Sau khi cập nhật thành công, tải lại trang
-			window.location.reload();
+
+			toast.success('Profile updated successfully', { id: toastId });
+			// Sau khi cập nhật thành công, tải lại trang
+			return data;
 		} catch (error) {
 			console.log(error.response.data.message);
 			dispatch({
 				type: 'UPDATE_USER_FAIL',
 				payload: error.response.data.message,
 			});
-			toast.error(error.response.data.message, errorOptions);
+			toast.error(error.response.data.message, { id: toastId });
 		}
 	};
 
 	// update user avatar req
 	const updateUserAvatar = async (imageFile) => {
+		const toastId = toast.loading('Đang cập nhật...');
 		try {
 			dispatch({
 				type: 'UPDATE_USER_AVATAR_REQUEST',
@@ -67,21 +70,22 @@ export const ProfileProvider = ({ children }) => {
 				type: 'UPDATE_USER_AVATAR_SUCCESS',
 				payload: data.result, // Điều này phụ thuộc vào cách server trả về dữ liệu mới của avatar
 			});
-      toast.success('Avatar updated successfully', successOptions);
+			toast.success('Avatar updated successfully', { id: toastId });
 			// Sau khi cập nhật thành công, tải lại trang
-			window.location.reload();
+			return data.result;
 		} catch (error) {
 			console.log(error.response.data.message);
 			dispatch({
 				type: 'UPDATE_USER_AVATAR_FAIL',
 				payload: error.response.data.message,
 			});
-			toast.error(error.response.data.message, errorOptions);
+			toast.error(error.response.data.message, { id: toastId });
 		}
 	};
 
 	// update user background req
 	const updateUserBackground = async (imageFile) => {
+		const toastId = toast.loading('Đang cập nhật...');
 		try {
 			dispatch({
 				type: 'UPDATE_USER_BACKGROUND_REQUEST',
@@ -100,16 +104,16 @@ export const ProfileProvider = ({ children }) => {
 				type: 'UPDATE_USER_BACKGROUND_SUCCESS',
 				payload: data.result, // Điều này phụ thuộc vào cách server trả về dữ liệu mới của avatar
 			});
-			toast.success('Background updated successfully', successOptions);
-      // Sau khi cập nhật thành công, tải lại trang
-			window.location.reload();
+			toast.success('Background updated successfully', { id: toastId });
+			// Sau khi cập nhật thành công, tải lại trang
+			return data.result;
 		} catch (error) {
 			console.log(error.response.data.message);
 			dispatch({
 				type: 'UPDATE_USER_BACKGROUND_FAIL',
 				payload: error.response.data.message,
 			});
-			toast.error(error.response.data.message, errorOptions);
+			toast.error(error.response.data.message, { id: toastId });
 		}
 	};
 

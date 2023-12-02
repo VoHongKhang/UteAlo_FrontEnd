@@ -30,16 +30,10 @@ const FeedOfUser = ({ inforUser, userProfile }) => {
 
 		try {
 			if (isMounted.current) {
-				const [res, response] =
-					userProfile === inforUser.userId
-						? await Promise.all([
-								hasMore.posts && PostApi.getPostInProfile(currentUser, newPage, 20),
-								hasMore.share && PostApi.getShareInProfile(currentUser, newPage, 20),
-						  ])
-						: await Promise.all([
-								hasMore.posts && PostApi.getPostUserInProfile(currentUser, userProfile, newPage, 20),
-								hasMore.share && PostApi.getShareUserInProfile(currentUser, userProfile, newPage, 20),
-						  ]);
+				const [res, response] = await Promise.all([
+					hasMore.posts && PostApi.getPostUserInProfile(currentUser, userProfile, newPage, 20),
+					hasMore.share && PostApi.getShareUserInProfile(currentUser, userProfile, newPage, 20),
+				]);
 
 				if (res) {
 					console.log('res', res);
@@ -72,16 +66,10 @@ const FeedOfUser = ({ inforUser, userProfile }) => {
 
 	const fetchPosts = async () => {
 		try {
-			let [res, response] =
-				userProfile === inforUser.userId
-					? await Promise.all([
-							PostApi.getPostInProfile(currentUser, page, 20),
-							PostApi.getShareInProfile(currentUser, page, 20),
-					  ])
-					: await Promise.all([
-							PostApi.getPostUserInProfile(currentUser, userProfile, page, 20),
-							PostApi.getShareUserInProfile(currentUser, userProfile, page, 20),
-					  ]);
+			const [res, response] = await Promise.all([
+				PostApi.getPostUserInProfile(currentUser, userProfile, page, 20),
+				PostApi.getShareUserInProfile(currentUser, userProfile, page, 20),
+			]);
 
 			if (response) {
 				console.log('response', response);

@@ -399,9 +399,9 @@ ul {
 .content--message--group {
 	max-width: 75%;
 }
-.removeMessage{
-	width: 100px!important;
-    display: block;
+.removeMessage {
+	width: 100px !important;
+	display: block;
 }
 .emotion--container {
 	display: flex;
@@ -546,9 +546,16 @@ ul {
 	height: 16px;
 	cursor: pointer;
 }
-.react--icon{
+.react--icon {
 	position: absolute;
-    bottom: -14px;
-    right: 5px;
+	bottom: -14px;
+	right: 5px;
+	cursor: pointer;
+}
+.title--popper {
+	font-size: 12px;
+	font-weight: 600;
+	margin-bottom: 4px;
+	padding: 8px;
 	cursor: pointer;
 }

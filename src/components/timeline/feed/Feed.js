@@ -148,65 +148,59 @@ const Feed = ({ inforUser }) => {
 	}, [listPost]);
 	return (
 		<div className="feed" style={{ color: theme.foreground, background: theme.background }}>
-			<div className="feedWrapper">
-				<Share inforUser={inforUser} newPosts={getNewPost} postGroupId={null} />
-				<InfiniteScroll
-					scrollableTarget="messages-history"
-					className='feed__scroll'
-					dataLength={postLength}
-					next={loadMore}
-					hasMore={hasMore.posts || hasMore.share}
-					loader={
-						<Skeleton
-							style={{ marginTop: '30px' }}
-							active
-							avatar
-							paragraph={{
-								rows: 4,
-							}}
-						/>
-					}
-					endMessage={
-						<Space
-							direction="vertical"
-							style={{ width: 'fit-content', margin: '50px auto' }}
-							align="center"
-						>
-							<img className="iamge_end" src={LogoUte} alt="UTEALO" />
-							<Typography.Title level={4} style={{ margin: 0 }}>
-								Mạng xã hội UTEALO
-							</Typography.Title>
+			<Share inforUser={inforUser} newPosts={getNewPost} postGroupId={null} />
+			<InfiniteScroll
+				scrollableTarget="messages-history"
+				className="feed__scroll"
+				dataLength={postLength}
+				next={loadMore}
+				hasMore={hasMore.posts || hasMore.share}
+				loader={
+					<Skeleton
+						style={{ marginTop: '30px' }}
+						active
+						avatar
+						paragraph={{
+							rows: 4,
+						}}
+					/>
+				}
+				endMessage={
+					<Space direction="vertical" style={{ width: 'fit-content', margin: '50px auto' }} align="center">
+						<img className="iamge_end" src={LogoUte} alt="UTEALO" />
+						<Typography.Title level={4} style={{ margin: 0 }}>
+							Mạng xã hội UTEALO
+						</Typography.Title>
 
-							<Typography.Text type="secondary">
-								Nơi kết nối, chia sẻ và trao đổi thông tin giữa sinh viên và giảng viên trường Đại học
-								Sư phạm Kỹ thuật TP.HCM
-							</Typography.Text>
-						</Space>
+						<Typography.Text type="secondary">
+							Nơi kết nối, chia sẻ và trao đổi thông tin giữa sinh viên và giảng viên trường Đại học Sư
+							phạm Kỹ thuật TP.HCM
+						</Typography.Text>
+					</Space>
+				}
+			>
+				{sortedList?.map((p) => {
+					if (p.postId) {
+						return (
+							<PostCard
+								inforUser={inforUser}
+								post={p}
+								key={`post-${p.postId}`}
+								newShare={getPostUpdate}
+							/>
+						);
+					} else {
+						return (
+							<SharePostCard
+								inforUser={inforUser}
+								share={p}
+								key={`share-${p.shareId}`}
+								newSharePosts={getNewSharePost}
+							/>
+						);
 					}
-				>
-					{sortedList?.map((p) => {
-						if (p.postId) {
-							return (
-								<PostCard
-									inforUser={inforUser}
-									post={p}
-									key={`post-${p.postId}`}
-									newShare={getPostUpdate}
-								/>
-							);
-						} else {
-							return (
-								<SharePostCard
-									inforUser={inforUser}
-									share={p}
-									key={`share-${p.shareId}`}
-									newSharePosts={getNewSharePost}
-								/>
-							);
-						}
-					})}
-				</InfiniteScroll>
-			</div>
+				})}
+			</InfiniteScroll>
 		</div>
 	);
 };

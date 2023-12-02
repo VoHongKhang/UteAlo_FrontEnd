@@ -73,13 +73,13 @@ const userAction = ({ currentUser, user, action }) => {
 
 	// Hủy lời mời tham gia nhóm
 	const handleCancelJoinGroup = async ({ currentUser, user }) => {
-		const toastId = toast.loading('Đang hủy lời mời kết bạn...');
+		const toastId = toast.loading('Đang hủy lời mời tham gia nhóm...');
 		try {
 			await PostGroupApi.cancelJoinGroupRequest({
 				token: currentUser.accessToken,
 				postGroupRequestId: user.postGroupRequestId,
 			});
-			toast.success('Hủy lời mời kết bạn thành công!', { id: toastId });
+			toast.success('Hủy lời mời tham gia nhóm thành công!', { id: toastId });
 		} catch (error) {
 			toast.error(error.message || error.toString(), { id: toastId });
 		}
@@ -93,7 +93,7 @@ const userAction = ({ currentUser, user, action }) => {
 				token: currentUser.accessToken,
 				postGroupId: user.postGroupId,
 			});
-			toast.success('Đang chấp nhận lời mời kết bạn thành công!', { id: toastId });
+			toast.success('Đang chấp nhận lời mời tham gia nhóm thành công!', { id: toastId });
 		} catch (error) {
 			toast.error(error.message || error.toString(), { id: toastId });
 		}
@@ -101,13 +101,13 @@ const userAction = ({ currentUser, user, action }) => {
 
 	// Từ chối lời mời tham gia nhóm
 	const handleDeclineJoinGroup = async ({ currentUser, user }) => {
-		const toastId = toast.loading('Đang hủy lời mời kết bạn...');
+		const toastId = toast.loading('Đang hủy lời mời tham gia nhóm...');
 		try {
 			await PostGroupApi.declineJoinGroupRequest({
 				token: currentUser.accessToken,
 				postGroupId: user.postGroupId,
 			});
-			toast.success('Hủy lời mời kết bạn thành công!', { id: toastId });
+			toast.success('Hủy lời mời tham gia nhóm thành công!', { id: toastId });
 		} catch (error) {
 			toast.error(error.message || error.toString(), { id: toastId });
 		}

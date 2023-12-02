@@ -5,6 +5,7 @@ import ListFriend from './ListFriend';
 import Topbar from '../../timeline/topbar/Topbar';
 import './friendRequest.css';
 import useAuth from '../../../context/auth/AuthContext';
+import { Toaster } from 'react-hot-toast';
 const FriendRequest = () => {
 	const {user: currentUser} = useAuth();
 	const [type, setType] = useState('friend');
@@ -51,6 +52,7 @@ const FriendRequest = () => {
 	return (
 		<>
 			<Helmet title={`${title}`} />
+			<Toaster />
 			<Topbar />
 			<div className="container">
 				<div className="leftbar">

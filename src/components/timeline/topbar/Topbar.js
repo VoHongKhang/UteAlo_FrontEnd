@@ -1,16 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Topbar.css';
 import axios from 'axios';
-import {
-	NightsStay,
-	Search,
-	WbSunny,
-	Home,
-	Group,
-	GroupAdd,
-	Notifications,
-	Message,
-} from '@material-ui/icons';
+import { NightsStay, Search, WbSunny, Home, Group, GroupAdd, Notifications } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 import useAuth from '../../../context/auth/AuthContext';
 import useTheme, { themes } from '../../../context/ThemeContext';
@@ -19,6 +10,7 @@ import noAvatar from '../../../assets/appImages/user.png';
 import { BASE_URL } from '../../../context/apiCall';
 import { useNavigate } from 'react-router-dom';
 import adver4 from '../../../assets/appImages/adver4.jpg';
+import { HiChatBubbleOvalLeft } from 'react-icons/hi2';
 
 const Topbar = ({ dataUser }) => {
 	const [user, setUser] = useState();
@@ -30,7 +22,6 @@ const Topbar = ({ dataUser }) => {
 	const [searchHistory, setSearchHistory] = useState([]);
 	const [showDropdown, setShowDropdown] = useState(false);
 	const [searchFriends, setSearchFriends] = useState([]);
-	const [suggestedValues, setSuggestedValues] = useState([]);
 	const inputRef = useRef(null);
 
 	// Toggle theme switch
@@ -57,7 +48,7 @@ const Topbar = ({ dataUser }) => {
 			dataUser(res.data.result);
 		};
 		fetchUsers();
-	}, [currentUser.accessToken, currentUser.userId]);
+	}, [currentUser]);
 
 	const buttonCenterHandler = (e, link) => {
 		// if (e.tagName === 'svg') e = e.parentNode;
@@ -112,8 +103,8 @@ const Topbar = ({ dataUser }) => {
 		// Gọi hàm tìm kiếm từ API dựa trên giá trị nhập vào
 		searchGroupsFromAPI(inputText);
 
-		const filteredValues = searchHistory.filter((value) => value.toLowerCase().includes(inputText.toLowerCase()));
-		setSuggestedValues(filteredValues);
+		//const filteredValues = searchHistory.filter((value) => value.toLowerCase().includes(inputText.toLowerCase()));
+		//setSuggestedValues(filteredValues);
 		setShowDropdown(true);
 	};
 
@@ -163,7 +154,23 @@ const Topbar = ({ dataUser }) => {
 	};
 
 	console.log(searchFriends);
-
+	const listButton = [
+		{
+			title: 'Trang chủ',
+			icon: <Home className="button-center-home " titleAccess="Trang chủ" />,
+			link: '/',
+		},
+		{
+			title: 'Nhóm',
+			icon: <Group className="button-center-groups" titleAccess="Nhóm" />,
+			link: '/groups',
+		},
+		{
+			title: 'Bạn bè',
+			icon: <GroupAdd className="button-center-friends" titleAccess="Bạn bè" />,
+			link: '/friends',
+		},
+	];
 	return (
 		<>
 			<div
@@ -255,25 +262,29 @@ const Topbar = ({ dataUser }) => {
 					</div>
 				</div>
 				<div className="topbarCenter">
-					<div className="button-center button-active" onClick={(e) => buttonCenterHandler(e.target, '/')}>
-						<Home className="button-center-home " titleAccess="Trang chủ" />
-					</div>
-					<div className="button-center" onClick={(e) => buttonCenterHandler(e.target, '/groups')}>
-						<Group className="button-center-groups" titleAccess="Nhóm" />
-					</div>
-					<div className="button-center" onClick={(e) => buttonCenterHandler(e.target, '/friends')}>
-						<GroupAdd className="button-center-friends" titleAccess="Bạn bè" />
-					</div>
-					<div className="button-center" onClick={themeModeHandler}>
-						<div className="topbarIconItem button-center-theme">
-							{theme.background === '#ffffff' ? <NightsStay /> : <WbSunny />}
+					{listButton.map((item, index) => (
+						<div
+							key={index}
+							className="button-center"
+							onClick={(e) => buttonCenterHandler(e.target, item.link)}
+						>
+							{item.icon}
+							<span className="button-center-title">{item.title}</span>
 						</div>
+					))}
+					<div className="button-center" onClick={themeModeHandler}>
+						{theme.background === '#ffffff' ? (
+							<NightsStay className="button-center-theme" titleAccess="Chế độ tối" />
+						) : (
+							<WbSunny className="button-center-theme" titleAccess="Chế độ sáng" />
+						)}
+						<span className="button-center-title">Theme</span>
 					</div>
 				</div>
 
 				<div className="topbarRight">
 					<div className="button-right">
-						<Message
+						<HiChatBubbleOvalLeft
 							className="button-right-message"
 							titleAccess="Tin nhắn"
 							onClick={handderMessageClick}

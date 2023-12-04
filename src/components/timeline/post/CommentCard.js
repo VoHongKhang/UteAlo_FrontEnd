@@ -9,7 +9,7 @@ import useAuth from '../../../context/auth/AuthContext';
 import LikeOrUnlikeCommentApi from '../../../api/timeline/commentPost/likeOrUnlikeComment';
 import DeleteCommentApi from '../../../api/timeline/commentPost/delete';
 import toast from 'react-hot-toast';
-import { Modal } from 'antd';
+import { Image, Modal } from 'antd';
 import { PermMedia, Cancel } from '@material-ui/icons';
 import { Send } from '@material-ui/icons';
 import InputEmoji from 'react-input-emoji';
@@ -390,7 +390,15 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 							</div>
 							<div className="postCommentContent">
 								<span>{comment.content}</span>
-								{comment.photos && <img className="commentImg" src={comment.photos} alt="..." />}
+								{comment.photos && (
+									<Image
+										width={200}
+										height={200}
+										className="commentImg"
+										src={comment.photos}
+										alt="..."
+									/>
+								)}
 							</div>
 						</div>
 

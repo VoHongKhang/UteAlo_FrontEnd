@@ -141,6 +141,7 @@ export const ShareModal = ({ post, user, currentUser, visible, onClose, onShare,
 		}
 	};
 	// #endregion
+
 	return (
 		<>
 			{action === 'sharePost' ? (

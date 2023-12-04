@@ -1,4 +1,4 @@
-import { Button, Card, Dropdown, Popconfirm, theme, Tooltip, Typography, Image } from 'antd';
+import { Button, Card, Dropdown, Popconfirm, Tooltip, Typography, Image } from 'antd';
 import { HiDotsHorizontal } from 'react-icons/hi';
 import userAction from '../../action/useUserAction';
 import { Link } from 'react-router-dom';
@@ -14,6 +14,7 @@ import {
 } from 'react-icons/hi2';
 import UserAvatar from '../../action/UserAvatar';
 import { useState, useEffect } from 'react';
+import useTheme from '../../../context/ThemeContext';
 const FriendCard = ({ user, type }) => {
 	const { user: currentUser } = useAuth();
 	const [userState, setUserState] = useState(user);
@@ -40,7 +41,7 @@ const FriendCard = ({ user, type }) => {
 		setRelationship(type);
 	}, [type, user]);
 
-	const { token } = theme.useToken();
+	const { theme } = useTheme();
 	const relationshipLabel = {
 		friend: 'Bạn bè',
 		sent: 'Đã gửi',
@@ -143,6 +144,7 @@ const FriendCard = ({ user, type }) => {
 	}, [relationship]);
 	return (
 		<Card
+			style={{ color: theme.foreground, background: theme.background }}
 			hoverable
 			cover={
 				<Image
@@ -150,23 +152,35 @@ const FriendCard = ({ user, type }) => {
 					height={100}
 					src={user?.background || 'http://via.placeholder.com/200x100?text='}
 					alt={user.username}
-					style={{ objectFit: 'cover', background: token.colorBgLayout }}
+					style={{ objectFit: 'cover' }}
 				/>
 			}
 			actions={[
-				<Tooltip key="profile" title="Trang cá nhân">
+				<Tooltip
+					style={{ color: theme.foreground, background: theme.background }}
+					key="profile"
+					title="Trang cá nhân"
+				>
 					<Link to={`/profile/${user.userId}`}>
-						<Button icon={<HiUser />} />
+						<Button style={{ color: theme.foreground, background: theme.background }} icon={<HiUser />} />
 					</Link>
 				</Tooltip>,
-				<Tooltip key="message" title="Nhắn tin">
+				<Tooltip
+					style={{ color: theme.foreground, background: theme.background }}
+					key="message"
+					title="Nhắn tin"
+				>
 					<Link to={`/message/${user.userId}`}>
-						<Button icon={<HiChatBubbleOvalLeft />} />
+						<Button
+							style={{ color: theme.foreground, background: theme.background }}
+							icon={<HiChatBubbleOvalLeft />}
+						/>
 					</Link>
 				</Tooltip>,
-				<Tooltip key="more" title="Xem thêm">
+				<Tooltip style={{ color: theme.foreground, background: theme.background }} key="more" title="Xem thêm">
 					<Dropdown key="more" menu={{ items: dropdownItems }} arrow disabled={false} trigger={['click']}>
 						<Button
+							style={{ color: theme.foreground, background: theme.background }}
 							icon={<HiDotsHorizontal />}
 							disabled={false}
 							loading={Object.keys(loading).some((item) => item !== 'chat' && loading[item])} // loading doesn't include chat
@@ -175,13 +189,18 @@ const FriendCard = ({ user, type }) => {
 					,
 				</Tooltip>,
 			]}
-			bodyStyle={{ padding: 12 }}
+			bodyStyle={{ color: theme.foreground, background: theme.background, padding: 12 }}
 		>
 			<Card.Meta
+				style={{ color: theme.foreground, background: theme.background }}
 				avatar={<UserAvatar user={user} />}
-				title={user.username}
+				title={<span style={{ color: theme.foreground, background: theme.background }}>{user.username}</span>}
 				description={
-					<Typography.Text strong type={relationshipColor[relationship]}>
+					<Typography.Text
+						style={{ color: theme.foreground, background: theme.background }}
+						strong
+						type={relationshipColor[relationship]}
+					>
 						{relationshipLabel[relationship]}
 					</Typography.Text>
 				}

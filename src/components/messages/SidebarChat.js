@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 import { BottomNavigation, BottomNavigationAction, Popover } from '@material-ui/core';
 import PostGroupApi from '../../api/postGroups/PostGroupApi';
 import { useNavigate } from 'react-router-dom';
+import useTheme from '../../context/ThemeContext';
 const SidebarChat = ({ user, onChangeMessage }) => {
 	const navigate = useNavigate();
 	const [friend, setFriend] = useState();
@@ -82,9 +83,10 @@ const SidebarChat = ({ user, onChangeMessage }) => {
 		toast.error('Chức năng đang được phát triển');
 		setAnchorEl(null);
 	};
+	const { theme } = useTheme();
 	return (
 		<div className="sidebar--chat">
-			<div className="header--chat">
+			<div className="header--chat" style={{ color: theme.foreground, background: theme.background }}>
 				<div className="header--chat--infor">
 					<span>Tin nhắn</span>
 					<Button
@@ -118,6 +120,7 @@ const SidebarChat = ({ user, onChangeMessage }) => {
 				</div>
 				<Search className="search--friend--message" placeholder="tìm kiếm bạn bè" />
 				<BottomNavigation
+					style={{ color: theme.foreground, background: theme.background }}
 					className="list--message--sidebar"
 					showLabels
 					value={isGroup}
@@ -125,8 +128,16 @@ const SidebarChat = ({ user, onChangeMessage }) => {
 						setIsGroup(newValue);
 					}}
 				>
-					<BottomNavigationAction label="Hộp thư" icon={<Message />} />
-					<BottomNavigationAction label="Cộng đồng" icon={<Group />} />
+					<BottomNavigationAction
+						style={{ color: theme.foreground, background: theme.background }}
+						label="Hộp thư"
+						icon={<Message />}
+					/>
+					<BottomNavigationAction
+						style={{ color: theme.foreground, background: theme.background }}
+						label="Cộng đồng"
+						icon={<Group />}
+					/>
 				</BottomNavigation>
 			</div>
 			<div className="container--sidebar--message">

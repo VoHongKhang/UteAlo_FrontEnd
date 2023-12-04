@@ -79,7 +79,9 @@ const EditProfile = () => {
 			key: '1',
 			label: (
 				<div className="title--collapse">
-					<span>Thông tin cá nhân của bạn</span>
+					<span style={{ color: theme.foreground, background: theme.background }}>
+						Thông tin cá nhân của bạn
+					</span>
 					<Tooltip title="Chỉnh sửa thông tin cá nhân" placement="top">
 						<Settings
 							htmlColor="#65676B"
@@ -117,7 +119,9 @@ const EditProfile = () => {
 			key: '2',
 			label: (
 				<div className="title--collapse">
-					<span>Thông tin tài khoản của bạn</span>
+					<span style={{ color: theme.foreground, background: theme.background }}>
+						Thông tin tài khoản của bạn
+					</span>
 					<Tooltip title="Đổi mật khẩu" placement="top">
 						<Settings
 							htmlColor="#65676B"
@@ -231,7 +235,7 @@ const EditProfile = () => {
 								</label>
 							</div>
 						</div>
-						<div className="group--contanier--top">
+						<div className="group--contanier--top--edit--profle">
 							<div className="group--detail">
 								<span className="group--name">{profileUser.userName}</span>
 							</div>

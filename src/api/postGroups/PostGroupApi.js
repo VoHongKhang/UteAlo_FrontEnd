@@ -422,7 +422,8 @@ const PostGroupApi = {
 			throw new Error(error.message);
 		}
 	},
-  	cancelJoinGroupRequest: async ({ token, postGroupRequestId }) => {
+	//Hủy yêu cầu tham gia nhóm
+	cancelJoinGroup: async ({ token, postGroupId }) => {
 		try {
 			const config = {
 				headers: {
@@ -430,7 +431,28 @@ const PostGroupApi = {
 					Authorization: `Bearer ${token}`,
 				},
 			};
-			const res = await axios.put(`${BASE_URL}/v1/groupPost/request/cancel/${postGroupRequestId}`,{}, config);
+			const res = await axios.put(`${BASE_URL}/v1/groupPost/cancel/request/group/${postGroupId}`, {}, config);
+			if (res.data.success) {
+				console.log(res.data);
+				return res.data; // Trả về dữ liệu từ thành công
+			} else {
+				throw new Error(res.data.message);
+			}
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	},
+
+	// Hủy những lời mời vào nhóm mà mình đã gửi
+	cancelJoinGroupRequest: async ({ token, postGroupRequestId }) => {
+		try {
+			const config = {
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`,
+				},
+			};
+			const res = await axios.put(`${BASE_URL}/v1/groupPost/request/cancel/${postGroupRequestId}`, {}, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công
@@ -487,7 +509,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${token}`,
 				},
 			};
-			const res = await axios.put(`${BASE_URL}/v1/groupPost/leaveGroup/${postGroupId}`,{}, config);
+			const res = await axios.put(`${BASE_URL}/v1/groupPost/leaveGroup/${postGroupId}`, {}, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công
@@ -545,13 +567,33 @@ const PostGroupApi = {
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công
-			} else { 
+			} else {
 				console.log(res.data);
 				throw new Error(res.data.message);
 			}
 		} catch (error) {
 			throw new Error(error.message);
 		}
-	}
+	},
+	deleteGroup: async ({ user, postGroupId }) => {
+		console.log('postGroupId', postGroupId);
+		try {
+			const config = {
+				headers: {
+					Authorization: `Bearer ${user?.accessToken}`,
+				},
+			};
+			const res = await axios.delete(`${BASE_URL}/v1/groupPost/delete/${postGroupId}`, config);
+			if (res.data.success) {
+				console.log(res.data);
+				return res.data; // Trả về dữ liệu từ thành công
+			} else {
+				console.log(res.data);
+				throw new Error(res.data.message);
+			}
+		} catch (error) {
+			throw new Error(error.message);
+		}
+	},
 };
 export default PostGroupApi;

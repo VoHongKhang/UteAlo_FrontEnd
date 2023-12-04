@@ -39,7 +39,7 @@ function Step2Form({ onSubmit, data }) {
 								data === 'SinhVien'
 									? /student.hcmute.edu.vn/
 									: data === 'GiangVien'
-									? /edu.hcmute.vn/
+									? /hcmute.edu.vn/
 									: null,
 							message:
 								data === 'SinhVien'

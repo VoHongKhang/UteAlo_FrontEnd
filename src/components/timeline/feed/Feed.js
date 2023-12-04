@@ -166,13 +166,35 @@ const Feed = ({ inforUser }) => {
 					/>
 				}
 				endMessage={
-					<Space direction="vertical" style={{ width: 'fit-content', margin: '50px auto' }} align="center">
+					<Space
+						direction="vertical"
+						style={{
+							color: theme.foreground,
+							background: theme.background,
+							width: 'fit-content',
+							margin: '50px auto',
+						}}
+						align="center"
+					>
 						<img className="iamge_end" src={LogoUte} alt="UTEALO" />
-						<Typography.Title level={4} style={{ margin: 0 }}>
+						<Typography.Title
+							level={4}
+							
+							style={{
+								color: theme.foreground,
+								background: theme.background, margin: 0 
+							}}
+						>
 							Mạng xã hội UTEALO
 						</Typography.Title>
 
-						<Typography.Text type="secondary">
+						<Typography.Text
+							type="secondary"
+							style={{
+								color: theme.foreground,
+								background: theme.background,
+							}}
+						>
 							Nơi kết nối, chia sẻ và trao đổi thông tin giữa sinh viên và giảng viên trường Đại học Sư
 							phạm Kỹ thuật TP.HCM
 						</Typography.Text>

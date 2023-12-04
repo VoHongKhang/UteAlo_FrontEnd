@@ -156,21 +156,54 @@ const SidebarGroup = ({ user }) => {
 		},
 	];
 	return (
-		<div className="sidebar--group">
-			<Space className="topSidebar" direction="vertical">
-				<div className="topSidebar--setting">
+		<div
+			className="sidebar--group"
+			style={{
+				color: theme.foreground,
+				background: theme.background,
+			}}
+		>
+			<Space
+				className="topSidebar"
+				direction="vertical"
+				style={{
+					color: theme.foreground,
+					background: theme.background,
+				}}
+			>
+				<div
+					className="topSidebar--setting"
+					style={{
+						color: theme.foreground,
+						background: theme.background,
+					}}
+				>
 					<div className="group--infor-introduce">Nhóm</div>
 					<div className="icon-setting">
 						<Settings
 							className="topSidebar--setting-icon"
 							style={{
 								fontSize: '25px',
+								color: theme.foreground,
+								background: theme.background,
 							}}
 						/>
 					</div>
 				</div>
-				<div className="topSidebar__search">
-					<div className="group--infor-introduce">
+				<div
+					className="topSidebar__search"
+					style={{
+						color: theme.foreground,
+						background: theme.background,
+					}}
+				>
+					<div
+						className="group--infor-introduce"
+						style={{
+							color: theme.foreground,
+							background: theme.background,
+						}}
+					>
 						<Search
 							className="icon__search"
 							style={{
@@ -179,8 +212,20 @@ const SidebarGroup = ({ user }) => {
 							}}
 						/>
 						{showDropdown && (
-							<div className="search-dropdown">
-								<div className="search-dropdown-title">
+							<div
+								className="search-dropdown"
+								style={{
+									color: theme.foreground,
+									background: theme.background,
+								}}
+							>
+								<div
+									className="search-dropdown-title"
+									style={{
+										color: theme.foreground,
+										background: theme.background,
+									}}
+								>
 									<span className="span-1">Gần đây</span>
 									<span className="span-2">Chỉnh sửa</span>
 								</div>
@@ -212,6 +257,10 @@ const SidebarGroup = ({ user }) => {
 													alt="avatarGroup"
 												></img>
 												<span
+													style={{
+														color: theme.foreground,
+														background: theme.background,
+													}}
 													className="item--postGroupName"
 													onClick={() => {
 														navigate(`/groups/${item.postGroupId}`);
@@ -226,9 +275,25 @@ const SidebarGroup = ({ user }) => {
 							</div>
 						)}
 					</div>
-					<form onSubmit={handleSearchSubmit}>
-						<div ref={inputRef}>
+					<form
+						onSubmit={handleSearchSubmit}
+						style={{
+							color: theme.foreground,
+							background: theme.background,
+						}}
+					>
+						<div
+							ref={inputRef}
+							style={{
+								color: theme.foreground,
+								background: theme.background,
+							}}
+						>
 							<input
+								style={{
+									color: theme.foreground,
+									background: theme.background,
+								}}
 								type="text"
 								placeholder="Tìm kiếm nhóm"
 								className="input__search"
@@ -256,7 +321,10 @@ const SidebarGroup = ({ user }) => {
 						key={index}
 						header={
 							<Divider orientation="left" style={{ margin: 0 }}>
-								<Typography.Title level={4} style={{ margin: 0 }}>
+								<Typography.Title
+									style={{ color: theme.foreground, background: theme.background, margin: 0 }}
+									level={4}
+								>
 									{list.title}
 								</Typography.Title>
 							</Divider>
@@ -269,15 +337,29 @@ const SidebarGroup = ({ user }) => {
 									<Button
 										type="text"
 										block
-										style={{ height: 'auto', padding: '8px' }}
+										style={{
+											color: theme.foreground,
+											background: theme.background,
+											height: 'auto',
+											padding: '8px',
+										}}
 										onClick={() => {
 											navigate(item.href);
 										}}
 									>
-										<Space align="center" style={{ width: '100%', marginLeft: '10px' }}>
+										<Space
+											align="center"
+											style={{
+												width: '100%',
+												marginLeft: '10px',
+											}}
+										>
 											<div className="icon-setting">{item.avatarGroup}</div>
 											<div style={{ marginTop: '14px' }}>
-												<Typography.Text strong>
+												<Typography.Text
+													style={{ color: theme.foreground, background: theme.background }}
+													strong
+												>
 													<div style={{ fontSize: '15px' }}>{item.postGroupName}</div>
 												</Typography.Text>
 											</div>
@@ -298,7 +380,12 @@ const SidebarGroup = ({ user }) => {
 												alt="avatar_group"
 												className="image--group"
 											/>
-											<Typography.Text strong>{item.postGroupName}</Typography.Text>
+											<Typography.Text
+												style={{ color: theme.foreground, background: theme.background }}
+												strong
+											>
+												{item.postGroupName}
+											</Typography.Text>
 										</Space>
 									</Button>
 								)}

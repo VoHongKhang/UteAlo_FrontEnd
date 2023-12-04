@@ -1,6 +1,7 @@
 import React from 'react';
 import { Layout, Space } from 'antd';
 import Topbar from './timeline/topbar/Topbar';
+import useTheme from '../context/ThemeContext';
 const { Footer, Content } = Layout;
 
 const contentStyle = {
@@ -10,36 +11,55 @@ const contentStyle = {
 	color: 'black',
 	backgroundColor: 'white',
 };
-const footerStyle = {
-	textAlign: 'center',
-	color: 'black',
-	width: '100%',
-	backgroundColor: 'white',
-	display: 'flex',
-	alignItems: 'center',
-	justifyContent: 'space-between',
-	position: 'fixed',
-	bottom: 0,
-};
 
 const NotFound = () => {
+	const { theme } = useTheme();
 	return (
-		<Space direction="vertical" style={{ width: '100%', position: 'fixed', top: 0 }} size={[0, 48]}>
+		<Space
+			direction="vertical"
+			style={{
+				color: theme.foreground,
+				background: theme.background,
+				width: '100%',
+				position: 'fixed',
+				top: 0,
+				height: '100vh',
+			}}
+			size={[0, 48]}
+		>
 			<Topbar />
-			<Layout>
+			<Layout style={{ color: theme.foreground, background: theme.background }}>
 				<Content style={contentStyle}>
-					<div style={{ width: '80%', height: '50%' }}>
-						<img
-							src="https://th.bing.com/th/id/OIP.Jb4XrrIxatYfB2DQxV0TngHaFs?pid=ImgDet&rs=1"
-							alt="anh"
-							style={{ margin: '0 0 0 300px' }}
-						/>
+					<div
+						style={{
+							color: theme.foreground,
+							background: theme.background,
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'center',
+						}}
+					>
+						<img src="https://th.bing.com/th/id/OIP.Jb4XrrIxatYfB2DQxV0TngHaFs?pid=ImgDet&rs=1" alt="anh" />
 					</div>
-					<div>
-						<p>Science (Khoa học), Technology (Công nghệ), Engineering(Kỹ thuật), Maths(Toán học)</p>
-					</div>
+					<div
+						style={{
+							color: theme.foreground,
+							background: theme.background,
+						}}
+					></div>
 				</Content>
-				<Footer style={footerStyle}>
+				<Footer
+					style={{
+						color: theme.foreground,
+						background: theme.background,
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'space-between',
+						position: 'fixed',
+						bottom: 0,
+						width: '100%',
+					}}
+				>
 					<p>Copyright © 2023 HCMUTE - All Rights Reserved</p>
 					<p>Powered and Designed by Ngô Diệp Quang Huy- Võ Hồng Khang</p>
 				</Footer>

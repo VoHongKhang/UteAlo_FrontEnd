@@ -22,6 +22,7 @@ import {
 	ListItemText,
 	Popover,
 } from '@material-ui/core';
+import useTheme from '../../../context/ThemeContext';
 const MemberGroup = () => {
 	const params = useParams();
 	const navigate = useNavigate();
@@ -131,6 +132,7 @@ const MemberGroup = () => {
 		handleCloseConfirmation();
 		handleClose();
 	};
+	const { theme } = useTheme();
 	return (
 		<>
 			<Helmet title={`Quản lý thành viên nhóm ||UTEALO`} />
@@ -138,7 +140,10 @@ const MemberGroup = () => {
 			<Topbar />
 			<div div className="homeContainer">
 				<SidebarManagerGroup user={currentUser} groupId={params.postGroupId} />
-				<div className="setting--group--member">
+				<div
+					className="setting--group--member"
+					style={{ color: theme.foreground, background: theme.background }}
+				>
 					<div className="member--contaner">
 						<div className="setting--group__title">Thành viên nhóm</div>
 						<div className="setting--group__search">

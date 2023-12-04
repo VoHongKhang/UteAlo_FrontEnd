@@ -2,15 +2,16 @@ import { Helmet } from 'react-helmet';
 import toast, { Toaster } from 'react-hot-toast';
 import Topbar from '../../timeline/topbar/Topbar';
 import SidebarManagerGroup from './sidebarManagerGroup/SidebarManagerGroup';
-import AcceptDenied from '../../AcceptDenied';
 import { useParams } from 'react-router-dom';
 import useAuth from '../../../context/auth/AuthContext';
 import PostGroupApi from '../../../api/postGroups/PostGroupApi';
 import { useEffect, useState } from 'react';
 import './ManagerGroup.css';
-import { Button, Form, Input, Select, Space } from 'antd';
-import { Edit, Lock, Public } from '@material-ui/icons';
+import { Button, FloatButton, Form, Input, Modal, Select, Space } from 'antd';
+import { Delete, Edit, HelpOutline, Lock, MoreHoriz, Public } from '@material-ui/icons';
 import TextArea from 'antd/es/input/TextArea';
+import { useNavigate } from 'react-router-dom';
+import useTheme from '../../../context/ThemeContext';
 const SettingManagerGroup = () => {
 	const params = useParams();
 	const { user: currentUser } = useAuth();
@@ -24,12 +25,33 @@ const SettingManagerGroup = () => {
 		bio: false,
 	});
 	const [inputValue, setInputValue] = useState({});
-
+	const [openModal, setOpenModal] = useState(false);
 	const checkBtnSave = () => {
 		if (isEditing.name || isEditing.role || isEditing.required || isEditing.bio) {
 			return true;
 		}
 		return false;
+	};
+
+	const navigate = useNavigate();
+	const handleCancel = () => {
+		setOpenModal(false);
+	};
+	const handleOk = async () => {
+		const toastId = toast.loading('Đang gửi yêu cầu...');
+
+		//Xóa nhóm
+		await PostGroupApi.deleteGroup({ user: currentUser, postGroupId: params.postGroupId })
+			.then((res) => {
+				console.log(res);
+				toast.success('Xóa nhóm thành công!', { id: toastId });
+				navigate('/groups');
+			})
+			.catch((err) => {
+				toast.error(`Xóa nhóm thất bại! Lỗi: ${err}`, { id: toastId });
+			});
+
+		setOpenModal(false);
 	};
 	const checkDataChange = () => {
 		if (
@@ -94,6 +116,7 @@ const SettingManagerGroup = () => {
 		};
 		fetchGroup();
 	}, [params, currentUser]);
+	const { theme } = useTheme();
 	return (
 		<div>
 			<Helmet title={`Quản lý nhóm ${postGroup.postGroupName}||UTEALO`} />
@@ -101,7 +124,7 @@ const SettingManagerGroup = () => {
 			<Topbar />
 			<div className="homeContainer">
 				<SidebarManagerGroup user={currentUser} groupId={params.postGroupId} />
-				<div className="setting--group">
+				<div className="setting--group" style={{ color: theme.foreground, background: theme.background }}>
 					<div className="setting--group--content">
 						<Form layout="vertical" form={form} name="detailGroup" onFinish={handleNext}>
 							<div className="form--title">Thiết lập nhóm</div>
@@ -250,6 +273,31 @@ const SettingManagerGroup = () => {
 							</Space>
 						</Form>
 					</div>
+					<FloatButton.Group trigger="click" type="primary" style={{ right: 24 }} icon={<MoreHoriz />}>
+						<FloatButton title="Xóa nhóm" icon={<Delete />} onClick={() => setOpenModal(true)} />
+						<FloatButton
+							title="Trợ giúp"
+							icon={<HelpOutline />}
+							onClick={() => navigate(`/groups/manager/${params.postGroupId}/help`)}
+						/>
+					</FloatButton.Group>
+
+					<Modal
+						title="Xác nhận"
+						open={openModal}
+						onOk={handleOk}
+						onCancel={handleCancel}
+						footer={[
+							<Button key="back" onClick={handleCancel}>
+								Hủy
+							</Button>,
+							<Button key="submit" type="primary" loading={loading} onClick={handleOk}>
+								Xác nhận
+							</Button>,
+						]}
+					>
+						<p>Bạn có chắc chắn muốn xóa nhóm này ?</p>
+					</Modal>
 				</div>
 			</div>
 		</div>

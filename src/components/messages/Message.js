@@ -6,6 +6,7 @@ import { Helmet } from 'react-helmet';
 import { Toaster } from 'react-hot-toast';
 import Topbar from '../timeline/topbar/Topbar';
 import SidebarChat from './SidebarChat';
+import useTheme from '../../context/ThemeContext';
 const Meessage = () => {
 	const [user, setUser] = useState();
 	const { user: currentUser } = useAuth();
@@ -27,17 +28,23 @@ const Meessage = () => {
 	const getUser = (data) => {
 		setUser(data);
 	};
+	const { theme } = useTheme();
 	return (
-		<>
+		<div style={{ color: theme.foreground, background: theme.background }}>
 			<Helmet title={`Tin nhắn |UTEALO`} />
 			<Toaster />
 			<Topbar dataUser={getUser} />
 			<div className="homeContainer">
 				<SidebarChat user={currentUser} onChangeMessage={onChangeMessage} />
 				<ChatRoom user={user} data={data} Toggeinfo={isShowInfo} />
-				<RightbarChat user={currentUser} group={postGroup} currentData={dataChatRoom} showRightbar={isShowRightbar} />
+				<RightbarChat
+					user={currentUser}
+					group={postGroup}
+					currentData={dataChatRoom}
+					showRightbar={isShowRightbar}
+				/>
 			</div>
-		</>
+		</div>
 	);
 };
 export default Meessage;

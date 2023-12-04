@@ -9,3 +9,6 @@
 .centerbar {
 	flex: 4;
 }
+.friendUser {
+	height: 100vh;
+}

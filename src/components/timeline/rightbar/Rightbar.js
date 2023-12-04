@@ -84,7 +84,10 @@ const Rightbar = ({ user }) => {
 						header={
 							<Divider orientation="left" style={{ margin: 0 }}>
 								<Space align="center" style={{ width: '100%' }}>
-									<Typography.Title level={5} style={{ margin: 0 }}>
+									<Typography.Title
+										level={5}
+										style={{ color: theme.foreground, background: theme.background, margin: 0 }}
+									>
 										{list.title}
 									</Typography.Title>
 
@@ -103,7 +106,7 @@ const Rightbar = ({ user }) => {
 						renderItem={(item) => (
 							<List.Item style={{ padding: '4px 0' }}>
 								{list.title === 'Yêu cầu kết bạn' ? (
-									<Space className='friendRequest'>
+									<Space className="friendRequest">
 										<div className="friendRequest--avatar">
 											<Link to={`/profile/${item.userId}`}>
 												<img
@@ -112,7 +115,14 @@ const Rightbar = ({ user }) => {
 													className="topbarImg"
 												/>
 											</Link>
-											<Typography.Text className="username_fq" strong>
+											<Typography.Text
+												style={{
+													color: theme.foreground,
+													background: theme.background,
+												}}
+												className="username_fq"
+												strong
+											>
 												{item.username}
 											</Typography.Text>
 										</div>
@@ -140,7 +150,12 @@ const Rightbar = ({ user }) => {
 									<Button type="text" block style={{ height: 'auto', padding: '2px' }}>
 										<Space
 											align="center"
-											style={{ width: '100%', cursor: 'pointer' }}
+											style={{
+												color: theme.foreground,
+												background: theme.background,
+												width: '100%',
+												cursor: 'pointer',
+											}}
 											onClick={() => navigate(`/profile/${item.userId}`)}
 										>
 											<img
@@ -148,7 +163,15 @@ const Rightbar = ({ user }) => {
 												alt="..."
 												className="topbarImg"
 											/>
-											<Typography.Text strong>{item.username}</Typography.Text>
+											<Typography.Text
+												style={{
+													color: theme.foreground,
+													background: theme.background,
+												}}
+												strong
+											>
+												{item.username}
+											</Typography.Text>
 										</Space>
 									</Button>
 								)}

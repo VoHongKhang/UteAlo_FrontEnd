@@ -175,14 +175,6 @@ const ManagerGroup = () => {
 										<span className="group--member">{postGroup.countMember} thành viên</span>
 									</div>
 								</div>
-								<div className="group--header--button">
-									<button variant="contained" className="group--button-add">
-										<p> + Mời</p>
-									</button>
-									{/* <button variant="contained" className="group--button-more">
-									<p> ▼ </p>
-								</button> */}
-								</div>
 							</div>
 							{photos && (
 								//Mở modal hiển thị hình ảnh đó và 2 nút lưu hoặc hủy
@@ -218,25 +210,7 @@ const ManagerGroup = () => {
 								</div>
 							)}
 							<hr />
-							<div className="list--feature--group">
-								<ul className="list-feature">
-									<li>Thảo luận</li>
-									<li>Đáng chú ý</li>
-									<li>Phòng họp mặt</li>
-									<li>Mọi người</li>
-									<li>Sự kiện</li>
-									<li>File phương tiện</li>
-									<li>File</li>
-								</ul>
-								<div className="container--search--group">
-									<div className="container--search--group-icon">
-										<Search />
-									</div>
-									<div className="container--search--group-more">
-										<MoreHoriz />
-									</div>
-								</div>
-							</div>
+
 							<div className="container--group">
 								{postGroup && (
 									<div className="rightbar--group">

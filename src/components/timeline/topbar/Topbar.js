@@ -10,7 +10,6 @@ import {
 	GroupAdd,
 	Notifications,
 	Message,
-	ArrowForwardIcon,
 } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 import useAuth from '../../../context/auth/AuthContext';

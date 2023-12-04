@@ -1,13 +1,13 @@
-.homeContainer{
-  display: flex;
-  width: 100%;
+.homeContainer {
+	display: flex;
+	width: 100%;
 }
 .sidebar {
-  flex: 2.5;
-  height: calc(100vh - 50px);
-  overflow-y: scroll;
-  position: sticky;
-  top: 50px;
+	flex: 2;
+	height: calc(100vh - 50px);
+	overflow-y: scroll;
+	position: sticky;
+	top: 50px;
 }
 .topbarImg {
 	width: 40px;
@@ -17,62 +17,67 @@
 	cursor: pointer;
 }
 ::-webkit-scrollbar {
-  width: 5px;
+	width: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background-color: #f1f1f1;
+	background-color: #f1f1f1;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: rgb(201, 198, 198);
+	background-color: rgb(201, 198, 198);
 }
 
 .sidebarWrapper {
-  padding: 20px;
+	padding: 20px;
 }
 
 .sidebarList {
-  padding: 0;
-  margin: 0;
-  list-style: none;
+	padding: 0;
+	margin: 0;
+	list-style: none;
 }
 
 .sidebarListItem {
-  display: flex;
-  align-items: center;
-  margin-bottom: 20px;
+	display: flex;
+	align-items: center;
+	margin-bottom: 20px;
 }
 
 .sidebarIcon {
-  margin-right: 15px;
+	margin-right: 15px;
 }
-
+.slider--bar--item {
+	display: flex;
+	justify-content: flex-start;
+	align-items: flex-start;
+	margin-left: 30px;
+}
 .sidebarButton {
-  width: 150px;
-  border: none;
-  padding: 10px;
-  border-radius: 5px;
-  font-weight: bold;
-  cursor: pointer;
+	width: 150px;
+	border: none;
+	padding: 10px;
+	border-radius: 5px;
+	font-weight: bold;
+	cursor: pointer;
 }
 
 .sidebarButton:hover {
-  background-color: rgb(167, 158, 158);
+	background-color: rgb(167, 158, 158);
 }
 
 .sidebarHr {
-  margin: 20px 0;
+	margin: 20px 0;
 }
 
 .sidebarFriendList {
-  padding: 0;
-  margin: 0;
-  list-style: none;
+	padding: 0;
+	margin: 0;
+	list-style: none;
 }
 
 @media screen and (max-width: 820px) {
-  .sidebar {
-    display: none;
-  }
+	.sidebar {
+		display: none;
+	}
 }

@@ -2,27 +2,21 @@ import { Button, Divider, List, Space, Typography } from 'antd';
 import { Link } from 'react-router-dom';
 import useTheme from '../../../context/ThemeContext';
 import './Sidebar.css';
-import { useNavigate } from 'react-router-dom';
-import useAuth from '../../../context/auth/AuthContext';
-import {
-	FcAbout,
-	FcCustomerSupport,
-	FcFeedback,
-	FcInfo,
-	FcPrivacy,
-	FcReading,
-	FcRefresh,
-	FcSettings,
-	FcSportsMode,
-} from 'react-icons/fc';
-import AuthEmailApi from '../../../api/auth/authEmailApi';
+import { CiLogout } from 'react-icons/ci';
+import { AiOutlineUserSwitch } from 'react-icons/ai';
+import { IoSettingsOutline } from 'react-icons/io5';
+import { BiSupport } from 'react-icons/bi';
+import { MdRunningWithErrors } from 'react-icons/md';
+import { IoMdInformationCircleOutline } from 'react-icons/io';
+import { MdOutlinePolicy } from 'react-icons/md';
+import { GrSecure } from 'react-icons/gr';
+import { RiChatPrivateLine } from 'react-icons/ri';
 const Sidebar = () => {
 	const { theme } = useTheme();
-	const navigate = useNavigate();
 	const openReport = () => {
 		// openModal(<ReportModal />);
 	};
-	const { user: currentUser } = useAuth();
+
 	//Đăng xuất
 	const logoutHandler = async () => {
 		localStorage.removeItem('userInfo');
@@ -31,17 +25,17 @@ const Sidebar = () => {
 		// } catch {
 		// 	console.log('Lỗi đăng xuất');
 		// }
-		window.location.href = "/login"
+		window.location.href = '/login';
 	};
 
 	const listAccountAction = [
 		{
 			title: 'Chuyển tài khoản',
-			icon: FcRefresh,
+			icon: AiOutlineUserSwitch,
 		},
 		{
 			title: 'Đăng xuất',
-			icon: FcSportsMode,
+			icon: CiLogout,
 			onClick: logoutHandler,
 		},
 	];
@@ -49,37 +43,37 @@ const Sidebar = () => {
 	const listShortCutAction = [
 		{
 			title: 'Cài đặt',
-			icon: FcSettings,
+			icon: IoSettingsOutline,
 			href: '/settings',
 		},
 		{
 			title: 'Trợ giúp',
-			icon: FcCustomerSupport,
+			icon: BiSupport,
 			href: '/help',
 		},
 		{
 			title: 'Báo lỗi',
-			icon: FcFeedback,
+			icon: MdRunningWithErrors,
 			onClick: openReport,
 		},
 		{
 			title: 'Giới thiệu',
-			icon: FcAbout,
+			icon: IoMdInformationCircleOutline,
 			href: '/about',
 		},
 		{
 			title: 'Điều khoản',
-			icon: FcReading,
+			icon: MdOutlinePolicy,
 			href: '/terms',
 		},
 		{
 			title: 'Quyền riêng tư',
-			icon: FcInfo,
+			icon: RiChatPrivateLine,
 			href: '/privacy',
 		},
 		{
 			title: 'Bảo mật',
-			icon: FcPrivacy,
+			icon: GrSecure,
 			href: '/security',
 		},
 	];
@@ -112,7 +106,7 @@ const Sidebar = () => {
 						</Divider>
 					}
 					split={false}
-					dataSource={list.data}S
+					dataSource={list.data}
 					renderItem={(item) => (
 						<List.Item style={{ padding: '4px 0' }}>
 							{item.href ? (
@@ -123,7 +117,7 @@ const Sidebar = () => {
 										style={{ height: 'auto', padding: '8px' }}
 										onClick={item.onClick}
 									>
-										<Space align="center" style={{ width: '100%' }}>
+										<Space align="center" style={{ width: '100%' }} className="slider--bar--item">
 											<item.icon size={20} />
 
 											<Typography.Text strong>{item.title}</Typography.Text>
@@ -137,7 +131,7 @@ const Sidebar = () => {
 									style={{ height: 'auto', padding: '8px' }}
 									onClick={item.onClick}
 								>
-									<Space align="center" style={{ width: '100%' }}>
+									<Space align="center" style={{ width: '100%' }} className="slider--bar--item">
 										<item.icon size={20} />
 
 										<Typography.Text strong>{item.title}</Typography.Text>

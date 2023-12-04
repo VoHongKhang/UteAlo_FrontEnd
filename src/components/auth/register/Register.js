@@ -4,6 +4,7 @@ import Step2Form from './Step2Form';
 import Step3Form from './Step3Form';
 import InforFormStudents from './InfoFormStudent';
 import { Button, Space, Steps } from 'antd';
+import { Toaster } from 'react-hot-toast';
 import './Register.css';
 import toast from 'react-hot-toast';
 import RegisterApi from '../../../api/auth/registerApi';
@@ -20,43 +21,67 @@ function Register() {
 	const canBack = step <= INFO_STEP && step > ACCOUNT_STEP;
 
 	//Xử lý kết quả submit của các form con
-	useEffect(() => {
-		if (step === 2) {
-			async function fetchData() {
-				setSubmited(true);
-				const toastId = toast.loading('Đang gửi yêu cầu...');
-				try {
-					await RegisterApi.register(formData);
-					toast.success('Gửi yêu thành công! Vui lòng kiểm tra email của bạn.', { id: toastId });
-					// Hiển thị thông báo chuyển trang xác thực email
-					setTimeout(() => {
-						toast.success('Đang chuyển trang xác thực email...', { id: toastId });
-					}, 3000);
-
-					// TỰ ĐỘng chuyển sang trang đăng nhập trong 5s
-					setTimeout(() => {
-						window.location.href = `/auth-email?email=${formData.email}`;
-					}, 6000);
-				} catch (error) {
-					toast.error(`Gửi yêu thất bại! Lỗi: ${error}`, { id: toastId });
-				}
-				setSubmited(false);
-			}
-			fetchData();
-		}
-	}, [formData]);
+	// useEffect(() => {
+	// 	console.log(formData);
+	// 	console.log(step);
+	// 	if (step === 2) {
+	// 		async function fetchData() {
+	// 			setSubmited(true);
+	// 			const id = toast.loading('Đang gửi yêu cầu..');
+	// 			try {
+	// 				await RegisterApi.register(formData);
+	// 				toast.success('Gửi yêu thành công! Vui lòng kiểm tra email của bạn.', { id: id });
+	// 				// Hiển thị thông báo chuyển trang xác thực email
+	// 				setTimeout(() => {
+	// 					toast.success('Đang chuyển trang xác thực email...', { id: id });
+	// 				}, 2000);
+	// 				// TỰ ĐỘng chuyển sang trang đăng nhập trong 5s
+	// 				setTimeout(() => {
+	// 					window.location.href = `/auth-email?email=${formData.email}`;
+	// 				}, 6000);
+	// 			} catch (error) {
+	// 				toast.error(`Gửi yêu thất bại! Lỗi: ${error}`, { id: id });
+	// 			}
+	// 			setSubmited(false);
+	// 		}
+	// 		fetchData();
+	// 	}
+	// }, [formData]);
 
 	const handleStepSubmit = (stepData) => {
 		setFormData((preData) => ({ ...preData, ...stepData }));
 		if (step < 2) {
 			nextStep();
+		} else {
+			async function fetchData() {
+				setSubmited(true);
+				const id = toast.loading('Đang gửi yêu cầu..');
+				try {
+					await RegisterApi.register(formData);
+					toast.success('Gửi yêu thành công! Vui lòng kiểm tra email của bạn.', { id: id });
+					// Hiển thị thông báo chuyển trang xác thực email
+					setTimeout(() => {
+						toast.success('Đang chuyển trang xác thực email...', { id: id });
+					}, 2000);
+					// TỰ ĐỘng chuyển sang trang đăng nhập trong 5s
+					setTimeout(() => {
+						window.location.href = `/auth-email?email=${formData.email}`;
+					}, 6000);
+				} catch (error) {
+					toast.error(`Gửi yêu thất bại! Lỗi: ${error.response ? error.response.data.message : error}`, {
+						id: id,
+					});
+				}
+				setSubmited(false);
+			}
+			fetchData();
 		}
 	};
 
 	return (
-		
 		<div className="register_form">
 			<Helmet title="UTEALO - Đăng ký" />
+			<Toaster />
 			<div className={`step step-${step}`}>
 				<Steps current={step}>
 					<Steps.Step title="Xác nhận vai trò" />
@@ -67,8 +92,12 @@ function Register() {
 			{step === 0 && <Step1Form onSubmit={handleStepSubmit} />}
 			{step === 1 && <Step2Form onSubmit={handleStepSubmit} data={formData.roleName} />}
 
-			{step === 2 && formData.roleName === 'SinhVien' && <InforFormStudents onSubmit={handleStepSubmit} loading={submited}/>}
-			{step === 2 && formData.roleName !== 'SinhVien' && <Step3Form onSubmit={handleStepSubmit} loading={submited}/>}
+			{step === 2 && formData.roleName === 'SinhVien' && (
+				<InforFormStudents onSubmit={handleStepSubmit} loading={submited} />
+			)}
+			{step === 2 && formData.roleName !== 'SinhVien' && (
+				<Step3Form onSubmit={handleStepSubmit} loading={submited} />
+			)}
 			<div className="step-action">
 				<Space style={{ justifyContent: 'flex-end' }}>
 					{canBack && (

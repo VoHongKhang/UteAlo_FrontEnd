@@ -6,9 +6,9 @@ import heartEmpty from '../../../assets/appImages/heartEmpty.png';
 import { Send } from '@material-ui/icons';
 import { Box, CircularProgress } from '@material-ui/core';
 import { AttachFile, PermMedia, Cancel, Group } from '@material-ui/icons';
-import axios from 'axios';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import { BASE_URL } from '../../../context/apiCall';
 import InputEmoji from 'react-input-emoji';
 import toast from 'react-hot-toast';
@@ -21,7 +21,7 @@ import CommentCard from './CommentCard';
 import { Modal, Image, theme } from 'antd';
 import vietnamProvinces from '../../../vietnamProvinces.json';
 
-const PostCard = ({ post, fetchPosts }) => {
+const PostCard = ({ inforUser, post, newShare }) => {
 	const isMounted = useRef(true);
 	const { sharePost, createLoading } = usePost();
 	const { user: currentUser } = useAuth();
@@ -54,7 +54,6 @@ const PostCard = ({ post, fetchPosts }) => {
 
 	const [like, setLike] = useState(post.likes?.length);
 	const [isLiked, setIsLiked] = useState(false);
-	const [user, setUser] = useState({});
 	const [commentLoading, setCommentLoading] = useState(false);
 	const { getTimelinePosts } = usePost();
 	const [comments, setCommentPost] = useState({});
@@ -79,7 +78,6 @@ const PostCard = ({ post, fetchPosts }) => {
 	// Chia sẻ
 	const [isShareModalVisible, setIsShareModalVisible] = useState(false);
 	const [postGroupId, setPostGroupId] = useState('');
-	const [liveUser, setLiveUser] = useState(null);
 	// Xử lý phần dấu 3 chấm
 	const [showOptions, setShowOptions] = useState(false);
 	// Chức năng xem chi tiết bài viết
@@ -120,25 +118,6 @@ const PostCard = ({ post, fetchPosts }) => {
 	const closeShareModal = () => {
 		setIsShareModalVisible(false);
 	};
-
-	// Hàm lấy profile của người dùng hiện tại
-	useEffect(() => {
-		const fetchUsers = async () => {
-			const config = {
-				headers: {
-					Authorization: `Bearer ${currentUser.accessToken}`,
-				},
-			};
-			try {
-				const res = await axios.get(`${BASE_URL}/v1/user/profile/${currentUser.userId}`, config);
-				const userData = res.data.result;
-				setLiveUser(userData);
-			} catch (error) {
-				console.error(error);
-			}
-		};
-		fetchUsers();
-	}, [currentUser.userId, currentUser.accessToken]);
 
 	// Hàm kiểm tra xem người dùng đã like bài post chưa
 	useEffect(() => {
@@ -191,27 +170,8 @@ const PostCard = ({ post, fetchPosts }) => {
 		setShowAllComments(!showAllComments);
 	};
 
-	document.addEventListener('input', function (event) {
-		const maxLength = 250; // Số ký tự tối đa cho phép
-		const element = document.querySelector('.react-input-emoji--input'); // Chọn đúng div của bạn
-
-		// Kiểm tra xem sự kiện nhập liệu có phải từ div mong muốn không
-		if (event.target === element) {
-			const text = element.innerText;
-
-			// Nếu vượt quá giới hạn, cắt bớt phần vượt quá
-			if (text.length > maxLength) {
-				element.innerText = text.slice(0, maxLength);
-			}
-		}
-	});
-
 	// Đăng bình luận post
 	const postCommentHandler = async () => {
-		if (content.length > 250) {
-			toast.error('Nội dung bình luận không được quá 250 ký tự!', errorOptions);
-			return;
-		}
 		try {
 			if (!content && !photosComment) {
 				toast.error('Vui lòng nhập nội dung hoặc hình ảnh!', errorOptions);
@@ -266,8 +226,8 @@ const PostCard = ({ post, fetchPosts }) => {
 				postId: post.postId,
 			};
 
-			await sharePost(newPost.content, newPost.postId, newPost.postGroupId);
-			fetchPosts();
+			const { data } = await sharePost(newPost.content, newPost.postId, newPost.postGroupId);
+			newShare(data, 'create');
 			setContent('');
 		} catch (error) {
 			console.error(error);
@@ -301,7 +261,7 @@ const PostCard = ({ post, fetchPosts }) => {
 			toast.success('Xóa bài đăng thành công!', { id: toastId });
 
 			// Fetch lại danh sách bài post sau khi xóa
-			fetchPosts();
+			newShare(postIdToDelete, 'detele');
 		} catch (error) {
 			setCommentLoading(false);
 			toast.error(error.response.data.message, errorOptions);
@@ -310,12 +270,12 @@ const PostCard = ({ post, fetchPosts }) => {
 
 	// chỉnh sửa bài post
 	const editPostHandler = async () => {
-		if (editContent.length > 250) {
-			toast.error('Nội dung bài viết không được quá 250 ký tự!', errorOptions);
-			return;
-		}
 		if (!editContent && !editPhotos && !editFiles) {
 			toast.error('Vui lòng không được để trống cả 3 trường dữ liệu!', errorOptions);
+			return;
+		}
+		if (editContent.length > 250) {
+			toast.error('Nội dung chỉ được tối đa 250 kí tự!', errorOptions);
 			return;
 		}
 		const toastId = toast.loading('Đang gửi yêu cầu...');
@@ -366,7 +326,7 @@ const PostCard = ({ post, fetchPosts }) => {
 					toast.success('Chỉnh sửa bài đăng thành công!', { id: toastId });
 
 					// Fetch lại danh sách bài post sau khi chỉnh sửa
-					fetchPosts();
+					newShare(response.data.result, 'update');
 				} else {
 					// Xử lý trường hợp API trả về lỗi
 					toast.error(response.message, { id: toastId });
@@ -450,23 +410,6 @@ const PostCard = ({ post, fetchPosts }) => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	// lấy thông tin của người dùng hiện tại
-	useEffect(() => {
-		const fetchUsers = async () => {
-			const config = {
-				headers: {
-					Authorization: `Bearer ${currentUser.accessToken}`,
-				},
-			};
-			if (post.userId) {
-				const res = await axios.get(`${BASE_URL}/v1/user/profile/${post.userId}`, config);
-
-				setUser(res.data.result);
-			}
-		};
-		fetchUsers();
-	}, [post.userId, currentUser.accessToken]);
-
 	// Format thời gian
 	function formatTime(time) {
 		const postTime = moment(time);
@@ -507,11 +450,11 @@ const PostCard = ({ post, fetchPosts }) => {
 			<div className="postWrapper">
 				<div className="postTop">
 					<div className="postTopLeft">
-						<Link to={`/profile/${user.userId}`}>
-							<img className="postProfileImg" src={user.avatar || sampleProPic} alt="..." />
+						<Link to={`/profile/${inforUser.userId}`}>
+							<img className="postProfileImg" src={inforUser.avatar || sampleProPic} alt="..." />
 						</Link>
 						<div className="postNameAndDate">
-							<span className="postUsername">{user.userName}</span>
+							<span className="postUsername">{inforUser.userName}</span>
 							<span className="postDate" onClick={() => handlePostDateClick(post)}>
 								{formatTime(post.postTime)}
 							</span>
@@ -588,7 +531,7 @@ const PostCard = ({ post, fetchPosts }) => {
 								onChange={(e) => setPostGroupId(parseInt(e.target.value))}
 							>
 								<option value={0}>Cá nhân</option>
-								{liveUser?.postGroup?.map((item) => (
+								{inforUser?.postGroup?.map((item) => (
 									<option key={item.postGroupId} value={item.postGroupId}>
 										{item.postGroupName}
 									</option>
@@ -736,8 +679,6 @@ const PostCard = ({ post, fetchPosts }) => {
 
 					{post.photos && (
 						<Image
-							hoverable
-							cover
 							width="100%"
 							className="postImg"
 							src={post.photos} // Sử dụng selectedPost.photos thay vì cố định URL như bạn đã đề cập

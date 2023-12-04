@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import useAuth from '../../context/auth/AuthContext';
-import ChatRoom from './ChatRoom';
+import ChatRoom from './tempt';
 import RightbarChat from './RightbarChat';
 import { Helmet } from 'react-helmet';
 import { Toaster } from 'react-hot-toast';
@@ -25,7 +25,6 @@ const Meessage = () => {
 		setIsShowRightbar(info);
 	};
 	const getUser = (data) => {
-		console.log("data",data);
 		setUser(data);
 	};
 	return (

@@ -1,96 +1,167 @@
 import React, { useEffect, useState } from 'react';
 import './Feed.css';
-import { useParams } from 'react-router-dom';
 import PostCard from '../post/PostCard';
 import SharePostCard from '../post/SharePostCard';
 import Share from '../sharePost/Share';
 import useAuth from '../../../context/auth/AuthContext';
 import useTheme from '../../../context/ThemeContext';
-import axios from 'axios';
-import { BASE_URL } from '../../../context/apiCall';
-import { Skeleton } from 'antd';
-
-const Feed = () => {
-	const params = useParams();
+import { Skeleton, Space, Typography } from 'antd';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import LogoUte from '../../../assets/icons/logo_UTE.png';
+import PostApi from '../../../api/timeline/post/PostApi';
+const Feed = ({ inforUser }) => {
 	const { user: currentUser } = useAuth();
-	const [posts, setPosts] = useState([]);
-	const [sharePosts, setSharePosts] = useState([]);
-	const [loading, setLoading] = useState(false);
-	const [visiblePosts, setVisiblePosts] = useState(3);
-	const [visibleSharePosts, setVisibleSharePosts] = useState(3);
+	const [posts, setPosts] = useState(new Map());
 	const { theme } = useTheme();
+	const [hasMore, setHasMore] = useState({
+		posts: false,
+		share: false,
+	});
+	const [page, setPage] = useState(0);
+	const [postLength, setPostLength] = useState(0);
 
+	const loadMore = () => {
+		const newPage = page + 1;
+		setPage(newPage);
+		if (hasMore.posts) {
+			const res = PostApi.fetchPostsGroup(currentUser, newPage, 20);
+			if (res) {
+				posts.set('post', [...posts.get('post'), ...res]);
+				setPostLength((pre) => pre + res.length);
+				if (res.length < 20) {
+					setHasMore({ ...hasMore, posts: false });
+				} else {
+					setHasMore({ ...hasMore, posts: true });
+				}
+				setPosts(new Map(posts.entries()));
+			}
+		} else if (hasMore.share) {
+			const response = PostApi.fetchPostsShare(currentUser, newPage, 20);
+			if (response) {
+				posts.set('share', [...posts.get('share'), ...response]);
+				setPostLength((pre) => pre + response.length);
+				if (response.length < 20) {
+					setHasMore({ ...hasMore, share: false });
+				} else {
+					setHasMore({ ...hasMore, share: true });
+				}
+				setPosts(new Map(posts.entries()));
+			}
+		}
+	};
 	// Lấy danh sách bài post
 	const fetchPosts = async () => {
 		try {
-			const config = {
-				headers: {
-					Authorization: `Bearer ${currentUser.accessToken}`,
-				},
-			};
-			setLoading(true);
+			const res = await PostApi.fetchPostsGroup(currentUser, page, 20);
+			const response = await PostApi.fetchPostsShare(currentUser, page, 20);
+			console.log('res', res);
+			console.log('response', response);
+			console.log('length', response.length);
+			if (response) {
+				posts.set('share', response);
+				setPostLength((pre) => pre + response.length);
+				if (response.length < 20) {
+					setHasMore({ ...hasMore, share: false });
+				} else {
+					setHasMore({ ...hasMore, share: true });
+				}
+				setPosts(new Map(posts.entries()));
+			}
 
-			const res = await axios.get(`${BASE_URL}/v1/post/get/timeLine`, config);
-			setLoading(false);
-			setPosts(res.data.result);
+			if (res) {
+				posts.set('post', res);
+				setPostLength((pre) => pre + res.length);
+				if (res.length < 20) {
+					setHasMore({ ...hasMore, posts: false });
+				} else {
+					setHasMore({ ...hasMore, posts: true });
+				}
+				setPosts(new Map(posts.entries()));
+			}
 		} catch (error) {
 			console.log(error);
 		}
 	};
-
-	// Lấy danh sách các bài share post
-	const fetchSharePosts = async () => {
-		try {
-			const config = {
-				headers: {
-					Authorization: `Bearer ${currentUser.accessToken}`,
-				},
-			};
-			setLoading(true);
-
-			const res = await axios.get(`${BASE_URL}/v1/share/get/timeLine`, config);
-			setLoading(false);
-			setSharePosts(res.data.result);
-		} catch (error) {
-			console.log(error);
+	const getNewPost = (data) => {
+		posts.set('post', [data, ...posts.get('post')]);
+		setPostLength((pre) => pre + 1);
+		setPosts(new Map(posts.entries()));
+	};
+	const getNewShare = (data, action) => {
+		console.log('data', data);
+		console.log('action', action);
+		if (action === 'delete') {
+			posts.set(
+				'share',
+				posts.get('share').filter((item) => item.shareId !== data)
+			);
+			setPostLength((pre) => pre - 1);
+			setPosts(new Map(posts.entries()));
+			return;
+		} else if (action === 'update') {
+			posts.set(
+				'share',
+				posts.get('share').map((item) => {
+					if (item.shareId === data.shareId) {
+						return data;
+					}
+					return item;
+				})
+			);
+			setPosts(new Map(posts.entries()));
+			return;
+		} else if (action === 'create') {
+			posts.set('share', [data, ...posts.get('share')]);
+			setPostLength((pre) => pre + 1);
+			setPosts(new Map(posts.entries()));
+		} else {
+			console.log('data', data);
 		}
 	};
-
+	const getNewSharePost = (data, action) => {
+		if (action === 'delete') {
+			posts.set(
+				'share',
+				posts.get('share').filter((item) => item.shareId !== data)
+			);
+			setPostLength((pre) => pre - 1);
+			setPosts(new Map(posts.entries()));
+			return;
+		} else if (action === 'update') {
+			posts.set(
+				'share',
+				posts.get('share').map((item) => {
+					if (item.shareId === data.shareId) {
+						return data;
+					}
+					return item;
+				})
+			);
+			setPosts(new Map(posts.entries()));
+			return;
+		}
+	};
 	useEffect(() => {
 		fetchPosts();
-		fetchSharePosts();
-		//eslint-disable-next-line
-	}, []);
-
-	// Xử lý nạp thêm bài viết khi cuộn xuống
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [currentUser]);
 	useEffect(() => {
-		const handleScroll = () => {
-			if (window.innerHeight + window.scrollY >= document.documentElement.offsetHeight - 100) {
-				// Khi cuộn xuống gần cuối trang (khoảng cách 100 pixel)
-				setVisiblePosts((prevVisiblePosts) => prevVisiblePosts + 3); // Nạp thêm 3 bài viết
-				setVisibleSharePosts((prevVisibleSharePosts) => prevVisibleSharePosts + 3);
-			}
-		};
-
-		window.addEventListener('scroll', handleScroll);
-		return () => {
-			window.removeEventListener('scroll', handleScroll);
-		};
-	}, []);
-
-	const visiblePostData = posts.slice(0, visiblePosts);
-	const visibleSharePostData = sharePosts.slice(0, visibleSharePosts);
-
-
+		console.log('posts', posts);
+		console.log(postLength);
+		console.log('hasMore', hasMore);
+	}, [hasMore, postLength, posts]);
 	return (
 		<div className="feed" style={{ color: theme.foreground, background: theme.background }}>
 			<div className="feedWrapper">
-				{(!params.userId || params.userId === currentUser.userId) && (
-					<Share fetchPosts={fetchPosts} postGroupId={null} />
-				)}
-
-				{visiblePostData.length === 0 ? (
-					<>
+				{/* {(!params.userId || params.userId === currentUser.userId) && ( */}
+				<Share inforUser={inforUser} newPosts={getNewPost} />
+				{/* )} */}
+				<InfiniteScroll
+					scrollableTarget="messages-history"
+					dataLength={postLength}
+					next={loadMore}
+					hasMore={hasMore.posts || hasMore.share}
+					loader={
 						<Skeleton
 							style={{ marginTop: '30px' }}
 							active
@@ -99,22 +170,37 @@ const Feed = () => {
 								rows: 4,
 							}}
 						/>
-						<Skeleton
-							style={{ marginTop: '30px' }}
-							active
-							avatar
-							paragraph={{
-								rows: 4,
-							}}
-						/>
-					</>
-				) : (
-					 visiblePostData.map((p) => <PostCard post={p} key={p.postId} fetchPosts={fetchPosts} />)
-				)}
+					}
+					endMessage={
+						<Space
+							direction="vertical"
+							style={{ width: 'fit-content', margin: '50px auto' }}
+							align="center"
+						>
+							<img className="iamge_end" src={LogoUte} alt="UTEALO" />
+							<Typography.Title level={4} style={{ margin: 0 }}>
+								Mạng xã hội UTEALO
+							</Typography.Title>
 
-				{visibleSharePostData.map((p) => (
-					<SharePostCard share={p} key={p.shareId} fetchSharePosts={fetchSharePosts} />
-				))}
+							<Typography.Text type="secondary">
+								Nơi kết nối, chia sẻ và trao đổi thông tin giữa sinh viên và giảng viên trường Đại học
+								Sư phạm Kỹ thuật TP.HCM
+							</Typography.Text>
+						</Space>
+					}
+				>
+					{posts.get('post')?.map((p) => (
+						<PostCard inforUser={inforUser} post={p} key={p.postId} newShare={getNewShare} />
+					))}
+					{posts.get('share')?.map((p) => (
+						<SharePostCard
+							inforUser={inforUser}
+							share={p}
+							key={p.shareId}
+							newSharePosts={getNewSharePost}
+						/>
+					))}
+				</InfiniteScroll>
 			</div>
 		</div>
 	);

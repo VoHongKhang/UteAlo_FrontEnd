@@ -18,5 +18,17 @@ const ProfileApi = {
 			throw new Error(err.response.data.message);
 		}
 	},
+	getAvatarAndName : async ({userId }) => {
+		try {
+			const res = await axios.get(`${BASE_URL}/v1/user/avatarAndName/${userId}`);
+			if (res.data.success) {
+				return res.data; // Trả về dữ liệu từ thành công
+			} else {
+				throw new Error(res.data.message);
+			}
+		} catch (err) {
+			throw new Error(err.response.data.message);
+		}
+	}
 };
 export default ProfileApi;

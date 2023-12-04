@@ -30,17 +30,17 @@ const MemberGroup = () => {
 	const [selectedItem, setSelectedItem] = useState(null);
 	const [anchorEl, setAnchorEl] = useState(null);
 	const [openConfirmation, setOpenConfirmation] = useState(false);
-	const [isAdminChange, setIsAdminChange] = useState(false);
+	const [isAdminChange, setIsAdminChange] = useState('');
 	const handleClick = (event, item) => {
 		setAnchorEl(event.currentTarget);
 		setSelectedItem(item);
-		setIsAdminChange(false);
+		setIsAdminChange('');
 	};
 
 	const handleClose = () => {
 		setAnchorEl(null);
 		setSelectedItem(null);
-		setIsAdminChange(false);
+		setIsAdminChange('');
 	};
 	const handleOpenConfirmation = (isAdminChange) => {
 		setOpenConfirmation(true);
@@ -49,7 +49,7 @@ const MemberGroup = () => {
 
 	const handleCloseConfirmation = () => {
 		setOpenConfirmation(false);
-		setIsAdminChange(false);
+		setIsAdminChange('');
 	};
 	useEffect(() => {
 		const fetchGroup = async () => {
@@ -66,30 +66,67 @@ const MemberGroup = () => {
 			postGroupId: params.postGroupId,
 			userId: [selectedItem.userId],
 		};
-
-		if (isAdminChange) {
-			const toastId = toast.loading('Đang gửi yêu cầu...');
-			try {
-				await PostGroupApi.appointAdminGroup({ user: currentUser, data: data });
-				toast.success('Chuyển quyền thành công!', { id: toastId });
-				navigate(`/groups/${params.postGroupId}`);
-			} catch (e) {
-				toast.error(`Chuyển quyền thất bại! Lỗi: ${e}`, { id: toastId });
-			}
-		} else {
-			if (selectedItem.roleName === 'Admin') {
-				toast.error('Không thể xóa quản trị viên khỏi nhóm');
-			} else {
+		switch (isAdminChange) {
+			case 'appointDeputy':
 				const toastId = toast.loading('Đang gửi yêu cầu...');
 				try {
-					await PostGroupApi.deleteMember({ user: currentUser, data: data });
-					toast.success('Xóa thành viên thành công!', { id: toastId });
-					const updatedMemberGroup = memberGroup.filter((member) => member !== selectedItem);
+					await PostGroupApi.appointDeputyGroup({ user: currentUser, data: data });
+					toast.success('Thêm quyền thành công!', { id: toastId });
+					// thay đổi quyền của selectItem và cập nhật lại trong list memberGroup
+					const updatedMemberGroup = memberGroup.map((member) => {
+						if (member.userId === selectedItem.userId) {
+							return { ...member, roleName: 'Deputy' };
+						}
+						return member;
+					});
 					setMemberGroup(updatedMemberGroup);
 				} catch (e) {
-					toast.error(`Xóa thành viên thất bại! Lỗi: ${e}`, { id: toastId });
+					toast.error(`Bạn không có quyền thêm phó quản trị viên`, { id: toastId });
 				}
-			}
+				break;
+			case 'removeDeputy':
+				const toastId1 = toast.loading('Đang gửi yêu cầu...');
+				try {
+					await PostGroupApi.removeDeputyGroup({ user: currentUser, data: data });
+					toast.success('Xóa quyền thành công!', { id: toastId1 });
+					const updatedMemberGroup = memberGroup.map((member) => {
+						if (member.userId === selectedItem.userId) {
+							return { ...member, roleName: 'Member' };
+						}
+						return member;
+					});
+					setMemberGroup(updatedMemberGroup);
+				} catch (e) {
+					toast.error(`Bạn không có quyền xóa phó quản trị viên`, { id: toastId1 });
+				}
+				break;
+			case 'removeMember':
+				if (selectedItem.roleName === 'Admin') {
+					toast.error('Không thể xóa quản trị viên khỏi nhóm');
+				} else {
+					const toastId = toast.loading('Đang gửi yêu cầu...');
+					try {
+						await PostGroupApi.deleteMember({ user: currentUser, data: data });
+						toast.success('Xóa thành viên thành công!', { id: toastId });
+						const updatedMemberGroup = memberGroup.filter((member) => member !== selectedItem);
+						setMemberGroup(updatedMemberGroup);
+					} catch (e) {
+						toast.error(`Xóa thành viên thất bại! Lỗi: ${e}`, { id: toastId });
+					}
+				}
+				break;
+			case 'appointAdmin':
+				const toastId2 = toast.loading('Đang gửi yêu cầu...');
+				try {
+					await PostGroupApi.appointAdminGroup({ user: currentUser, data: data });
+					toast.success('Nhượng quyền thành công!', { id: toastId2 });
+					navigate(`/groups/${params.postGroupId}`);
+				} catch (e) {
+					toast.error(`Bạn không có quyền nhượng quyền quản trị viên`, { id: toastId2 });
+				}
+				break;
+			default:
+				break;
 		}
 		handleCloseConfirmation();
 		handleClose();
@@ -119,7 +156,13 @@ const MemberGroup = () => {
 									<Avatar className="avatarMember" alt={item.username} src={item.avatarUser} />
 									<ListItemText
 										primary={item.username}
-										secondary={item.roleName === 'Admin' ? 'Quản trị viên' : 'Thành viên'}
+										secondary={
+											item.roleName === 'Admin'
+												? 'Quản trị viên'
+												: item.roleName === 'Member'
+												? 'Thành viên'
+												: 'Phó quản trị viên'
+										}
 									/>
 									<div>
 										<IconButton
@@ -147,17 +190,38 @@ const MemberGroup = () => {
 												{selectedItem?.roleName === 'Member' && (
 													<Typography
 														className="poper--member--item"
-														onClick={() => handleOpenConfirmation(true)}
+														onClick={() => handleOpenConfirmation('appointDeputy')}
 													>
-														Chỉ định làm admin
+														Chỉ định làm phó quản trị viên
 													</Typography>
 												)}
+												{selectedItem?.roleName === 'Deputy' &&
+													selectedItem?.userId !== currentUser.userId && (
+														<Typography
+															className="poper--member--item"
+															onClick={() => handleOpenConfirmation('removeDeputy')}
+														>
+															Hủy quyền phó quản trị viên
+														</Typography>
+													)}
 												<Typography
 													className="poper--member--item"
-													onClick={() => handleOpenConfirmation(false)}
+													onClick={() => handleOpenConfirmation('removeMember')}
 												>
-													Xóa khỏi nhóm
+													{selectedItem?.roleName === 'Deputy' &&
+													selectedItem?.userId === currentUser.userId
+														? 'Rời khỏi nhóm'
+														: 'Xóa khỏi nhóm'}
 												</Typography>
+												{selectedItem?.roleName !== 'Admin' &&
+													selectedItem?.userId !== currentUser.userId && (
+														<Typography
+															className="poper--member--item"
+															onClick={() => handleOpenConfirmation('appointAdmin')}
+														>
+															Nhượng quyền quản trị viên
+														</Typography>
+													)}
 												<Typography
 													className="poper--member--item"
 													onClick={() => navigate(`/profile/${selectedItem.userId}`)}
@@ -173,13 +237,26 @@ const MemberGroup = () => {
 								<DialogTitle>Xác nhận thay đổi</DialogTitle>
 								<DialogContent>
 									<DialogContentText>
-										{isAdminChange
+										{isAdminChange === 'appointDeputy'
 											? `Bạn có chắc chắn muốn chỉ định thành viên ${
 													selectedItem && selectedItem.username
-											  } làm admin?`
+											  } làm Phó quản trị viên? `
+											: isAdminChange === 'removeDeputy'
+											? `Bạn có chắc chắn muốn hủy quyền phó quản trị viên của ${
+													selectedItem && selectedItem.username
+											  }
+											 `
+											: isAdminChange === 'removeMember'
+											? `Bạn có chắc chắn muốn xóa thành viên ${
+													selectedItem && selectedItem.username
+											  } khỏi nhóm? `
+											: isAdminChange === 'appointAdmin'
+											? `Bạn có chắc chắn muốn nhượng quyền quản trị viên cho ${
+													selectedItem && selectedItem.username
+											  } `
 											: `Bạn có chắc chắn muốn xóa thành viên ${
 													selectedItem && selectedItem.username
-											  } khỏi nhóm?`}
+											  } khỏi nhóm? `}
 									</DialogContentText>
 								</DialogContent>
 								<DialogActions>

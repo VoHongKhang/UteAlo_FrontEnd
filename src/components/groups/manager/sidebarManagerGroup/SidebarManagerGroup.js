@@ -52,25 +52,36 @@ const SidebarManagerGroup = ({ user, groupId }) => {
 		console.log('Open more');
 	};
 	return (
-		<div className="sidebar--group">
-			<Space className="topSidebar" direction="vertical">
-				<div className="topSidebar--back">
+		<div className="sidebar--group" style={{ color: theme.foreground, background: theme.background }}>
+			<Space
+				className="topSidebar"
+				direction="vertical"
+				style={{ color: theme.foreground, background: theme.background }}
+			>
+				<div className="topSidebar--back" style={{ color: theme.foreground, background: theme.background }}>
 					<div className="icon-back" onClick={() => navigate(`/groups/${groupId}`)}>
 						<ArrowBack
+							style={{ fontSize: '25px', color: theme.foreground, background: theme.background }}
 							className="topSidebar--back-icon"
-							style={{
-								fontSize: '25px',
-							}}
 						/>
 					</div>
 					<div className="group--infor-introduce">Quản lý nhóm</div>
 				</div>
-				<div className="topSidebar__addMemberGroup">
+				<div
+					className="topSidebar__addMemberGroup"
+					style={{ color: theme.foreground, background: theme.background }}
+				>
 					<Button type="primary" block className="topSidebar__button" onClick={handlerAddMember}>
 						<span className="addMember--icon--plus">+</span>
 						<span className="addMemberGroup--text">Mời</span>
 					</Button>
-					<Button type="default" block className="button--more" onClick={openMore}>
+					<Button
+						style={{ color: theme.foreground, background: theme.background }}
+						type="default"
+						block
+						className="button--more"
+						onClick={openMore}
+					>
 						...
 					</Button>
 				</div>
@@ -82,6 +93,7 @@ const SidebarManagerGroup = ({ user, groupId }) => {
 			>
 				{lists.map((list, index) => (
 					<List
+						style={{ color: theme.foreground, background: theme.background }}
 						key={index}
 						header={
 							<Divider orientation="left" style={{ margin: 0 }}>

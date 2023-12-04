@@ -1,7 +1,7 @@
 import { over } from 'stompjs';
 import SockJS from 'sockjs-client';
 import sampleProPic from '../../assets/appImages/user.png';
-import { Avatar, Badge, Button, Form, Input, List, Popover, Space, Spin, theme, Tooltip, Typography } from 'antd';
+import { Avatar, Badge, Button, Form, Input, List, Popover, Space, Spin, Tooltip, Typography } from 'antd';
 import classnames from 'classnames';
 import { useEffect, useRef, useState } from 'react';
 import { HiX } from 'react-icons/hi';
@@ -14,11 +14,12 @@ import './Message.css';
 import { Call, CameraEnhance, InfoOutlined } from '@material-ui/icons';
 import { Modal } from 'antd';
 import MessageApi from '../../api/messages/MessageApi';
+import useTheme from '../../context/ThemeContext';
 
 var stompClient = null;
 const ChatRoom = ({ user, data, Toggeinfo }) => {
 	const [form] = Form.useForm();
-	const { token } = theme.useToken();
+	const { theme } = useTheme();
 	const files = Form.useWatch('files', form);
 	const [messages, setMessages] = useState(new Map());
 	const [info, setInfo] = useState(false);
@@ -140,7 +141,6 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 			} else if (data?.postGroupId) {
 				stompClient.subscribe('/chatroom/room/' + data?.postGroupId, onMessageReceived);
 			}
-			
 		};
 		// kieerm tra data !== {} thi moi chay
 		if (data.userId || data.postGroupId) {
@@ -349,11 +349,17 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 									align="center"
 								>
 									<img className="iamge_end" src={data?.avatar || sampleProPic} alt="haha" />
-									<Typography.Title level={4} style={{ margin: 0 }}>
+									<Typography.Title
+										style={{ margin: 0, color: theme.foreground, background: theme.background }}
+										level={4}
+									>
 										{data?.userName || data?.postGroupName}
 									</Typography.Title>
 
-									<Typography.Text type="secondary">
+									<Typography.Text
+										style={{ color: theme.foreground, background: theme.background }}
+										type="secondary"
+									>
 										Đây là đoạn chat của bạn với {data?.userName || data?.postGroupName}
 									</Typography.Text>
 								</Space>
@@ -386,14 +392,7 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 						id="scroll-down-btn"
 					/>
 
-					<Space
-						className={classnames('typing', { show: typingList.length > 0 })}
-						style={{
-							backgroundColor: token.colorBgContainer,
-							borderColor: token.colorBorder,
-							boxShadow: token.boxShadow,
-						}}
-					>
+					<Space className={classnames('typing', { show: typingList.length > 0 })}>
 						<Avatar.Group maxCount={3} size="small" className="typing_list">
 							{typingList.map(({ user, nickname }) => (
 								<img
@@ -417,7 +416,7 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 					>
 						<Form.Item name="files" hidden />
 						<input {...getInputProps()} ref={inputFilesRef} />
-						<div className={'dropzone_content'} style={{ borderColor: token.colorPrimary }}>
+						<div className={'dropzone_content'}>
 							<Typography.Text strong>Gửi file</Typography.Text>
 
 							<Typography.Text type="secondary">Thả file vào đây để gửi</Typography.Text>
@@ -426,7 +425,7 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 				</div>
 
 				<div className="footer--chatroom">
-					<Space className="input" style={{ borderColor: token.colorBorder }}>
+					<Space className="input">
 						<Form.Item
 							style={{ flex: 1 }}
 							name="content"
@@ -439,7 +438,7 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 							noStyle
 						>
 							<Input.TextArea
-								style={{ flex: 1 }}
+								style={{ flex: 1, color: theme.foreground, background: theme.background }}
 								placeholder="Nhập tin nhắn"
 								autoSize={{ maxRows: 5 }}
 								bordered={false}

@@ -256,7 +256,7 @@ const Profile = () => {
 			<Toaster />
 
 			<Topbar dataUser={getUser} />
-			<div className="profile">
+			<div className="profile" style={{ color: theme.foreground, background: theme.background }}>
 				<div className="profileRight">
 					<div className="profileRightTop">
 						<div className="profileCover" style={{ color: theme.foreground, background: theme.background }}>

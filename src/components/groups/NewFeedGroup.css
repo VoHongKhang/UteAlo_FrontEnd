@@ -10,13 +10,13 @@
 	padding: 20px;
 }
 
-.menu--post .post {
-	background: #FFFFFF;
+/* .menu--post .post {
+	background: #ffffff;
 }
 
 .menu--post .share {
-	background: #FFFFFF;
-}
+	background: #ffffff;
+} */
 .menu--post .header--group {
 	border-bottom: solid #ccc 1px;
 }
@@ -45,24 +45,22 @@
 }
 
 .group--member {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 	margin-left: 4px;
 }
 
 .group--public {
 	margin-left: 4px;
 	display: flex;
-    justify-content: center;
-    align-items: center;
+	justify-content: center;
+	align-items: center;
 	margin-right: 20px;
 }
 
 .list--feature--group {
 	display: flex;
-	align-items: center;
-	justify-content: space-evenly;
 	margin: 0px 12px;
 	width: 100%;
 }
@@ -79,8 +77,8 @@
 	color: #333;
 	cursor: pointer;
 	font-size: 15px;
-    color: #65676B;
-    margin: auto;
+	color: #65676b;
+	margin: auto;
 	padding: 0px 16px;
 }
 
@@ -90,26 +88,25 @@
 }
 
 .group--button-add {
-	background-color: #1877F2;
-    border: none;
+	background-color: #1877f2;
+	border: none;
 	border-radius: 5px;
 	color: white;
-    font-size: 15px;
+	font-size: 15px;
 	height: 32px;
-    width: 64px;
+	width: 64px;
 }
 
 .group--button-more {
-	background-color: #E4E6EB;
-    border: none;
-    border-radius: 5px;
-    color: #706565;
-    font-size: 15px;
-    height: 33px;
-    width: 42px;
-    margin-left: 10px;
+	background-color: #e4e6eb;
+	border: none;
+	border-radius: 5px;
+	color: #706565;
+	font-size: 15px;
+	height: 33px;
+	width: 42px;
+	margin-left: 10px;
 }
-
 
 .group--button-joined-icon {
 	font-size: 15px;
@@ -122,25 +119,23 @@
 
 .container--search--group-icon {
 	font-weight: 600;
-    padding: 8px 10px;
-    background: #e4e6eb;
-    border-radius: 5px;
-    font-size: 16px;
-    margin-right: 10px;
+	padding: 8px 10px;
+	background: #e4e6eb;
+	border-radius: 5px;
+	font-size: 16px;
+	margin-right: 10px;
 	height: 37px;
 }
 
 .container--search--group-more {
 	font-weight: 600;
-    padding: 8px 10px;
-    background: #e4e6eb;
-    border-radius: 5px;
-    font-size: 16px;
+	padding: 8px 10px;
+	background: #e4e6eb;
+	border-radius: 5px;
+	font-size: 16px;
 	margin-right: 10px;
 	height: 37px;
 }
-
-  
 
 .groupUserImg {
 	width: 150px;
@@ -152,6 +147,7 @@
 
 .menu--post {
 	flex: 5.5 1;
+	overflow: hidden;
 }
 
 .container--group {
@@ -159,14 +155,13 @@
 }
 
 .rightbar--group {
-	flex:4;
+	flex: 4;
 	margin-top: -31px;
 	margin-left: -5px;
 }
 
 .group--infor {
 	height: 404px;
-    width: 370px;
 	background: #ffffff;
 	box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.1), 0px -3px 5px rgba(0, 0, 0, 0.1), 3px 0px 5px rgba(0, 0, 0, 0.1),
 		-3px 0px 5px rgba(0, 0, 0, 0.1);
@@ -176,57 +171,62 @@
 
 .menu--post .group--infor-introduce {
 	font-size: 18px;
-    font-weight: 600;
-    padding-top: 15px;
-    padding-left: 8px;
-    margin: auto;
-    margin-left: 6px;
+	font-weight: 600;
+	padding-top: 15px;
+	padding-left: 8px;
+	margin: auto;
+	margin-left: 6px;
 }
 
 .group--infor-bio {
 	margin-left: 16px;
-    margin-top: 12px;
-    margin-right: 22px;
+	margin-top: 12px;
+	margin-right: 22px;
 }
 
 .group--infor-bio span {
 	font-size: 14px;
 }
 
-.group--infor-public, .group--infor-show, .group--infor-location {
+.group--infor-public,
+.group--infor-show,
+.group--infor-location {
 	margin-left: 14px;
-    margin-top: 14px;
+	margin-top: 14px;
 	display: flex;
 }
 
-.group--public, .group--show, .group--location {
+.group--public,
+.group--show,
+.group--location {
 	font-size: 15px;
-    font-weight: 600;
-    margin-left: 6px;
+	font-weight: 600;
+	margin-left: 6px;
 	margin-top: 2px;
 }
 
 .group--public-text {
 	display: flex;
-    justify-content: center;
-    align-items: center;
+	justify-content: center;
+	align-items: center;
 	margin-left: 4px;
 	margin-right: 20px;
 }
 
-.group--infor-public-text, .group--infor-show-text {
+.group--infor-public-text,
+.group--infor-show-text {
 	margin-left: 40px;
 	margin-top: 10px;
 }
 
-.group--infor-public-text span, .group--infor-show-text span {
+.group--infor-public-text span,
+.group--infor-show-text span {
 	font-size: 14px;
 }
 
 .group--infor-more {
 	background: #e4e6eb;
 	padding: 0 12px;
-	width: 340px;
 	height: 36px;
 	margin: auto;
 	display: flex;
@@ -235,13 +235,13 @@
 	border-radius: 6px;
 	font-weight: 600;
 	font-size: 15px;
-	margin-top: 20px;
+	margin: 20px 10px 0px 10px;
+	cursor: pointer;
 }
 
 .group--file {
 	margin-top: 25px;
 	height: 360px;
-    width: 370px;
 	background: #ffffff;
 	box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.1), 0px -3px 5px rgba(0, 0, 0, 0.1), 3px 0px 5px rgba(0, 0, 0, 0.1),
 		-3px 0px 5px rgba(0, 0, 0, 0.1);

@@ -6,6 +6,7 @@ import { Button, Image } from 'antd';
 import PostGroupApi from '../../api/postGroups/PostGroupApi';
 import ProfileApi from '../../api/profile/ProfileApi';
 import { useNavigate } from 'react-router-dom';
+import useTheme from '../../context/ThemeContext';
 const RightbarChat = ({ user, group, currentData, showRightbar }) => {
 	const [data, setData] = useState({});
 	const [choose, setChoose] = useState(0);
@@ -80,6 +81,7 @@ const RightbarChat = ({ user, group, currentData, showRightbar }) => {
 			navigate(`/groups/${data.postGroupId}`);
 		}
 	};
+	const { theme } = useTheme();
 	return (
 		<>
 			{showRightbar && (
@@ -89,6 +91,7 @@ const RightbarChat = ({ user, group, currentData, showRightbar }) => {
 						<p>{data?.fullName || data?.postGroupName}</p>
 					</div>
 					<BottomNavigation
+						style={{ color: theme.foreground, background: theme.background }}
 						className="list--message--sidebar"
 						showLabels
 						value={choose}
@@ -98,9 +101,21 @@ const RightbarChat = ({ user, group, currentData, showRightbar }) => {
 							setChoose(newValue);
 						}}
 					>
-						<BottomNavigationAction label="Ảnh" icon={<Photo />} />
-						<BottomNavigationAction label="Video" icon={<VideoLibrary />} />
-						<BottomNavigationAction label="File tài liệu" icon={<FileCopy />} />
+						<BottomNavigationAction
+							style={{ color: theme.foreground, background: theme.background }}
+							label="Ảnh"
+							icon={<Photo />}
+						/>
+						<BottomNavigationAction
+							style={{ color: theme.foreground, background: theme.background }}
+							label="Video"
+							icon={<VideoLibrary />}
+						/>
+						<BottomNavigationAction
+							style={{ color: theme.foreground, background: theme.background }}
+							label="File tài liệu"
+							icon={<FileCopy />}
+						/>
 					</BottomNavigation>
 					<div className="file--container">
 						{choose === 0 &&

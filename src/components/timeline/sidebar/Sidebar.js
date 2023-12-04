@@ -100,7 +100,10 @@ const Sidebar = () => {
 					key={index}
 					header={
 						<Divider orientation="left" style={{ margin: 0 }}>
-							<Typography.Title level={4} style={{ margin: 0 }}>
+							<Typography.Title
+								level={4}
+								style={{ color: theme.foreground, background: theme.background, margin: 0 }}
+							>
 								{list.title}
 							</Typography.Title>
 						</Divider>
@@ -114,13 +117,34 @@ const Sidebar = () => {
 									<Button
 										type="text"
 										block
-										style={{ height: 'auto', padding: '8px' }}
+										style={{
+											color: theme.foreground,
+											background: theme.background,
+											height: 'auto',
+											padding: '8px',
+										}}
 										onClick={item.onClick}
 									>
-										<Space align="center" style={{ width: '100%' }} className="slider--bar--item">
+										<Space
+											align="center"
+											style={{
+												color: theme.foreground,
+												background: theme.background,
+												width: '100%',
+											}}
+											className="slider--bar--item"
+										>
 											<item.icon size={20} />
 
-											<Typography.Text strong>{item.title}</Typography.Text>
+											<Typography.Text
+												style={{
+													color: theme.foreground,
+													background: theme.background,
+												}}
+												strong
+											>
+												{item.title}
+											</Typography.Text>
 										</Space>
 									</Button>
 								</Link>
@@ -128,13 +152,30 @@ const Sidebar = () => {
 								<Button
 									type="text"
 									block
-									style={{ height: 'auto', padding: '8px' }}
+									style={{
+										color: theme.foreground,
+										background: theme.background,
+										height: 'auto',
+										padding: '8px',
+									}}
 									onClick={item.onClick}
 								>
-									<Space align="center" style={{ width: '100%' }} className="slider--bar--item">
+									<Space
+										align="center"
+										style={{ color: theme.foreground, background: theme.background, width: '100%' }}
+										className="slider--bar--item"
+									>
 										<item.icon size={20} />
 
-										<Typography.Text strong>{item.title}</Typography.Text>
+										<Typography.Text
+											style={{
+												color: theme.foreground,
+												background: theme.background,
+											}}
+											strong
+										>
+											{item.title}
+										</Typography.Text>
 									</Space>
 								</Button>
 							)}

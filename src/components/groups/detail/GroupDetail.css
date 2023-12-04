@@ -2,21 +2,26 @@
 	background-color: #e9eaf4;
 }
 
-.feed {
+.feed--detail {
 	flex: 5.22;
 }
-
+.feed--detail-feedWrapper {
+	padding: 8px;
+}
 .feedWrapper {
 	padding: 20px;
 }
-
-.post {
-	background: #FFFFFF;
+.feed--group--scroll {
+	padding: 8px !important;
 }
 
-.share {
-	background: #FFFFFF;
-}
+/* .post {
+	background: #ffffff;
+} */
+
+/* .share {
+	background: #ffffff;
+} */
 
 .groupCover {
 	height: 320px;
@@ -24,7 +29,7 @@
 }
 
 .groupCoverImg {
-	height: 320px!important;
+	height: 320px !important;
 	width: 100%;
 	display: block;
 	text-align: center;
@@ -79,8 +84,6 @@
 
 .list--feature--group {
 	display: flex;
-	align-items: center;
-	justify-content: space-evenly;
 	margin: 0px 12px;
 	width: 100%;
 }
@@ -97,7 +100,7 @@
 	color: #333;
 	cursor: pointer;
 	font-size: 15px;
-	color: #65676B;
+	color: #65676b;
 	margin: auto;
 	padding: 0px 16px;
 }
@@ -107,10 +110,11 @@
 	color: #000;
 }
 
-.group--header--button {}
+.group--header--button {
+}
 
 .header--group .group--button-add {
-	background-color: #1877F2;
+	background-color: #1877f2;
 	border: none;
 	border-radius: 5px;
 	color: white;
@@ -121,7 +125,7 @@
 }
 
 .group--button-more {
-	background-color: #E4E6EB;
+	background-color: #e4e6eb;
 	border: none;
 	border-radius: 5px;
 	color: #706565;
@@ -132,7 +136,7 @@
 }
 
 .group--button-joined {
-	background-color: #E4E6EB;
+	background-color: #e4e6eb;
 	border: none;
 	border-radius: 5px;
 	color: black;
@@ -171,16 +175,14 @@
 	margin-right: 10px;
 }
 
-
-
 .groupUserImg {
-	width: 150px!important;
-	height: 150px!important;
+	width: 150px !important;
+	height: 150px !important;
 	position: absolute;
 	bottom: -25%;
 	left: 12%;
 	border-radius: 50%;
-    border: 1px solid #ccc;
+	border: 1px solid #ccc;
 	cursor: pointer;
 }
 
@@ -194,11 +196,9 @@
 
 .menu--post .rightbar--group {
 	flex: 4;
-	margin-top: -31px;
+	margin: -42px 6px 0px 0px;
 	display: flex;
 	flex-direction: column;
-	align-items: center;
-	margin-left: -28px;
 }
 
 .group--infor {
@@ -264,11 +264,11 @@
 .group--infor-more {
 	background: #e4e6eb;
 	padding: 0 12px;
-	width: 340px;
 	height: 36px;
 	margin: auto;
 	display: flex;
 	justify-content: center;
+	color: #000 !important;
 	align-items: center;
 	border-radius: 6px;
 	font-weight: 600;
@@ -375,7 +375,7 @@
 .friend--seleted-text {
 	padding-left: 10px;
 	padding-top: 10px;
-	color: #65676B;
+	color: #65676b;
 	font-size: 13px;
 }
 
@@ -436,7 +436,7 @@
 .qr--text-two {
 	font-size: 11px;
 	margin-top: -2px;
-	color: #65676B;
+	color: #65676b;
 }
 
 .line--bottom {
@@ -507,6 +507,24 @@
 	height: 38px;
 	margin-top: 4px;
 }
-.popover--list{
-	
+.search--button,
+.more--button {
+	margin-right: 12px;
+	cursor: pointer;
+}
+.more--button:hover,
+.search--button:hover {
+	color: #1877f2;
+}
+.feed--note {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.feed--note-feedWrapper {
+	width: 80%;
+}
+.table--file {
+	width: 100%;
 }

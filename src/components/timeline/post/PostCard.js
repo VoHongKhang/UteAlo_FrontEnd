@@ -193,6 +193,10 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 				toast.error('Vui lòng nhập nội dung hoặc hình ảnh!', { id: toastId });
 				return; // Dừng việc thực hiện tiếp theo nếu nội dung rỗng
 			}
+			if (content.length > 250) {
+				toast.error('Nội dung bài viết không được vượt quá 250 ký tự!');
+				return;
+			}
 			setCommentLoading(true);
 			if (post.postId) {
 				const formData = new FormData();
@@ -242,12 +246,17 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 			toast.error('Không thể chia sẻ bài viết trong chính nhóm này!');
 			return;
 		} else {
-			try {
-				const res = await sharePost(e);
-				newShare(res.result, 'create');
-			} catch (error) {
-				console.error(error);
-				toast.error('Có lỗi xảy ra khi tạo bài viết.');
+			if (e.content.length > 250) {
+				toast.error('Nội dung bài viết không được vượt quá 250 ký tự!');
+				return;
+			} else {
+				try {
+					const res = await sharePost(e);
+					newShare(res.result, 'create');
+				} catch (error) {
+					console.error(error);
+					toast.error('Có lỗi xảy ra khi tạo bài viết.');
+				}
 			}
 		}
 	};
@@ -342,10 +351,16 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 		return;
 	}
 	return (
-		<div className={classnames(classPost)}>
+		<div
+			className={classnames(classPost)}
+			style={{
+				color: theme.foreground,
+				background: theme.background,
+			}}
+		>
 			{post === null ? (
 				<Skeleton
-					style={{ marginTop: '30px' }}
+					style={{ color: theme.foreground, background: theme.background, marginTop: '30px' }}
 					active
 					avatar
 					paragraph={{
@@ -353,12 +368,22 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 					}}
 				/>
 			) : (
-				<div className="postWrapper">
+				<div
+					className="postWrapper"
+					style={{
+						color: theme.foreground,
+						background: theme.background,
+					}}
+				>
 					<div className="postTop">
 						<div className="postTopLeft">
 							<div className="post--header--left">
 								{post.postGroupName && (
 									<span
+										style={{
+											color: theme.foreground,
+											background: theme.background,
+										}}
 										className="postGroupname"
 										onClick={() => navigate(`/groups/${post.postGroupId}`)}
 									>
@@ -375,7 +400,13 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 									/>
 
 									<div className="postNameAndDate">
-										<span className={classnames('postUsername', classNameUser)}>
+										<span
+											style={{
+												color: theme.foreground,
+												background: theme.background,
+											}}
+											className={classnames('postUsername', classNameUser)}
+										>
 											{post?.roleName === 'SinhVien'
 												? 'Sinh viên: '
 												: post?.roleName === 'GiangVien'
@@ -390,11 +421,26 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 											{post.userName}
 										</span>
 										{modalDetail !== 3 ? (
-											<span className="postDate" onClick={() => handleButtonClick(post)}>
+											<span
+												style={{
+													color: theme.foreground,
+													background: theme.background,
+												}}
+												className="postDate"
+												onClick={() => handleButtonClick(post)}
+											>
 												{formatTime(post.updateAt)}
 											</span>
 										) : (
-											<span className="postDateShare">{formatTime(post.updateAt)}</span>
+											<span
+												style={{
+													color: theme.foreground,
+													background: theme.background,
+												}}
+												className="postDateShare"
+											>
+												{formatTime(post.updateAt)}
+											</span>
 										)}
 									</div>
 								</div>
@@ -425,12 +471,28 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 									</div>
 								) : null)}
 						</div>
-						{(modalDetail === 0 || modalDetail ===3) && (
+						{(modalDetail === 0 || modalDetail === 3) && (
 							<div className="comment" id="postTopRight">
-								<IconButton aria-describedby="simple-popover" onClick={(e) => handleClick(e)}>
-									<MoreHoriz />
+								<IconButton
+									style={{
+										color: theme.foreground,
+										background: theme.background,
+									}}
+									aria-describedby="simple-popover"
+									onClick={(e) => handleClick(e)}
+								>
+									<MoreHoriz
+										style={{
+											color: theme.foreground,
+											background: theme.background,
+										}}
+									/>
 								</IconButton>
 								<Popover
+									style={{
+										color: theme.foreground,
+										background: theme.background,
+									}}
 									id="simple-popover"
 									open={Boolean(anchorEl)}
 									className="popper--member"
@@ -445,9 +507,18 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 										horizontal: 'right',
 									}}
 								>
-									<div>
+									<div
+										style={{
+											color: theme.foreground,
+											background: theme.background,
+										}}
+									>
 										{post?.privacyLevel !== 'PRIVATE' && group?.groupType !== 'Private' && (
 											<Typography
+												style={{
+													color: theme.foreground,
+													background: theme.background,
+												}}
 												className="poper--member--item"
 												onClick={() => handleOpenConfirmation('sharePost')}
 											>
@@ -457,12 +528,20 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 										{post?.userId === currentUser.userId && (
 											<>
 												<Typography
+													style={{
+														color: theme.foreground,
+														background: theme.background,
+													}}
 													className="poper--member--item"
 													onClick={() => handleOpenConfirmation('editPost')}
 												>
 													Chỉnh sửa bài viết
 												</Typography>
 												<Typography
+													style={{
+														color: theme.foreground,
+														background: theme.background,
+													}}
 													className="poper--member--item"
 													onClick={() => handleOpenConfirmation('deletePost')}
 												>
@@ -473,6 +552,10 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 
 										{post?.userId !== currentUser.userId && (
 											<Typography
+												style={{
+													color: theme.foreground,
+													background: theme.background,
+												}}
 												className="poper--member--item"
 												onClick={() => handleOpenConfirmation('reportPost')}
 											>
@@ -502,7 +585,13 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 						onClose={handleModalClose}
 						modalDetail={modalDetail}
 					/>
-					<div className="postCenter">
+					<div
+						className="postCenter"
+						style={{
+							color: theme.foreground,
+							background: theme.background,
+						}}
+					>
 						{post.content && <span className="postText">{post.content}</span>}
 						{post.photos && (
 							<Image
@@ -514,21 +603,39 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 							/>
 						)}
 						{post.files && post.files.toLowerCase().endsWith('.txt') && (
-							<div className="postFile">
+							<div
+								className="postFile"
+								style={{
+									color: theme.foreground,
+									background: theme.background,
+								}}
+							>
 								<a href={post.files} target="_blank" rel="noopener noreferrer">
 									{post.files.substr(post.files.lastIndexOf('/') + 1)}
 								</a>
 							</div>
 						)}
 						{post.files && post.files.toLowerCase().endsWith('.docx') && (
-							<div className="postFile">
+							<div
+								className="postFile"
+								style={{
+									color: theme.foreground,
+									background: theme.background,
+								}}
+							>
 								<a href={post.files} target="_blank" rel="noopener noreferrer">
 									{post.files.substr(post.files.lastIndexOf('/') + 1)}
 								</a>
 							</div>
 						)}
 						{post.files && post.files.toLowerCase().endsWith('.pdf') && (
-							<div className="postFile">
+							<div
+								className="postFile"
+								style={{
+									color: theme.foreground,
+									background: theme.background,
+								}}
+							>
 								<a href={post.files} target="_blank" rel="noopener noreferrer">
 									{post.files.substr(post.files.lastIndexOf('/') + 1)}
 								</a>
@@ -536,7 +643,13 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 						)}
 					</div>
 
-					<div className="postBottom">
+					<div
+						className="postBottom"
+						style={{
+							color: theme.foreground,
+							background: theme.background,
+						}}
+					>
 						<div className="postBottomLeft">
 							<img
 								className="likeIcon"
@@ -544,10 +657,25 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 								src={isLiked ? heart : heartEmpty}
 								alt="heart"
 							/>
-							<span className="postLikeCounter">{like} người đã thích</span>
+							<span
+								className="postLikeCounter"
+								style={{
+									color: theme.foreground,
+									background: theme.background,
+								}}
+							>
+								{like} người đã thích
+							</span>
 						</div>
 						<div className="postBottomRight">
-							<span className="postCommentText" onClick={toggleShowAllComments}>
+							<span
+								className="postCommentText"
+								onClick={toggleShowAllComments}
+								style={{
+									color: theme.foreground,
+									background: theme.background,
+								}}
+							>
 								{commentlength} bình luận
 							</span>
 						</div>

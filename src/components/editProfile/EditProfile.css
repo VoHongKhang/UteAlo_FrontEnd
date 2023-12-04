@@ -160,8 +160,11 @@
 .edit--group--avatar {
 	left: 21% !important;
 }
-.group--contanier--top {
+.group--contanier--top--edit--profle {
 	margin-left: 25% !important;
+    min-height: 100px;
+    display: flex;
+    align-items: center;
 }
 .collapse--content {
 	display: flex;

@@ -1,11 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import PostCard from '../../timeline/post/PostCard';
 import useAuth from '../../../context/auth/AuthContext';
 import sampleProPic from '../../../assets/appImages/user.png';
 import noCover from '../../../assets/appImages/noCover.jpg';
-import { Search, Public, People, MoreHoriz, Visibility, Room, Lock } from '@material-ui/icons';
+import { Search, Public, People, MoreHoriz, Lock } from '@material-ui/icons';
 import { useParams } from 'react-router-dom';
-import Share from '../../timeline/sharePost/Share';
 import Topbar from '../../timeline/topbar/Topbar';
 import SidebarGroup from '../sidebar/SidebarGroup';
 import { Helmet } from 'react-helmet';
@@ -13,7 +11,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import PostGroupApi from '../../../api/postGroups/PostGroupApi';
 import './GroupDetail.css';
 import { useNavigate } from 'react-router-dom';
-import { Image, Typography, theme } from 'antd';
+import { Image, Tabs, Typography } from 'antd';
 import { Modal, Select, Checkbox } from 'antd';
 import qrCode from '../../../assets/icons/qr-code/qr-code.png';
 import home from '../../../assets/icons/qr-code/home.png';
@@ -22,11 +20,14 @@ import people from '../../../assets/icons/qr-code/people.png';
 import GetFriendApi from '../../../api/profile/friend/getFriendApi';
 import InviteFriendApi from '../../../api/postGroups/inviteFriendApi';
 import noAvatar from '../../../assets/appImages/user.png';
-import SharePostCard from '../../timeline/post/SharePostCard';
-import { Skeleton } from 'antd';
-import InfiniteScroll from 'react-infinite-scroll-component';
 import { postDetail } from '../../../api/postGroups/postDetail';
 import { Popover } from '@material-ui/core';
+import Discuss from './Discuss';
+import NotePost from './NotePost';
+import MemberGroup from './MemberGroup';
+import FileMedia from './FileMedia';
+import FileDoc from './FileDoc';
+import useTheme from '../../../context/ThemeContext';
 const GroupDetail = () => {
 	const isMounted = useRef(true);
 	const params = useParams();
@@ -174,7 +175,7 @@ const GroupDetail = () => {
 	const navigate = useNavigate();
 	const [loading, setLoading] = useState(false);
 	const [postGroup, setPostGroup] = useState([]);
-	const { token } = theme.useToken();
+	const { theme } = useTheme();
 	const [listFriends, setListFriends] = useState([]);
 	// Xử lý nút hiện thì modal khi bấm nút mời
 	const [isInviteModalVisible, setIsInviteModalVisible] = useState(false);
@@ -198,7 +199,7 @@ const GroupDetail = () => {
 		const fetchGroup = async () => {
 			const res = await PostGroupApi.getGroup({ user: currentUser, postId: params.postGroupId });
 			setPostGroup(res.result);
-			console.log('res', res.result);
+			console.log('resGroup', res.result);
 		};
 		fetchGroup();
 	}, [params, currentUser]);
@@ -232,24 +233,22 @@ const GroupDetail = () => {
 		setIsInviteModalVisible(true);
 	};
 
-	const listImage = [noCover, noCover, noCover, noCover];
 	const handleGroup = async (e) => {
 		const target = e.target.innerHTML;
 		console.log('postId', params);
 		switch (target) {
 			case 'Tham gia nhóm':
-				const toastId = toast.loading('Đang gửi yêu cầu tham gia...');
-				await PostGroupApi.joinGroup({ token: currentUser.accessToken, postGroupId: params.postGroupId })
+				await PostGroupApi.joinGroup({
+					token: currentUser.accessToken,
+					postGroupId: params.postGroupId,
+				})
 					.then((res) => {
-						toast.success('Gửi yêu cầu tham gia thành công!', { id: toastId });
-						//reload trang
-						console.log('res', { ...postGroup, roleGroup: res.result });
 						setPostGroup({ ...postGroup, roleGroup: res.result });
-						console.log('postGroup', postGroup);
 					})
 					.catch((error) => {
-						toast.error(error.message || error.toString(), { id: toastId });
+						console.log(error);
 					});
+
 				break;
 			case 'Đã Tham gia':
 				setAnchorEl(e.currentTarget);
@@ -270,31 +269,7 @@ const GroupDetail = () => {
 				break;
 		}
 	};
-	// Hàm border-radius 4 gốc cho 4 ảnh
-	function getImageStyles(index) {
-		let borderStyles = '';
 
-		switch (index) {
-			case 0:
-				borderStyles = '8px 0 0 0';
-				break;
-			case 1:
-				borderStyles = '0 8px 0 0';
-				break;
-			case 2:
-				borderStyles = '0 0 0 8px';
-				break;
-			case 3:
-				borderStyles = '0 0 8px 0';
-				break;
-			default:
-				borderStyles = '0';
-		}
-
-		return {
-			borderRadius: borderStyles,
-		};
-	}
 	const leaveGroup = async () => {
 		const toastId = toast.loading('Đang rời khỏi nhóm...');
 
@@ -324,13 +299,13 @@ const GroupDetail = () => {
 	};
 	const cancelLegage = async () => {
 		const toastId = toast.loading('Đang hủy yêu cầu tham gia nhóm...');
-		await PostGroupApi.cancelJoinGroupRequest({
+		await PostGroupApi.cancelJoinGroup({
 			token: currentUser.accessToken,
 			postGroupId: params.postGroupId,
 		})
 			.then((res) => {
 				toast.success('Hủy yêu cầu tham gia nhóm thành công!', { id: toastId });
-				
+
 				//reload trang
 				console.log('res', { ...postGroup, roleGroup: res.result });
 				setPostGroup({ ...postGroup, roleGroup: res.result });
@@ -413,6 +388,63 @@ const GroupDetail = () => {
 			},
 		});
 	};
+
+	//Tab
+	const onChange = (key) => {
+		console.log('key', key);
+		if (key === '3') {
+			console.log('key', key);
+			navigate(`/message/${params.postGroupId}`);
+		}
+	};
+
+	const items = [
+		{
+			key: '1',
+			label: <span style={{ color: theme.foreground, background: theme.background }}>Thảo luận</span>,
+			children: (
+				<Discuss
+					postGroup={postGroup}
+					inforUser={inforUser}
+					postLength={postLength}
+					sortedList={sortedList}
+					hasMore={hasMore}
+					loadMore={loadMore}
+					getNewPost={getNewPost}
+					getPostUpdate={getPostUpdate}
+					getNewSharePost={getNewSharePost}
+				/>
+			),
+		},
+		{
+			key: '2',
+			label: <span style={{ color: theme.foreground, background: theme.background }}>Đáng chú ý</span>,
+			children: <NotePost postGroup={postGroup} inforUser={inforUser} currentUser={currentUser} />,
+		},
+		{
+			key: '3',
+			label: <span style={{ color: theme.foreground, background: theme.background }}>Phòng trò chuyện</span>,
+		},
+		{
+			key: '4',
+			label: <span style={{ color: theme.foreground, background: theme.background }}>Mọi người</span>,
+			children: <MemberGroup groupId={postGroup.postGroupId} currentUser={currentUser} />,
+		},
+		{
+			key: '5',
+			label: <span style={{ color: theme.foreground, background: theme.background }}>File phương tiện</span>,
+			children: <FileMedia />,
+		},
+		{
+			key: '6',
+			label: <span style={{ color: theme.foreground, background: theme.background }}>File tài liệu</span>,
+			children: <FileDoc />,
+		},
+	];
+	const operations = {
+		left: <Search className="search--button" />,
+		right: <MoreHoriz className="more--button" />,
+	};
 	return (
 		<>
 			<Helmet title={`Nhóm ${postGroup.postGroupName} |UTEALO`} />
@@ -422,7 +454,10 @@ const GroupDetail = () => {
 				<SidebarGroup user={currentUser} />
 				<div className="menu--post">
 					{postGroup && (
-						<div className="header--group">
+						<div
+							className="header--group"
+							style={{ color: theme.foreground, background: theme.background, margin: 0 }}
+						>
 							<div
 								className="groupCover"
 								style={{ color: theme.foreground, background: theme.background }}
@@ -435,7 +470,7 @@ const GroupDetail = () => {
 										className="groupCoverImg"
 										src={postGroup.background} // Sử dụng selectedPost.photos thay vì cố định URL như bạn đã đề cập
 										alt={'backgroup'}
-										style={{ objectFit: 'cover', background: token.colorBgLayout }}
+										style={{ objectFit: 'cover' }}
 									/>
 								) : (
 									<img className="groupCoverImg" src={noCover} alt="..." />
@@ -450,7 +485,7 @@ const GroupDetail = () => {
 										alt={'backgroup'}
 										style={{
 											objectFit: 'cover',
-											background: token.colorBgLayout,
+
 											top: '-80px',
 										}}
 									/>
@@ -725,189 +760,16 @@ const GroupDetail = () => {
 							</div>
 							<hr />
 							<div className="list--feature--group">
-								<ul className="list-feature">
-									<li>Thảo luận</li>
-									<li>Đáng chú ý</li>
-									<li>Phòng họp mặt</li>
-									<li>Mọi người</li>
-									<li>Sự kiện</li>
-									<li>File phương tiện</li>
-									<li>File</li>
-								</ul>
-								<div className="container--search--group">
-									<div className="container--search--group-icon">
-										<Search />
-									</div>
-									<div className="container--search--group-more">
-										<MoreHoriz />
-									</div>
-								</div>
+								<Tabs
+									defaultActiveKey="1"
+									style={{ color: theme.foreground, background: theme.background, width: '99%' }}
+									items={items}
+									onChange={onChange}
+									tabBarExtraContent={operations}
+								/>
 							</div>
 						</div>
 					)}
-					<div className="container--group">
-						{(postGroup.roleGroup === 'Waiting Accept' ||
-							postGroup.roleGroup === 'Accept Invited' ||
-							postGroup.roleGroup === 'None') &&
-						postGroup.groupType === 'Private' ? (
-							<div></div>
-						) : (
-							<div className="feed">
-								<div className="feedWrapper" id="feed--group--scroll">
-									{(postGroup.roleGroup === 'Admin' ||
-										postGroup.roleGroup === 'Member' ||
-										postGroup.roleGroup === 'Deputy') && (
-										<Share newPosts={getNewPost} postGroupId={postGroup.postGroupId} />
-									)}
-									<InfiniteScroll
-										scrollableTarget="feed--group--scroll"
-										className="feed__scroll"
-										dataLength={postLength}
-										next={loadMore}
-										hasMore={hasMore.posts || hasMore.share}
-										loader={
-											<Skeleton
-												style={{ marginTop: '30px' }}
-												active
-												avatar
-												paragraph={{
-													rows: 4,
-												}}
-											/>
-										}
-									>
-										{sortedList?.map((p) => {
-											if (p.postId) {
-												return (
-													<PostCard
-														inforUser={inforUser}
-														post={p}
-														key={`post-${p.postId}`}
-														group={postGroup}
-														newShare={getPostUpdate}
-													/>
-												);
-											} else {
-												return (
-													<SharePostCard
-														inforUser={inforUser}
-														share={p}
-														key={`share-${p.shareId}`}
-														newSharePosts={getNewSharePost}
-													/>
-												);
-											}
-										})}
-									</InfiniteScroll>
-
-									{/* {visiblePostData.length === 0 ? (
-										<>
-											<Skeleton
-												style={{ marginTop: '30px' }}
-												active
-												avatar
-												paragraph={{
-													rows: 4,
-												}}
-											/>
-											<Skeleton
-												style={{ marginTop: '30px' }}
-												active
-												avatar
-												paragraph={{
-													rows: 4,
-												}}
-											/>
-										</>
-									) : (
-										visiblePostData.map((p) => (
-											<PostCard post={p} key={p.postId} fetchPosts={fetchPosts} />
-										))
-									)}
-									{sharePosts.map((p) => (
-										<SharePostCard share={p} key={p.shareId} fetchSharePosts={fetchSharePosts} />
-									))} */}
-								</div>
-							</div>
-						)}
-						{postGroup && (
-							<div className="rightbar--group">
-								<div className="group--infor">
-									<div className="group--infor-introduce">Giới thiệu</div>
-									<div className="group--infor-bio">
-										<span>{postGroup.bio}</span>
-									</div>
-									{postGroup.groupType === 'Public' ? (
-										<>
-											<div className="group--infor-public">
-												<Public htmlColor="#65676B" className="group--public-icon" />
-												<span className="group--public">Nhóm Công khai</span>
-											</div>
-											<div className="group--infor-public-text">
-												<span>
-													Bất kỳ ai cũng có thể nhìn thấy mọi người trong nhóm và những gì họ
-													đăng.
-												</span>
-											</div>
-										</>
-									) : (
-										<>
-											<div className="group--infor-public">
-												<Lock htmlColor="#65676B" className="group--public-icon" />
-												<span className="group--public">Nhóm riêng tư</span>
-											</div>
-											<div className="group--infor-public-text">
-												<span>
-													Chỉ thành viên mới nhìn thấy mọi người trong nhóm và những gì họ
-													đăng.
-												</span>
-											</div>
-										</>
-									)}
-
-									<div className="group--infor-show">
-										<Visibility htmlColor="#65676B" className="group--show-icon" />
-										<span className="group--show">Hiển thị</span>
-									</div>
-									<div className="group--infor-show-text">
-										<span>Ai cũng có thể tìm thấy nhóm này.</span>
-									</div>
-
-									<div className="group--infor-location">
-										<Room htmlColor="#65676B" className="group--location-icon" />
-										<span className="group--location">Thành Phố Hồ Chí Minh</span>
-									</div>
-
-									<div className="group--infor-more">Tìm hiểu thêm</div>
-								</div>
-								{(postGroup.roleGroup === 'Waiting Accept' ||
-									postGroup.roleGroup === 'Accept Invited' ||
-									postGroup.roleGroup === 'None') &&
-								postGroup.groupType === 'Private' ? (
-									<div></div>
-								) : (
-									<div className="group--file">
-										<div className="group--file-text">
-											<div className="group--file-text-title">File phương tiện</div>
-											<div className="group--file-text-more">Xem tất cả file</div>
-										</div>
-
-										<div className="file--photos">
-											{Array.from({ length: 4 }).map((_, index) => (
-												<div
-													key={index}
-													className="filePhotoItem"
-													style={getImageStyles(index)}
-												>
-													<img src={listImage[index] || sampleProPic} alt="" />
-												</div>
-											))}
-										</div>
-									</div>
-								)}
-							</div>
-						)}
-					</div>
 				</div>
 			</div>
 		</>

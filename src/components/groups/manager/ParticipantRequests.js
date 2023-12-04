@@ -11,6 +11,7 @@ import UserCard from './UserCard';
 import { FloatButton, List, Modal, Button } from 'antd';
 import { DoneAll, HelpOutline, MoreHoriz } from '@material-ui/icons';
 import { useNavigate } from 'react-router-dom';
+import useTheme from '../../../context/ThemeContext';
 const ParticipantRequests = () => {
 	const params = useParams();
 	const navigate = useNavigate();
@@ -33,7 +34,7 @@ const ParticipantRequests = () => {
 				userId: [],
 			};
 			memberGroup?.map((item) => {
-				return data.userId = [...data.userId, item.userId];
+				return (data.userId = [...data.userId, item.userId]);
 			});
 			console.log('data', data);
 			await PostGroupApi.acceptMemberGroup({ user: currentUser, data: data });
@@ -47,6 +48,7 @@ const ParticipantRequests = () => {
 	const handleCancel = () => {
 		setOpenModal(false);
 	};
+	const { theme } = useTheme();
 	return (
 		<>
 			<Helmet title={`Quản lý thành viên nhóm ||UTEALO`} />
@@ -54,8 +56,12 @@ const ParticipantRequests = () => {
 			<Topbar />
 			<div div className="homeContainer">
 				<SidebarManagerGroup user={currentUser} groupId={params.postGroupId} />
-				<div className="setting--group--member">
+				<div
+					className="setting--group--member"
+					style={{ color: theme.foreground, background: theme.background }}
+				>
 					<List
+						style={{ color: theme.foreground, background: theme.background }}
 						className="list--member--required"
 						itemLayout="horizontal"
 						dataSource={memberGroup}

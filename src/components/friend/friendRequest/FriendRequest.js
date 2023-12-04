@@ -6,8 +6,9 @@ import Topbar from '../../timeline/topbar/Topbar';
 import './friendRequest.css';
 import useAuth from '../../../context/auth/AuthContext';
 import { Toaster } from 'react-hot-toast';
+import useTheme from '../../../context/ThemeContext';
 const FriendRequest = () => {
-	const {user: currentUser} = useAuth();
+	const { user: currentUser } = useAuth();
 	const [type, setType] = useState('friend');
 	const [title, setTitle] = useState('Bạn bè');
 	const changeType = (key) => {
@@ -44,22 +45,33 @@ const FriendRequest = () => {
 			Icon: require('@ant-design/icons').UserOutlined,
 		},
 		{
-			type:'suggest',
+			type: 'suggest',
 			title: 'Gợi ý kết bạn',
 			Icon: require('@ant-design/icons').UserSwitchOutlined,
-		}
+		},
 	];
+	const { theme } = useTheme();
 	return (
-		<>
+		<div style={{ color: theme.foreground, background: theme.background }} className="friendUser">
 			<Helmet title={`${title}`} />
 			<Toaster />
 			<Topbar />
-			<div className="container">
+			<div className="container" style={{ color: theme.foreground, background: theme.background }}>
 				<div className="leftbar">
-					<Card title="Danh sách" headStyle={{ padding: '0 16px' }} bodyStyle={{ padding: 8 }}>
+					<Card
+						style={{ color: theme.foreground, background: theme.background }}
+						title={<span style={{ color: theme.foreground, background: theme.background }}>Danh sách</span>}
+						headStyle={{ padding: '0 16px' }}
+						bodyStyle={{ padding: 8 }}
+					>
 						<Menu
 							mode="vertical"
-							style={{ width: '100%', border: 'none' }}
+							style={{
+								color: theme.foreground,
+								background: theme.background,
+								width: '100%',
+								border: 'none',
+							}}
 							items={friendTypeList.map((item) => ({
 								key: item.type,
 								icon: <item.Icon size={20} />,
@@ -71,11 +83,11 @@ const FriendRequest = () => {
 					</Card>
 				</div>
 
-				<div className="centerbar">
-					<ListFriend currentUser ={currentUser} title={title} type={type} />
+				<div className="centerbar" style={{ color: theme.foreground, background: theme.background }}>
+					<ListFriend currentUser={currentUser} title={title} type={type} />
 				</div>
 			</div>
-		</>
+		</div>
 	);
 };
 

@@ -24,7 +24,7 @@ const ThemeContext = createContext(initialState);
 
 export const ThemeProvider = ({ children }) => {
   const checkUserPreference =
-    localStorage.getItem("userTheme") === "light" ? themes.light : themes.dark;
+    localStorage.getItem("userTheme") === "dark" ? themes.dark : themes.light;
   const [theme, setTheme] = useState(checkUserPreference);
 
   return (

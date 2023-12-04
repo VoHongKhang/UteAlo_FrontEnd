@@ -1,4 +1,4 @@
-import { Button, Image, List, Space, Spin, theme, Tooltip, Typography } from 'antd';
+import { Button, Image, List, Space, Spin, Tooltip, Typography } from 'antd';
 import classnames from 'classnames';
 import { HiDownload } from 'react-icons/hi';
 import { HiArrowPath, HiEye } from 'react-icons/hi2';
@@ -14,8 +14,9 @@ import { useEffect, useState } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Popover } from '@material-ui/core';
 import { fileUtil } from './utils/fileUtil';
 import sampleProPic from '../../assets/appImages/user.png';
+import useTheme from '../../context/ThemeContext';
 function MessageItem({ isOwner, message, stompClient, nextCombine, onRetry }) {
-	const { token } = theme.useToken();
+	const { theme } = useTheme();
 	const classes = ['message'];
 	const classParent = [isOwner ? 'sent--item' : 'received--item'];
 	classes.push(isOwner ? 'sent' : 'received');
@@ -105,12 +106,21 @@ function MessageItem({ isOwner, message, stompClient, nextCombine, onRetry }) {
 		<Space className={classnames(classParent)} align={isOwner ? 'end' : 'start'}>
 			{!isOwner && <img src={message?.senderAvatar || sampleProPic} alt="avatar" className="sender-avatar" />}
 			<div className={isOwner ? 'senderMessage' : 'receivedMessage'}>
-				{!isOwner && <Typography.Text className="sender-name">{message?.senderName}</Typography.Text>}
-				<Space direction="vertical" className={classnames(classes)}>
+				{!isOwner && (
+					<Typography.Text
+						style={{ color: theme.foreground, background: theme.background }}
+						className="sender-name"
+					>
+						{message?.senderName}
+					</Typography.Text>
+				)}
+				<Space
+					direction="vertical"
+					style={{ color: theme.foreground, background: theme.background }}
+					className={classnames(classes)}
+				>
 					{message.isDeleted ? (
-						<Typography.Text type="danger" className="text removeMessage">
-							Tin nhắn đã bị thu hồi
-						</Typography.Text>
+						<Typography.Text className="text removeMessage">Tin nhắn đã bị thu hồi</Typography.Text>
 					) : (
 						<>
 							<div className="icon--message">
@@ -152,7 +162,11 @@ function MessageItem({ isOwner, message, stompClient, nextCombine, onRetry }) {
 									</Typography.Text>
 								</List.Item>
 							)}
-							<Typography.Text className="text" title={message.createAt}>
+							<Typography.Text
+								className="text"
+								style={{ color: theme.foreground }}
+								title={message.createAt}
+							>
 								{message.content}
 								{reactIcon?.react && (
 									<span className="react--icon">

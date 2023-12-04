@@ -26,8 +26,8 @@ const NewFeedGroup = ({ inforUser, currentUser }) => {
 		try {
 			if (isMounted.current) {
 				const [res, response] = await Promise.all([
-					hasMore.posts && PostApi.getPostInAllGroup({user: currentUser,page: newPage,size: 20}),
-					hasMore.share && PostApi.getShareInAllGroup({user: currentUser,page: newPage,size: 20})
+					hasMore.posts && PostApi.getPostInAllGroup({ user: currentUser, page: newPage, size: 20 }),
+					hasMore.share && PostApi.getShareInAllGroup({ user: currentUser, page: newPage, size: 20 }),
 				]);
 
 				if (res) {
@@ -62,8 +62,8 @@ const NewFeedGroup = ({ inforUser, currentUser }) => {
 	const fetchPosts = async () => {
 		try {
 			const [res, response] = await Promise.all([
-				PostApi.getPostInAllGroup({user: currentUser,page: page,size: 20}),
-				PostApi.getShareInAllGroup({user: currentUser,page: page,size: 20}),
+				PostApi.getPostInAllGroup({ user: currentUser, page: page, size: 20 }),
+				PostApi.getShareInAllGroup({ user: currentUser, page: page, size: 20 }),
 			]);
 
 			if (response) {
@@ -135,7 +135,7 @@ const NewFeedGroup = ({ inforUser, currentUser }) => {
 				<InfiniteScroll
 					scrollableTarget="feed"
 					dataLength={postLength}
-					className='feed__scroll'
+					className="feed__scroll"
 					next={loadMore}
 					hasMore={hasMore.posts || hasMore.share}
 					loader={
@@ -149,7 +149,10 @@ const NewFeedGroup = ({ inforUser, currentUser }) => {
 						/>
 					}
 					endMessage={
-						<Space direction="vertical" style={{ width: '100%', textAlign: 'center' }}>
+						<Space
+							direction="vertical"
+							style={{ width: '100%', textAlign: 'center', marginBottom: '20px' }}
+						>
 							<h3>Yay! You have seen it all</h3>
 						</Space>
 					}

@@ -8,6 +8,7 @@ import vietnamProvinces from '../../../vietnamProvinces.json';
 import noAvatar from '../../../assets/appImages/user.png';
 import usePost from '../../../context/post/PostContext';
 import { Select } from 'antd';
+import useTheme from '../../../context/ThemeContext';
 
 const Share = ({ inforUser, newPosts, postGroupId }) => {
 	const [location, setLocation] = useState('');
@@ -19,7 +20,7 @@ const Share = ({ inforUser, newPosts, postGroupId }) => {
 	const [privacyLevel, setPrivacyLevel] = useState('PUBLIC');
 	const [picLoading, setPicLoading] = useState(false);
 	const { createPost, createLoading } = usePost();
-
+	const { theme } = useTheme();
 	useEffect(() => {
 		console.log(privacyLevel);
 		console.log('postGroupId', postGroupId);
@@ -60,7 +61,10 @@ const Share = ({ inforUser, newPosts, postGroupId }) => {
 	// Đăng bài post
 	const postSubmitHandler = async (e) => {
 		e.preventDefault();
-
+		if (content.length > 250) {
+			toast.error('Nội dung bài viết không được vượt quá 250 ký tự!');
+			return;
+		}
 		try {
 			const newPost = {
 				location: location || '',
@@ -100,11 +104,17 @@ const Share = ({ inforUser, newPosts, postGroupId }) => {
 	return (
 		<>
 			<Toaster />
-			<div className="share">
+			<div
+				className="share"
+				style={{
+					color: theme.foreground,
+					background: theme.background,
+				}}
+			>
 				<form className="shareWrapper" onSubmit={postSubmitHandler}>
 					<div className="shareTop">
 						<img className="shareProfileImg" src={inforUser?.avatar || noAvatar} alt="..." />
-						<InputEmoji value={content} onChange={setContent} placeholder={`Bạn đang nghĩ gì ?`} />
+						<InputEmoji  value={content} onChange={setContent} placeholder={`Bạn đang nghĩ gì ?`} />
 					</div>
 					<hr className="shareHr" />
 					{picLoading && (
@@ -163,11 +173,22 @@ const Share = ({ inforUser, newPosts, postGroupId }) => {
 											width: '100%',
 										}}
 									>
-										<Public htmlColor="black" className="shareIcon" />
+										<Public
+											htmlColor="black"
+											className="shareIcon"
+											style={{
+												color: theme.foreground,
+												background: theme.background,
+											}}
+										/>
 										<Select
 											id="privacyLevel"
 											defaultValue="PUBLIC"
-											style={{ width: 120 }}
+											style={{
+												color: theme.foreground,
+												background: theme.background,
+												width: 120,
+											}}
 											onChange={(value) => setPrivacyLevel(value)}
 										>
 											<Select.Option value="PUBLIC">Công khai</Select.Option>
@@ -180,7 +201,15 @@ const Share = ({ inforUser, newPosts, postGroupId }) => {
 							<div className="shareOption">
 								<label htmlFor="loc" className="shareOption">
 									<Room htmlColor="green" className="shareIcon" />
-									<select id="loc" value={location} onChange={(e) => setLocation(e.target.value)}>
+									<select
+										id="loc"
+										style={{
+											color: theme.foreground,
+											background: theme.background,
+										}}
+										value={location}
+										onChange={(e) => setLocation(e.target.value)}
+									>
 										<option>Vị trí</option>
 										{vietnamProvinces.map((province) => (
 											<option key={province.id} value={province.name}>

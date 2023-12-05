@@ -6,18 +6,21 @@ import { ProfileProvider } from './context/profile/ProfileContext';
 import { ThemeProvider } from './context/ThemeContext';
 import reportWebVitals from './reportWebVitals';
 import { createRoot } from 'react-dom/client';
+import { WebSocketProvider } from './context/WebSocketContext';
 
 const root = createRoot(document.getElementById('root'));
 root.render(
-	<ThemeProvider>
-		<AuthProvider>
-			<PostProvider>
-				<ProfileProvider>
-					<App />
-				</ProfileProvider>
-			</PostProvider>
-		</AuthProvider>
-	</ThemeProvider>
+	<WebSocketProvider>
+		<ThemeProvider>
+			<AuthProvider>
+				<PostProvider>
+					<ProfileProvider>
+						<App />
+					</ProfileProvider>
+				</PostProvider>
+			</AuthProvider>
+		</ThemeProvider>
+	</WebSocketProvider>
 );
 
 reportWebVitals();

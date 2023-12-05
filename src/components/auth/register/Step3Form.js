@@ -27,10 +27,6 @@ function Step3Form({ onSubmit, loading }) {
 							required: true,
 							message: 'Vui lòng nhập họ và tên!',
 						},
-						{
-							pattern: /^[a-zA-Z\s]*$/,
-							message: 'Họ tên không được chứa số, kí tự đặc biệt!',
-						},
 					]}
 				>
 					<Input />

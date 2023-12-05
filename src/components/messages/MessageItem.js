@@ -62,7 +62,7 @@ function MessageItem({ isOwner, message, stompClient, nextCombine, onRetry }) {
 				receiverId: message.receiverId,
 			};
 			// gửi lên server
-			stompClient.send('/app/private-message', {}, JSON.stringify(data));
+			stompClient.send('/app/react-message', {}, JSON.stringify(data));
 		}
 	};
 	const handleClick = (event, item) => {
@@ -85,13 +85,21 @@ function MessageItem({ isOwner, message, stompClient, nextCombine, onRetry }) {
 				content: message?.content,
 				senderId: message.senderId,
 				receiverId: message?.receiverId,
+				senderAvatar: message?.avatar,
+				senderName: message?.userName,
 				groupId: message?.groupId,
 				createdAt: message?.createdAt,
 				updatedAt: message?.updatedAt,
 				isDeleted: true,
 			};
 			// gửi lên server
-			stompClient.send('/app/private-message', {}, JSON.stringify(data));
+
+			if (message?.groupId && message?.groupId !== 'null') {
+				stompClient.send('/app/sendMessage/' + data?.groupId, {}, JSON.stringify(data));
+			} else {
+				stompClient.send('/app/private-message', {}, JSON.stringify(data));
+			}
+
 			message.isDeleted = true;
 		}
 		handleClose();

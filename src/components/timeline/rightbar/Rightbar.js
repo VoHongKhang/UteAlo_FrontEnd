@@ -152,7 +152,7 @@ const Rightbar = ({ user }) => {
 											align="center"
 											style={{
 												color: theme.foreground,
-												background: theme.background,
+
 												width: '100%',
 												cursor: 'pointer',
 											}}
@@ -166,7 +166,6 @@ const Rightbar = ({ user }) => {
 											<Typography.Text
 												style={{
 													color: theme.foreground,
-													background: theme.background,
 												}}
 												strong
 											>

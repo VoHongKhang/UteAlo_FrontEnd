@@ -99,20 +99,26 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 
 		const onMessageReceived = (payload) => {
 			var payloadData = JSON.parse(payload.body);
-			if (payloadData?.groupId) {
+			console.log('payloadData', payloadData);
+			if (payloadData?.groupId && payloadData?.groupId !== 'null') {
 				//trường hợp gửi react thì chỉnh sửa trong mảng
 
 				if (messages.get(payloadData.groupId.toString())) {
 					if (payloadData?.isDeleted) {
+						console.log('createAt', payloadData?.createdAt);
+						console.log('messageSender', messages.get(payloadData.groupId.toString()));
 						const index = messages
 							.get(payloadData.groupId.toString())
 							.findIndex((item) => item?.createdAt === payloadData?.createdAt);
+						console.log('index', index);
 						if (index !== -1) {
 							messages.get(payloadData.groupId.toString())[index] = payloadData;
 							//setMessages(new Map(messages));
 							setMessages(new Map(messages.entries()));
 						}
 					} else {
+						console.log('createAt', payloadData?.createdAt);
+						console.log('messageSender', messages.get(payloadData.groupId.toString()));
 						messages.get(payloadData.groupId.toString()).unshift(payloadData);
 						//setMessages(new Map(messages));
 						setMessages(new Map(messages.entries()));
@@ -120,15 +126,20 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 				}
 			} else {
 				if (payloadData?.isDeleted) {
+					console.log('createAt', payloadData?.createdAt);
+					console.log('messageSender', messages.get(payloadData.senderId));
 					const index = messages
 						.get(payloadData.senderId)
 						.findIndex((item) => item?.createdAt === payloadData?.createdAt);
+					console.log('index', index);
 					if (index !== -1) {
 						messages.get(payloadData.senderId)[index] = payloadData;
 						//setMessages(new Map(messages));
 						setMessages(new Map(messages.entries()));
 					}
 				} else {
+					console.log('createAt', payloadData?.createdAt);
+					console.log('messageSender', messages.get(payloadData.senderId));
 					messages.get(payloadData.senderId).unshift(payloadData);
 					//setMessages(new Map(messages));
 					setMessages(new Map(messages.entries()));

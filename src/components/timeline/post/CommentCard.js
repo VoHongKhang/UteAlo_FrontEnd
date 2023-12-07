@@ -175,7 +175,7 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 					toast.error(response.message, { id: toastId });
 				}
 			}
-			if (post.shareId && post.postId) {
+			if (post.shareId && !post.postId) {
 				const formData = new FormData();
 				formData.append('content', content || '');
 				if (photosComment) {
@@ -340,7 +340,7 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 					setCommentReplies(res);
 				}
 			}
-			if (post.shareId && post.postId) {
+			if (post.shareId && !post.postId) {
 				const res = await GetCommentReplyShareApi.getCommentReply(comment.commentId);
 				if (isMounted.current) {
 					setCommentReplies(res);

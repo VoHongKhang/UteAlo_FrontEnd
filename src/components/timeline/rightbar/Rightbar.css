@@ -143,3 +143,9 @@
 		display: none;
 	}
 }
+.online--icon{
+	color: #1872f2;
+    position: absolute;
+    top: 0;
+    left: 0;
+}

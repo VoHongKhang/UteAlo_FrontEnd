@@ -22,8 +22,8 @@ const Sidebar = () => {
 	};
 
 	//Đăng xuất
-	const logoutHandler = () => {
-		disconnectWebSocket(currentUser);
+	const logoutHandler = async () => {
+		await disconnectWebSocket(currentUser);
 
 		setTimeout(() => {
 			localStorage.removeItem('userInfo');
@@ -33,7 +33,7 @@ const Sidebar = () => {
 			// 	console.log('Lỗi đăng xuất');
 			// }
 			window.location.href = '/login';
-		}, 1500);
+		}, 1000);
 	};
 
 	const listAccountAction = [

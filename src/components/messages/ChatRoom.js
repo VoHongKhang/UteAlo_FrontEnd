@@ -1,249 +1,419 @@
-import React, { useEffect, useState } from 'react';
 import { over } from 'stompjs';
 import SockJS from 'sockjs-client';
-import HeartIcon from '../../assets/icons/heart.png';
-import HahaIcon from '../../assets/icons/haha.png';
-import LikeIcon from '../../assets/icons/like.png';
-import SadIcon from '../../assets/icons/sad.png';
-import WowIcon from '../../assets/icons/wow.png';
-import AngryIcon from '../../assets/icons/angry.png';
-import './Message.css';
 import sampleProPic from '../../assets/appImages/user.png';
-import {
-	Add,
-	Call,
-	CameraEnhance,
-	InfoOutlined,
-	InsertEmoticon,
-	MoreHoriz,
-	Photo,
-	Reply,
-	Send,
-	SportsCricketRounded,
-} from '@material-ui/icons';
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Icon, Popover } from '@material-ui/core';
-import { Button, Input, Typography } from 'antd';
+import { Avatar, Badge, Button, Form, Input, List, Popover, Space, Spin, Tooltip, Typography } from 'antd';
+import classnames from 'classnames';
+import { useEffect, useRef, useState } from 'react';
+import { HiX } from 'react-icons/hi';
+import { HiArrowSmallDown, HiFaceSmile, HiPaperAirplane, HiPaperClip, HiPlus } from 'react-icons/hi2';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import { conversationConfig } from './utils/conversationConfig';
+import { useDropzone } from 'react-dropzone';
+import MessageItem from './MessageItem';
+import './Message.css';
+import { Call, CameraEnhance, InfoOutlined } from '@material-ui/icons';
+import { Modal } from 'antd';
 import MessageApi from '../../api/messages/MessageApi';
-import toast from 'react-hot-toast';
-var stompClient = null;
-const ChatRoom = ({ user, data, Toggeinfo }) => {
-	const moment = require('moment');
-	const chatContainer = document.querySelector('.container--chatroom');
+import useTheme from '../../context/ThemeContext';
+import moment from 'moment';
 
-	const [reactIcon, setReactIcon] = useState(null);
-	const [privateChats, setPrivateChats] = useState(new Map());
-	const [iconMessage, setIconMessage] = useState(null);
-	const [publicChats, setPublicChats] = useState(new Map());
+var stompClient = null;
+const ChatRoom = ({ user, data, Toggeinfo, currentUser }) => {
+	const [form] = Form.useForm();
+	const { theme } = useTheme();
+	const files = Form.useWatch('files', form);
+	const [messages, setMessages] = useState(new Map());
 	const [info, setInfo] = useState(false);
 	const [page, setPage] = useState(0);
-	const [loading, setLoading] = useState(false);
-	const [anchorEl, setAnchorEl] = useState(null);
-	const [selectedItem, setSelectedItem] = useState(null);
-	const [openConfirmation, setOpenConfirmation] = useState(false);
-	const [userData, setUserData] = useState({
-		connected: false,
-		content: '',
-	});
+	const checkGroup = data?.postGroupId ? true : false;
+	const [hasMore, setHasMore] = useState(false);
 	const handleClickInfo = () => {
 		setInfo(!info);
 		Toggeinfo(info);
 	};
-	const handleReactIcon = (react) => {
-		console.log('react', react);
-	};
+	const loadMore = async (isGroup) => {
+		try {
+			// Tăng trang để tải dữ liệu mới
+			const nextPage = page + 1;
 
-	const handleSendMessage = () => {
-		if (stompClient) {
-			if (userData.content.trim() === '') {
-				return; // Tránh gửi tin nhắn trống
+			if (isGroup) {
+				const res = await MessageApi.getMessageGroup({ groupId: data?.postGroupId, page: nextPage, size: 20 });
+				if (res?.success) {
+					messages.get(data?.postGroupId.toString()).push(...res?.result);
+					if (res?.result?.length < 40) {
+						setHasMore(false);
+					} else {
+						setHasMore(true);
+					}
+					// setMessages(new Map(messages));
+					setMessages(new Map(messages.entries()));
+				}
+			} else {
+				const res = await MessageApi.getMessage({ userId: data?.userId, page: nextPage, size: 20 });
+				if (res?.success) {
+					messages.get(data?.userId).push(...res?.result);
+					if (res?.result?.length < 40) {
+						setHasMore(false);
+					} else {
+						setHasMore(true);
+					}
+					setMessages(new Map(messages.entries()));
+				}
 			}
-			var chatMessage = {
-				senderId: user.userId,
-				senderAvatar: user?.avatar,
-				senderName: user?.userName,
-				receiverId: data?.userId,
-				groupId: data?.postGroupId,
-				messageType: 'TEXT',
-				content: userData.content,
-				createAt: new Date(),
-				status: 'MESSAGE',
-			};
-			console.log('data?.userId', data?.userId);
-			if (data?.userId) {
-				privateChats.get(data?.userId).push(chatMessage);
-				setPrivateChats(new Map(privateChats));
-				stompClient.send('/app/private-message', {}, JSON.stringify(chatMessage));
-			}
-			if (data?.postGroupId) {
-				stompClient.send('/app/sendMessage/' + data?.postGroupId, {}, JSON.stringify(chatMessage));
-			}
-			setUserData({ ...userData, content: '' });
-			chatContainer.scrollTop = chatContainer.scrollHeight;
+			setPage(nextPage);
+		} catch (error) {
+			console.log('Error loading more data:', error.message);
 		}
 	};
-
-	const userJoin = () => {
-		if (!privateChats.get(data?.userId)) {
-			privateChats.set(data?.userId, []);
-			setPrivateChats(new Map(privateChats));
-		}
-
-		if (!publicChats.get(data?.postGroupId.toString())) {
-			publicChats.set(data?.postGroupId.toString(), []);
-			setPublicChats(new Map(publicChats));
-		}
-	};
-
-	const handleScroll = () => {
-		// if (chatContainer) {
-		// 	const scrollY = chatContainer.scrollTop; // Lấy vị trí cuộn hiện tại
-		// 	// Chiều cao của trang
-		// 	const pageHeight = chatContainer.scrollHeight;
-		// 	// Tính toán 60% chiều cao
-		// 	const sixtyPercentHeight = (pageHeight * 40) / 100;
-		// 	if (scrollY < sixtyPercentHeight && !loading) {
-		// 		setLoading(true);
-		// 		setTimeout(() => {
-		// 			AddMessages();
-		// 			setLoading(false);
-		// 			// 	chatContainer.scrollTo(0, scrollY);
-		// 		}, 100); // Giả định thời gian API call
-		// 	}
-		// }
-	};
-	// const AddMessages = async () => {
-	// 	const res = await MessageApi.getMessage({ userId: data?.userId, page: page + 1, size: 20 });
-	// 	console.log('res', res);
-	// 	setPage(page + 1);
-	// 	if (res) {
-	// 		if (privateChats.get(data?.userId)) {
-	// 			res.result.forEach((element) => {
-	// 				privateChats.get(data?.userId).unshift(element);
-	// 				setPrivateChats(new Map(privateChats));
-	// 			});
-	// 		}
-	// 	}
-	// };
 	useEffect(() => {
-		console.log('privateChats', privateChats);
-	}, [privateChats]);
-
+		console.log('messages', messages);
+	}, [messages]);
 	useEffect(() => {
 		const fetchData = async () => {
-			connect();
-
-			if (!privateChats.get(data.userId) && data.userId) {
-				const res = await MessageApi.getMessage({ userId: data.userId, page: page, size: 20 });
-				if (res) {
-					privateChats.set(data.userId, res.result);
-					setPrivateChats(new Map(privateChats));
+			if (data?.userId && !messages.get(data?.userId)) {
+				setPage(0);
+				const res = await MessageApi.getMessage({ userId: data?.userId, page: 0, size: 20 });
+				if (res?.success) {
+					messages.set(data?.userId, res?.result);
+					if (res?.result?.length < 20) {
+						setHasMore(false);
+					} else {
+						setHasMore(true);
+					}
+					// setMessages(new Map(messages));
+					setMessages(new Map(messages.entries()));
 				}
 			}
-			if ( data?.postGroupId && !publicChats.get(data?.postGroupId.toString()) ) {
-				const res = await MessageApi.getMessageGroup({ groupId: data?.postGroupId, page: page, size: 20 });
-				if (res) {
-					publicChats.set(data?.postGroupId.toString(), res.result);
-					setPublicChats(new Map(publicChats));
+			if (data?.postGroupId && !messages.get(data?.postGroupId.toString())) {
+				setPage(0);
+				const res = await MessageApi.getMessageGroup({ groupId: data?.postGroupId, page: 0, size: 40 });
+				if (res?.success) {
+					messages.set(data?.postGroupId.toString(), res?.result);
+					if (res?.result?.length < 40) {
+						setHasMore(false);
+					} else {
+						setHasMore(true);
+					}
+					// setMessages(new Map(messages));
+					setMessages(new Map(messages.entries()));
 				}
-			}
-			if (chatContainer) {
-				chatContainer.scrollTop = chatContainer.scrollHeight;
 			}
 		};
-		fetchData();
-	}, [data]);
-	const connect = () => {
-		let Sock = new SockJS('http://localhost:8089/ws');
-		stompClient = over(Sock);
-		stompClient.connect({}, onConnected, onError);
-	};
-	const onConnected = () => {
-		setUserData({ ...userData, connected: true });
 
-		stompClient.subscribe('/user/' + user?.userId + '/private', onPrivateMessage);
-		if (data?.postGroupId) {
-			stompClient.subscribe('/chatroom/room/' + data?.postGroupId, onMessageReceived);
-		}
-		userJoin();
-	};
+		const onMessageReceived = (payload) => {
+			var payloadData = JSON.parse(payload.body);
+			console.log('payloadData', payloadData);
+			if (payloadData?.groupId && payloadData?.groupId !== 'null') {
+				//trường hợp gửi react thì chỉnh sửa trong mảng
 
-	const onMessageReceived = (payload) => {
-		var payloadData = JSON.parse(payload.body);
+				if (messages.get(payloadData.groupId.toString())) {
+					if (payloadData?.isDeleted) {
+						console.log('createdAt', payloadData?.createdAt);
+						console.log('messageSender', messages.get(payloadData.groupId.toString()));
+						const index = messages
+							.get(payloadData.groupId.toString())
+							.findIndex((item) => item?.createdAt === payloadData?.createdAt);
+						console.log('index', index);
+						if (index !== -1) {
+							messages.get(payloadData.groupId.toString())[index] = payloadData;
+							setMessages(new Map(messages.entries()));
+						}
+					} else {
+						if (payloadData?.isReact) {
+							//tìm tin nhắn thông qua createdAt và chỉnh sửa trong mảng
+							console.log('createdAt', payloadData?.createdAt);
+							console.log('messageSender', messages.get(payloadData.groupId.toString()));
+							const index = messages
+								.get(payloadData.groupId.toString())
+								.findIndex((item) => item?.createdAt === payloadData?.createdAt);
+							console.log('index', index);
+							if (index !== -1) {
+								if (
+									messages.get(payloadData.groupId.toString())[index].react === null ||
+									messages.get(payloadData.groupId.toString())[index].react === undefined ||
+									messages.get(payloadData.groupId.toString())[index].react.length === 0
+								) {
+									console.log(
+										'messages.get(needId)[index].react',
+										messages.get(payloadData.groupId.toString())[index].react
+									);
+									messages.get(payloadData.groupId.toString())[index].react = [payloadData];
+								} else {
+									const react = messages.get(payloadData.groupId.toString())[index].react;
+									let checkReact = true;
+									react.map((item) => {
+										if (item.reactUser === payloadData.reactUser) {
+											checkReact = false;
+											if (item.react === payloadData.react) {
+												console.log('xóa react');
+												//xóa react
+												react.splice(react.indexOf(item), 1);
+											} else {
+												console.log('thay đổi react');
+												//thay đổi react
+												item.react = payloadData.react;
+											}
+										}
+									});
+									if (checkReact) {
+										console.log('thêm react');
+										react.push(payloadData);
+									}
+									console.log('react', react);
+									messages.get(payloadData.groupId.toString())[index].react = react;
+								}
+								setMessages(new Map(messages.entries()));
+							}
+						} else {
+							console.log('createdAt', payloadData?.createdAt);
+							console.log('messageSender', messages.get(payloadData.groupId.toString()));
+							messages.get(payloadData.groupId.toString()).unshift(payloadData);
+							setMessages(new Map(messages.entries()));
+						}
+					}
+				}
+			} else {
+				if (payloadData?.isDeleted) {
+					const index = messages
+						.get(payloadData.senderId)
+						.findIndex((item) => item?.createdAt === payloadData?.createdAt);
+					if (index !== -1) {
+						messages.get(payloadData.senderId)[index] = payloadData;
+						setMessages(new Map(messages.entries()));
+					}
+				} else {
+					if (payloadData?.isReact) {
+						const needId =
+							payloadData.senderId === currentUser?.userId
+								? payloadData.receiverId
+								: payloadData.senderId;
+						console.log('createdAt', payloadData?.createdAt);
+						console.log('needId', needId);
+						console.log('messageSender', messages);
 
-		if (publicChats.get(payloadData.groupId.toString())) {
-			publicChats.get(payloadData.groupId.toString()).push(payloadData);
-			setPublicChats(new Map(publicChats));
-		} else {
-			let list = [];
-			list.push(payloadData);
-			publicChats.set(payloadData.groupId.toString(), list);
-			setPublicChats(new Map(publicChats));
-		}
-	};
-	const onPrivateMessage = (payload) => {
-		var payloadData = JSON.parse(payload.body);
-		if (privateChats.get(payloadData.senderId)) {
-			privateChats.get(payloadData.senderId).push(payloadData);
-			setPrivateChats(new Map(privateChats));
-		} else {
-			let list = [];
-			list.push(payloadData);
-			privateChats.set(payloadData.senderId, list);
-			setPrivateChats(new Map(privateChats));
-		}
-		chatContainer.scrollTop = chatContainer.scrollHeight;
-	};
-	const handleClose = () => {
-		setIconMessage(null);
-		setAnchorEl(null);
-		setSelectedItem(null);
-	};
-	const handleClick = (event, item) => {
-		if (event.currentTarget.className.animVal === 'MuiSvgIcon-root icon--more--message') {
-			setIconMessage('More');
-		}
-		if (event.currentTarget.className.animVal === 'MuiSvgIcon-root icon--reply--message') {
-			setIconMessage('Reply');
-		}
-		if (event.currentTarget.className.animVal === 'MuiSvgIcon-root icon--emoticon--message') {
-			setIconMessage('Emoticon');
-		}
+						const index = messages
+							.get(needId)
+							.findIndex((item) => item?.createdAt === payloadData?.createdAt);
+						console.log('index', index);
+						if (index !== -1) {
+							if (
+								messages.get(needId)[index].react === null ||
+								messages.get(needId)[index].react === undefined ||
+								messages.get(needId)[index].react.length === 0
+							) {
+								console.log('messages.get(needId)[index].react', messages.get(needId)[index].react);
+								messages.get(needId)[index].react = [payloadData];
+							} else {
+								const react = messages.get(needId)[index].react;
+								let checkReact = true;
+								react.map((item) => {
+									if (item.reactUser === payloadData.reactUser) {
+										checkReact = false;
+										if (item.react === payloadData.react) {
+											console.log('xóa react');
+											//xóa react
+											react.splice(react.indexOf(item), 1);
+										} else {
+											console.log('thay đổi react');
+											//thay đổi react
+											item.react = payloadData.react;
+										}
+									}
+								});
+								if (checkReact) {
+									console.log('thêm react');
+									react.push(payloadData);
+								}
+								console.log('react', react);
+								messages.get(needId)[index].react = react;
+							}
 
-		setAnchorEl(event.currentTarget);
-		setSelectedItem(item);
-	};
-	const onError = (err) => {
-		console.log(err);
-	};
-	const handleConfirmAction = async () => {
-		selectedItem.createAt = moment(selectedItem.createAt).format('YYYY-MM-DD HH:mm:ss.SSSSSS');
+							setMessages(new Map(messages.entries()));
+						}
+					} else {
+						console.log('createdAt', payloadData?.createdAt);
+						console.log('messageSender', messages.get(payloadData.senderId));
+						messages.get(payloadData.senderId).unshift(payloadData);
+						setMessages(new Map(messages.entries()));
+					}
+				}
+			}
+		};
+		const onConnected = () => {
+			if (data?.userId) {
+				stompClient.subscribe('/user/' + user?.userId + '/private', onMessageReceived);
+			} else if (data?.postGroupId) {
+				stompClient.subscribe('/chatroom/room/' + data?.postGroupId, onMessageReceived);
+			}
+		};
+		// kieerm tra data !== {} thi moi chay
+		if (data.userId || data.postGroupId) {
+			console.log('data', data);
+			fetchData();
+			let Sock = new SockJS('http://localhost:8089/ws');
+			stompClient = over(Sock);
+			stompClient.connect({}, onConnected, (err) => console.log(err));
+		}
+		return () => {
+			if (stompClient !== null) {
+				stompClient.disconnect();
+			}
+			console.log('Disconnected');
+			setPage(0);
+		};
+	}, [data, user?.userId]);
 
-		const toastId = toast.loading('Đang gửi yêu cầu...');
+	const textInputRef = useRef(null);
+	const sendMessage = async (messageData) => {
+		form.resetFields();
+		setTimeout(() => textInputRef.current?.focus(), 0);
+		console.log(data);
+		const msgPlaceholder = {
+			content: messageData?.content,
+			files: messageData?.files[0],
+			senderId: user.userId,
+			receiverId: data?.userId,
+			groupId: data?.postGroupId,
+			senderAvatar: user.avatar,
+			senderName: user.userName,
+			createdAt: new Date().toISOString(),
+			updatedAt: new Date().toISOString(),
+			isDeleted: false,
+			react: null,
+		};
 		try {
-			await MessageApi.deleteMessage(selectedItem);
-			toast.success('Xóa tin nhắn thành công!', { id: toastId });
-			privateChats.set(
-				data?.userId,
-				[...privateChats.get(data?.userId)].filter((member) => member !== selectedItem)
-			);
-			setPrivateChats(new Map(privateChats));
+			if (data?.userId) {
+				stompClient.send('/app/private-message', {}, JSON.stringify(msgPlaceholder));
+				// thay đổi createdAt và updatedAt
+				const date = moment(msgPlaceholder.createdAt);
+
+				// Convert ngày giờ sang múi giờ UTC
+				const utcDate = date.utc();
+				msgPlaceholder.createdAt = utcDate.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+				msgPlaceholder.updatedAt = utcDate.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+				messages.get(data?.userId).unshift(msgPlaceholder);
+				setMessages(new Map(messages.entries()));
+				console.log('sent');
+			}
+			if (data?.postGroupId) {
+				console.log('sent group');
+				stompClient.send('/app/sendMessage/' + data?.postGroupId, {}, JSON.stringify(msgPlaceholder));
+			}
 		} catch (error) {
-			toast.error(`Có lỗi trong khi xóa Lỗi: ${error}`, { id: toastId });
+			messages.get(data?.userId).unshift({
+				...messageData,
+				error: 'Mạng yếu, vui lòng thử lại sau',
+			});
+			console.log('error', error);
+			// setMessages(new Map(messages));
+			setMessages(new Map(messages.entries()));
 		}
-		setOpenConfirmation(false);
-		handleClose();
+	};
+	const bottomRef = useRef(null);
+	const scrollToBottom = () => bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+	useEffect(() => {
+		// Scroll
+		const msgHistoryEl = document.getElementById('messages-history');
+		const scrollDownBtnEl = document.getElementById('scroll-down-btn');
+
+		const handleScroll = (e) => {
+			console.log('scroll', e);
+			const { scrollTop } = e.target;
+
+			if (scrollDownBtnEl) {
+				const classList = scrollDownBtnEl.classList;
+				if (scrollTop < -200) {
+					if (!classList.contains('show')) classList.add('show');
+				} else {
+					if (classList.contains('show')) classList.remove('show');
+				}
+			}
+		};
+		msgHistoryEl?.addEventListener('scroll', handleScroll);
+
+		return () => {
+			msgHistoryEl?.removeEventListener('scroll', handleScroll);
+		};
+	}, []);
+	const inputFilesRef = useRef(null);
+
+	const onDropAccepted = (acceptedFiles) => {
+		form.setFieldValue('files', acceptedFiles);
 	};
 
-	const handleKeyPress = (event) => {
-		if (event.key === 'Enter') {
-			handleSendMessage();
-		}
+	const onDropRejected = (rejectedFiles) =>
+		Modal.error({
+			title: 'File không hợp lệ',
+			content: (
+				<List
+					bordered
+					size="small"
+					dataSource={rejectedFiles}
+					renderItem={(item) => {
+						const error = item.errors.pop();
+						return (
+							<List.Item>
+								<List.Item.Meta
+									title={item.file.name}
+									description={
+										<Typography.Text type="danger" strong>
+											{error?.message || 'Lỗi không xác định'}
+										</Typography.Text>
+									}
+								/>
+							</List.Item>
+						);
+					}}
+				/>
+			),
+		});
+
+	const dropzone = useDropzone({ onDropAccepted, onDropRejected, ...conversationConfig.dropzone });
+
+	const { getRootProps, getInputProps, isDragAccept, isDragReject } = dropzone;
+
+	console.log('dropzone', dropzone);
+
+	const typingRef = useRef(null);
+	const emitStopTyping = () => {
+		// // emit stop typing event
+		// window.socket.emit('stopTypingMessage', {
+		// 	conversation: id,
+		// 	senderId: authUser?._id,
+		// });
+		// // clear typingRef
+		// typingRef.current = null;
 	};
-	const handleCloseConfirmation = () => {
-		setOpenConfirmation(false);
-		setAnchorEl(null);
-		setSelectedItem(null);
+
+	const emitTyping = () => {
+		// // if typingRef is null, emit typing event
+		// if (!typingRef.current)
+		// 	window.socket.emit('typingMessage', {
+		// 		conversation: id,
+		// 		senderId: authUser?._id,
+		// 	});
+		// // if typingRef is not null, clear timeout
+		// else clearTimeout(typingRef.current);
+		// // set timeout to emit stop typing event after 1s
+		// typingRef.current = setTimeout(emitStopTyping, 1000);
 	};
+
+	// listen typing event from socket io
+	const [typingList, setTypingList] = useState([]);
+
+	// const fetchData = () => {
+	// 	// Simulate fetching data from an API
+	// 	// In a real application, you would make an API call here
+	// 	const newData = [];
+
+	// 	// Update state with new data
+	// 	// setData((prevData) => [...prevData, ...newData]);
+
+	// 	// Check if there is more data to load
+	// 	// Set hasMore to false when there is no more data
+	// 	// setHasMore(/* Check if there is more data */);
+	// };
+
 	return (
 		<div className="chatroom">
 			<div className="header--chatroom">
@@ -264,175 +434,204 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 					/>
 				</div>
 			</div>
-			<div className="container--chatroom" onScroll={handleScroll}>
-				{privateChats.get(data?.userId) &&
-					[...privateChats.get(data?.userId)].map((msg, index) => (
-						<div className={msg?.senderId === user?.userId ? 'sent--item' : 'received--item'} key={index}>
-							<div className={msg.senderId === user?.userId ? 'sent' : 'received'}>
-								<div className="icon--message">
-									<MoreHoriz className="icon--more--message" onClick={(e) => handleClick(e, msg)} />
-									<Reply className="icon--reply--message" onClick={(e) => handleClick(e, msg)} />
+			<Form
+				className="container--chatroom"
+				form={form}
+				onFinish={sendMessage}
+				initialValues={{ files: '', text: '' }}
+			>
+				<div className="history" {...getRootProps()}>
+					<div className="history_content" id="messages-history">
+						<InfiniteScroll
+							scrollableTarget="messages-history"
+							dataLength={
+								checkGroup
+									? messages.get(data?.postGroupId.toString())?.length
+									: messages.get(data?.userId)?.length || 0
+							}
+							style={{ display: 'flex', flexDirection: 'column-reverse' }}
+							next={loadMore}
+							hasMore={hasMore}
+							inverse={true}
+							loader={<Spin style={{ margin: '8px auto' }} />}
+							endMessage={
+								<Space
+									direction="vertical"
+									style={{ width: 'fit-content', margin: 'auto' }}
+									align="center"
+								>
+									<img className="iamge_end" src={data?.avatar || sampleProPic} alt="haha" />
+									<Typography.Title
+										style={{ margin: 0, color: theme.foreground, background: theme.background }}
+										level={4}
+									>
+										{data?.userName || data?.postGroupName}
+									</Typography.Title>
 
-									<InsertEmoticon
-										className="icon--emoticon--message"
-										onClick={(e) => handleClick(e, msg)}
-									/>
-								</div>
-
-								<span >{msg.content}</span>
-							</div>
-						</div>
-					))}
-				{data?.postGroupId &&
-					publicChats.get(data?.postGroupId.toString()) &&
-					[...publicChats.get(data?.postGroupId.toString())].map((msg, index) => (
-						<div className={msg.senderId === user?.userId ? 'sent--item' : 'received--item'} key={index}>
-							{msg.senderId !== user?.userId ? (
-								<>
-									<img src={msg.senderAvatar} alt="Sender Avatar" className="sender-avatar" />
-									<div className="content--message--group">
-										<span className="sender-name">{msg.senderName}</span>
-										<div className={msg.senderId === user?.userId ? 'sent' : 'received'}>
-											<div className="icon--message">
-												<MoreHoriz
-													className="icon--more--message"
-													onClick={(e) => handleClick(e, msg)}
-												/>
-												<Reply
-													className="icon--reply--message"
-													onClick={(e) => handleClick(e, msg)}
-												/>
-
-												<InsertEmoticon
-													className="icon--emoticon--message"
-													onClick={(e) => handleClick(e, msg)}
-												/>
-											</div>
-
-											<span title={msg.createAt.toLocaleString()}>{msg.content}</span>
-										</div>
-									</div>
-								</>
-							) : (
-								<div className={msg.senderId === user?.userId ? 'sent' : 'received'}>
-									<div className="icon--message">
-										<MoreHoriz
-											className="icon--more--message"
-											onClick={(e) => handleClick(e, msg)}
+									<Typography.Text
+										style={{ color: theme.foreground, background: theme.background }}
+										type="secondary"
+									>
+										Đây là đoạn chat của bạn với {data?.userName || data?.postGroupName}
+									</Typography.Text>
+								</Space>
+							}
+						>
+							{/* Bottom ref */}
+							<div ref={bottomRef} />
+							{((data?.userId && messages.get(data?.userId)) ||
+								(data?.postGroupId && messages.get(data?.postGroupId.toString()))) &&
+								[...messages.get(checkGroup ? data?.postGroupId.toString() : data?.userId)].map(
+									(item, index) => (
+										<MessageItem
+											key={item.createdAt + index}
+											currentUser={user}
+											message={item}
+											stompClient={stompClient}
+											isOwner={item.senderId === user?.userId}
+											onRetry={() => sendMessage(item)}
 										/>
-										<Reply className="icon--reply--message" onClick={(e) => handleClick(e, msg)} />
-
-										<InsertEmoticon
-											className="icon--emoticon--message"
-											onClick={(e) => handleClick(e, msg)}
-										/>
-									</div>
-
-									<span title={msg.createAt.toLocaleString()}>{msg.content}</span>
-								</div>
-							)}
-						</div>
-					))}
-				<Popover
-					id="simple-popover"
-					open={Boolean(anchorEl)}
-					className="popper--member"
-					anchorEl={anchorEl}
-					onClose={handleClose}
-					anchorOrigin={{
-						vertical: 'bottom',
-						horizontal: 'right',
-					}}
-					transformOrigin={{
-						vertical: 'top',
-						horizontal: 'right',
-					}}
-				>
-					<div>
-						{iconMessage === 'More' && (
-							<Typography className="poper--member--item" onClick={() => setOpenConfirmation(true)}>
-								Thu hồi tin nhắn
-							</Typography>
-						)}
-						{iconMessage === 'Reply' && (
-							<Typography className="poper--member--item" onClick={() => setOpenConfirmation(true)}>
-								Trả lời tin nhắn
-							</Typography>
-						)}
-						{iconMessage === 'Emoticon' && (
-							<div className="emotion--container">
-								<img
-									src={HeartIcon}
-									alt="Heart Icon"
-									className="icon--emoticon"
-									onClick={() => handleReactIcon('Heart')}
-								/>
-								<img
-									src={HahaIcon}
-									alt="Haha Icon"
-									className="icon--emoticon"
-									onClick={() => handleReactIcon('Haha')}
-								/>
-								<img
-									src={LikeIcon}
-									alt="Like Icon"
-									className="icon--emoticon"
-									onClick={() => handleReactIcon('Like')}
-								/>
-								<img
-									src={SadIcon}
-									alt="Sad Icon"
-									className="icon--emoticon"
-									onClick={() => handleReactIcon('Sad')}
-								/>
-								<img
-									src={WowIcon}
-									alt="Wow Icon"
-									className="icon--emoticon"
-									onClick={() => handleReactIcon('Wow')}
-								/>
-								<img
-									src={AngryIcon}
-									alt="Angry Icon"
-									className="icon--emoticon"
-									onClick={() => handleReactIcon('Angry')}
-								/>
-							</div>
-						)}
+									)
+								)}
+							;
+						</InfiniteScroll>
 					</div>
-				</Popover>
 
-				<Dialog open={openConfirmation} onClose={handleCloseConfirmation}>
-					<DialogTitle>Xác nhận thay đổi</DialogTitle>
-					<DialogContent>
-						<DialogContentText>Bạn có chắc chắn muốn xóa tin nhắn này ?</DialogContentText>
-					</DialogContent>
-					<DialogActions>
-						<Button onClick={handleCloseConfirmation} color="primary" variant="outlined">
-							Hủy
-						</Button>
-						<Button onClick={handleConfirmAction} color="primary" variant="contained">
-							Xác nhận
-						</Button>
-					</DialogActions>
-				</Dialog>
-			</div>
-			<div className="footer--chatroom">
-				<div className="footer--chatroom--icon-message">
-					<Add className="header--chatroom--right--icon" />
-					<Photo className="header--chatroom--right--icon" />
-					<SportsCricketRounded className="header--chatroom--right--icon" />
+					<Button
+						shape="circle"
+						icon={<HiArrowSmallDown />}
+						onClick={scrollToBottom}
+						className={'scroll_down'}
+						id="scroll-down-btn"
+					/>
+
+					<Space className={classnames('typing', { show: typingList.length > 0 })}>
+						<Avatar.Group maxCount={3} size="small" className="typing_list">
+							{typingList.map(({ user, nickname }) => (
+								<img
+									src="https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"
+									alt="haha"
+								/>
+							))}
+						</Avatar.Group>
+
+						<Typography.Text type="secondary" className={'typing_text'}>
+							đang soạn tin...
+						</Typography.Text>
+					</Space>
+
+					<div
+						className={'dropzone'}
+						style={{
+							zIndex: isDragAccept || isDragReject ? 1 : -1,
+							opacity: isDragAccept || isDragReject ? 1 : 0,
+						}}
+					>
+						<Form.Item name="files" hidden />
+						<input {...getInputProps()} ref={inputFilesRef} />
+						<div className={'dropzone_content'}>
+							<Typography.Text strong>Gửi file</Typography.Text>
+
+							<Typography.Text type="secondary">Thả file vào đây để gửi</Typography.Text>
+						</div>
+					</div>
 				</div>
-				<Input
-					className="input-message"
-					type="text"
-					placeholder="Nhập tin nhắn..."
-					value={userData.content}
-					onKeyPress={handleKeyPress}
-					onChange={(e) => setUserData({ ...userData, content: e.target.value })}
-				/>
-				<Button className="footer--chatroom--button-message" onClick={handleSendMessage} icon={<Send />} />
-			</div>
+
+				<div className="footer--chatroom">
+					<Space className="input">
+						<Form.Item
+							style={{ flex: 1 }}
+							name="content"
+							rules={[
+								{
+									required: true,
+									message: 'Vui lòng nhập tin nhắn',
+								},
+							]}
+							noStyle
+						>
+							<Input.TextArea
+								style={{ flex: 1, color: theme.foreground, background: theme.background }}
+								placeholder="Nhập tin nhắn"
+								autoSize={{ maxRows: 5 }}
+								bordered={false}
+								onPressEnter={(e) => {
+									if (e.shiftKey) return;
+
+									const text = e.currentTarget.value?.trim();
+									if (!text) return;
+
+									e.preventDefault();
+									form.submit();
+								}}
+								ref={textInputRef}
+								onKeyDown={emitTyping}
+							/>
+						</Form.Item>
+
+						<Tooltip title="Thêm icon">
+							<Button shape="circle" icon={<HiFaceSmile />} />
+						</Tooltip>
+
+						<Popover
+							title={
+								<Space align="center" style={{ width: '100%' }}>
+									<Typography.Text strong>Đính kèm</Typography.Text>
+
+									<Tooltip title="Thêm file">
+										<Button
+											shape="circle"
+											size="small"
+											onClick={() => inputFilesRef.current?.click()}
+											icon={<HiPlus />}
+											style={{ marginLeft: 'auto' }}
+										/>
+									</Tooltip>
+								</Space>
+							}
+							content={
+								<List
+									className={'file_list'}
+									size="small"
+									bordered
+									dataSource={files}
+									renderItem={(file) => (
+										<List.Item
+											extra={
+												<Button
+													shape="circle"
+													icon={<HiX />}
+													size="small"
+													onClick={() => {
+														const files = form.getFieldValue('files');
+														form.setFieldValue(
+															'files',
+															files.filter((f) => f !== file)
+														);
+													}}
+												/>
+											}
+										>
+											<List.Item.Meta title={file.name} />
+										</List.Item>
+									)}
+								/>
+							}
+							trigger={['click']}
+						>
+							<Tooltip title="Đính kèm">
+								<Badge count={files?.length}>
+									<Button shape="circle" icon={<HiPaperClip />} />
+								</Badge>
+							</Tooltip>
+						</Popover>
+
+						<Tooltip title="Gửi">
+							<Button shape="circle" icon={<HiPaperAirplane />} htmlType="submit" />
+						</Tooltip>
+					</Space>
+				</div>
+			</Form>
 		</div>
 	);
 };

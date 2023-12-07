@@ -1,18 +1,20 @@
 import { useState } from 'react';
 import useAuth from '../../context/auth/AuthContext';
-import ChatRoom from './tempt';
+import ChatRoom from './ChatRoom';
 import RightbarChat from './RightbarChat';
 import { Helmet } from 'react-helmet';
 import { Toaster } from 'react-hot-toast';
 import Topbar from '../timeline/topbar/Topbar';
 import SidebarChat from './SidebarChat';
 import useTheme from '../../context/ThemeContext';
+import { useParams } from 'react-router-dom';
 const Meessage = () => {
 	const [user, setUser] = useState();
+	const params = useParams();
 	const { user: currentUser } = useAuth();
 	const [postGroup, setPostGroup] = useState({
 		isGroup: false,
-		id: '',
+		id: params?.userId,
 	});
 	const [data, setData] = useState({});
 	const [isShowRightbar, setIsShowRightbar] = useState(true);
@@ -29,6 +31,7 @@ const Meessage = () => {
 		setUser(data);
 	};
 	const { theme } = useTheme();
+
 	return (
 		<div style={{ color: theme.foreground, background: theme.background }}>
 			<Helmet title={`Tin nhắn |UTEALO`} />
@@ -36,7 +39,8 @@ const Meessage = () => {
 			<Topbar dataUser={getUser} />
 			<div className="homeContainer">
 				<SidebarChat user={currentUser} onChangeMessage={onChangeMessage} />
-				<ChatRoom user={user} data={data} Toggeinfo={isShowInfo} />
+				<ChatRoom user={user} data={data} Toggeinfo={isShowInfo} currentUser={currentUser} />
+
 				<RightbarChat
 					user={currentUser}
 					group={postGroup}

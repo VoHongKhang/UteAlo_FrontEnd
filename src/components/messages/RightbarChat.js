@@ -54,7 +54,7 @@ const RightbarChat = ({ user, group, currentData, showRightbar }) => {
 					}
 				} else {
 					try {
-						await ProfileApi.getProfile({ user: user, userId: group.id })
+						await ProfileApi.getProfile({ user: user, userId: group.id})
 							.then((res) => {
 								setData(res.result);
 							})

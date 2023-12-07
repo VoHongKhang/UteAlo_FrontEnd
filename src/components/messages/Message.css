@@ -317,6 +317,7 @@ ul {
 	word-wrap: break-word;
 	display: flex;
 	flex-direction: column;
+	min-width: 50px;
 }
 .container--chatroom .sent .icon--message {
 	position: absolute;

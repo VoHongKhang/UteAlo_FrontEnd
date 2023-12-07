@@ -9,6 +9,7 @@ import './Rightbar.css';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import GetFriendApi from '../../../api/profile/friend/getFriendApi';
+import { HiStatusOnline } from "react-icons/hi";
 const Rightbar = ({ user }) => {
 	const navigate = useNavigate();
 	const { theme } = useTheme();
@@ -106,53 +107,57 @@ const Rightbar = ({ user }) => {
 						renderItem={(item) => (
 							<List.Item style={{ padding: '4px 0' }}>
 								{list.title === 'Yêu cầu kết bạn' ? (
-									<Space className="friendRequest">
-										<div className="friendRequest--avatar">
-											<Link to={`/profile/${item.userId}`}>
-												<img
-													src={item?.avatar ? item?.avatar : noAvatar}
-													alt="..."
-													className="topbarImg"
-												/>
-											</Link>
-											<Typography.Text
-												style={{
-													color: theme.foreground,
-													background: theme.background,
-												}}
-												className="username_fq"
-												strong
-											>
-												{item.username}
-											</Typography.Text>
-										</div>
-										<div className="friendRequest--button">
-											<Button
-												type="primary"
-												size="small"
-												style={{ float: 'right', margin: '0 4px' }}
-												onClick={() => handlerAccept(item)}
-											>
-												Chấp nhận
-											</Button>
+									!item ? (
+										<ProfileRightbar />
+									) : (
+										<Space className="friendRequest">
+											<div className="friendRequest--avatar">
+												<Link to={`/profile/${item.userId}`}>
+													<img
+														src={item?.avatar ? item?.avatar : noAvatar}
+														alt="..."
+														className="topbarImg"
+													/>
+												</Link>
+												<Typography.Text
+													style={{
+														color: theme.foreground,
+														background: theme.background,
+													}}
+													className="username_fq"
+													strong
+												>
+													{item.username}
+												</Typography.Text>
+											</div>
+											<div className="friendRequest--button">
+												<Button
+													type="primary"
+													size="small"
+													style={{ float: 'right', margin: '0 4px' }}
+													onClick={() => handlerAccept(item)}
+												>
+													Chấp nhận
+												</Button>
 
-											<Button
-												type="default"
-												size="small"
-												style={{ float: 'right', margin: '0 4px' }}
-												onClick={() => handlerDeny(item)}
-											>
-												Từ chối
-											</Button>
-										</div>
-									</Space>
+												<Button
+													type="default"
+													size="small"
+													style={{ float: 'right', margin: '0 4px' }}
+													onClick={() => handlerDeny(item)}
+												>
+													Từ chối
+												</Button>
+											</div>
+										</Space>
+									)
 								) : (
 									<Button type="text" block style={{ height: 'auto', padding: '2px' }}>
 										<Space
 											align="center"
 											style={{
 												color: theme.foreground,
-												background: theme.background,
+
 												width: '100%',
 												cursor: 'pointer',
 											}}
@@ -163,10 +168,10 @@ const Rightbar = ({ user }) => {
 												alt="..."
 												className="topbarImg"
 											/>
+											{item.isOnline && <HiStatusOnline className="online--icon" />}
 											<Typography.Text
 												style={{
 													color: theme.foreground,
-													background: theme.background,
 												}}
 												strong
 											>

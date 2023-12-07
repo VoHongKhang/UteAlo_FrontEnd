@@ -11,21 +11,29 @@ import { IoMdInformationCircleOutline } from 'react-icons/io';
 import { MdOutlinePolicy } from 'react-icons/md';
 import { GrSecure } from 'react-icons/gr';
 import { RiChatPrivateLine } from 'react-icons/ri';
+import { useWebSocket } from '../../../context/WebSocketContext';
+import useAuth from '../../../context/auth/AuthContext';
 const Sidebar = () => {
 	const { theme } = useTheme();
+	const { disconnectWebSocket } = useWebSocket();
+	const { user: currentUser } = useAuth();
 	const openReport = () => {
 		// openModal(<ReportModal />);
 	};
 
 	//Đăng xuất
 	const logoutHandler = async () => {
-		localStorage.removeItem('userInfo');
-		// try {
-		// 	await AuthEmailApi.logout(currentUser);
-		// } catch {
-		// 	console.log('Lỗi đăng xuất');
-		// }
-		window.location.href = '/login';
+		await disconnectWebSocket(currentUser);
+
+		setTimeout(() => {
+			localStorage.removeItem('userInfo');
+			// try {
+			// 	await AuthEmailApi.logout(currentUser);
+			// } catch {
+			// 	console.log('Lỗi đăng xuất');
+			// }
+			window.location.href = '/login';
+		}, 1000);
 	};
 
 	const listAccountAction = [

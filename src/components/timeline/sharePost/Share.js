@@ -9,6 +9,7 @@ import noAvatar from '../../../assets/appImages/user.png';
 import usePost from '../../../context/post/PostContext';
 import { Select } from 'antd';
 import useTheme from '../../../context/ThemeContext';
+import { useWebSocket } from '../../../context/WebSocketContext';
 
 const Share = ({ inforUser, newPosts, postGroupId }) => {
 	const [location, setLocation] = useState('');
@@ -25,6 +26,10 @@ const Share = ({ inforUser, newPosts, postGroupId }) => {
 		console.log(privacyLevel);
 		console.log('postGroupId', postGroupId);
 	}, [privacyLevel, postGroupId]);
+
+	//khai báo websocket
+	const { stompClient } = useWebSocket();
+
 	// Xử lý ảnh của bài post
 	const postDetails = (e) => {
 		const file = e.target.files[0];
@@ -90,6 +95,7 @@ const Share = ({ inforUser, newPosts, postGroupId }) => {
 			);
 			// Sau khi createPost hoàn thành, gọi fetchPosts để cập nhật danh sách bài viết
 			newPosts(res.result);
+			stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(res.result));
 			// Xóa nội dung và ảnh đã chọn
 			setLocation('');
 			setContent('');
@@ -114,7 +120,7 @@ const Share = ({ inforUser, newPosts, postGroupId }) => {
 				<form className="shareWrapper" onSubmit={postSubmitHandler}>
 					<div className="shareTop">
 						<img className="shareProfileImg" src={inforUser?.avatar || noAvatar} alt="..." />
-						<InputEmoji  value={content} onChange={setContent} placeholder={`Bạn đang nghĩ gì ?`} />
+						<InputEmoji value={content} onChange={setContent} placeholder={`Bạn đang nghĩ gì ?`} />
 					</div>
 					<hr className="shareHr" />
 					{picLoading && (

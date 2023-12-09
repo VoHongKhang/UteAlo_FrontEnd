@@ -169,7 +169,7 @@
 	justify-content: center;
 	cursor: pointer;
 	border-radius: 50%;
-	background: gray;
+	background: #fff;
 }
 .button-right-message,
 .button-right-notifications,

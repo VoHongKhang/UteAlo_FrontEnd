@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import SockJS from 'sockjs-client';
 import { over } from 'stompjs';
 
@@ -12,6 +12,7 @@ const onError = (err) => {
 };
 export const WebSocketProvider = ({ children }) => {
 	const [stompClient, setStompClient] = useState(null);
+	const [notification, setNotification] = useState(null);
 	const connectWebSocket = (currentUser, onConnectedCallback) => {
 		if (currentUser && !stompClient) {
 			let Sock = new SockJS('http://localhost:8089/ws');
@@ -25,6 +26,9 @@ export const WebSocketProvider = ({ children }) => {
 						userId: currentUser.userId,
 						isOnline: true,
 					};
+					client.subscribe('/user/' + currentUser?.userId + '/notification', (e) =>
+						setNotification(JSON.parse(e.body))
+					);
 					client.send('/app/isOnline', {}, JSON.stringify(data));
 
 					if (onConnectedCallback) {
@@ -37,7 +41,6 @@ export const WebSocketProvider = ({ children }) => {
 			setStompClient(client);
 		}
 	};
-
 	const disconnectWebSocket = (currentUser) => {
 		if (stompClient) {
 			// Set timeout để đảm bảo tin nhắn cuối cùng có đủ thời gian để gửi đi
@@ -56,7 +59,7 @@ export const WebSocketProvider = ({ children }) => {
 	};
 
 	return (
-		<WebSocketContext.Provider value={{ stompClient, connectWebSocket, disconnectWebSocket }}>
+		<WebSocketContext.Provider value={{ stompClient, connectWebSocket, disconnectWebSocket, notification }}>
 			{children}
 		</WebSocketContext.Provider>
 	);

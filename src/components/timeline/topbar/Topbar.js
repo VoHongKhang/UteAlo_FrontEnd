@@ -11,6 +11,8 @@ import { BASE_URL } from '../../../context/apiCall';
 import { useNavigate } from 'react-router-dom';
 import adver4 from '../../../assets/appImages/adver4.jpg';
 import { HiChatBubbleOvalLeft } from 'react-icons/hi2';
+import { Badge } from 'antd';
+import { useWebSocket } from '../../../context/WebSocketContext';
 
 const Topbar = ({ dataUser }) => {
 	const [user, setUser] = useState();
@@ -23,6 +25,16 @@ const Topbar = ({ dataUser }) => {
 	const [showDropdown, setShowDropdown] = useState(false);
 	const [searchFriends, setSearchFriends] = useState([]);
 	const inputRef = useRef(null);
+	const [listNotification, setListNotification] = useState([]);
+
+	const { notification } = useWebSocket();
+	useEffect(() => {
+		console.log('notification', notification);
+		if (notification) {
+			setListNotification((prev) => [...prev, notification]);
+			console.log('listNotification', listNotification);
+		}
+	}, [notification]);
 
 	// Toggle theme switch
 	const themeModeHandler = () => {
@@ -51,15 +63,6 @@ const Topbar = ({ dataUser }) => {
 	}, [currentUser]);
 
 	const buttonCenterHandler = (e, link) => {
-		// if (e.tagName === 'svg') e = e.parentNode;
-		// if (e.tagName === 'path') e = e.parentNode.parentNode;
-
-		// const buttons = document.querySelectorAll('.button-center');
-		// buttons.forEach((button) => {
-		// 	button.classList.remove('button-active');
-		// });
-		// e.classList.add('button-active');
-		// Chuyển trang theo link sử dụng
 		navigate(link);
 	};
 
@@ -284,18 +287,22 @@ const Topbar = ({ dataUser }) => {
 
 				<div className="topbarRight">
 					<div className="button-right">
-						<HiChatBubbleOvalLeft
-							className="button-right-message"
-							titleAccess="Tin nhắn"
-							onClick={handderMessageClick}
-						/>
+						<Badge count={5}>
+							<HiChatBubbleOvalLeft
+								className="button-right-message"
+								titleAccess="Tin nhắn"
+								onClick={handderMessageClick}
+							/>
+						</Badge>
 					</div>
 					<div className="button-right">
-						<Notifications
-							className="button-right-notifications"
-							titleAccess="Thông báo"
-							onClick={handderNotificationClick}
-						/>
+						<Badge count={listNotification.length || 0}>
+							<Notifications
+								className="button-right-notifications"
+								titleAccess="Thông báo"
+								onClick={handderNotificationClick}
+							/>
+						</Badge>
 					</div>
 
 					<Link to={`/profile/${currentUser.userId}`}>

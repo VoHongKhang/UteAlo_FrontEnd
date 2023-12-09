@@ -6,7 +6,7 @@ import { useWebSocket } from './context/WebSocketContext';
 export default function App() {
 	const { user: currentUser } = useAuth();
 	const Page404 = notFoundRoute.component;
-	const { connectWebSocket, disconnectWebSocket } = useWebSocket();
+	const { connectWebSocket, disconnectWebSocket, notification } = useWebSocket();
 	const isComponentUnmounted = useRef(false);
 	window.addEventListener('beforeunload', async function (event) {
 		// Hủy bỏ sự kiện ngăn chặn đóng trang

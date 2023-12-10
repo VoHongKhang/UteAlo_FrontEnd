@@ -11,9 +11,12 @@ import { BASE_URL } from '../../../context/apiCall';
 import { useNavigate } from 'react-router-dom';
 import adver4 from '../../../assets/appImages/adver4.jpg';
 import { HiChatBubbleOvalLeft } from 'react-icons/hi2';
-import { Badge } from 'antd';
+import { Badge, Typography } from 'antd';
 import { useWebSocket } from '../../../context/WebSocketContext';
-
+import NotificationApi from '../../../api/notification/NotificationApi';
+import { Popover } from '@material-ui/core';
+import toast, { Toaster } from 'react-hot-toast';
+import classnames from 'classnames';
 const Topbar = ({ dataUser }) => {
 	const [user, setUser] = useState();
 	const { user: currentUser } = useAuth();
@@ -26,15 +29,31 @@ const Topbar = ({ dataUser }) => {
 	const [searchFriends, setSearchFriends] = useState([]);
 	const inputRef = useRef(null);
 	const [listNotification, setListNotification] = useState([]);
-
+	const [page, setPage] = useState(0);
 	const { notification } = useWebSocket();
 	useEffect(() => {
 		console.log('notification', notification);
 		if (notification) {
-			setListNotification((prev) => [...prev, notification]);
-			console.log('listNotification', listNotification);
+			// unshift thêm vào đầu mảng
+			setListNotification([notification, ...listNotification]);
 		}
 	}, [notification]);
+
+	useEffect(() => {
+		console.log('listNotification', listNotification);
+	}, [currentUser]);
+	useEffect(() => {
+		const fetchNotifications = async () => {
+			const res = await NotificationApi.getNotifications({ user: currentUser, page: page, size: 10 });
+			if (res.success) {
+				console.log(res.data);
+				setListNotification(res.result);
+			} else {
+				throw new Error(res.message);
+			}
+		};
+		fetchNotifications();
+	}, [currentUser]);
 
 	// Toggle theme switch
 	const themeModeHandler = () => {
@@ -43,9 +62,6 @@ const Topbar = ({ dataUser }) => {
 	};
 	const handderMessageClick = () => {
 		navigate(`/message/${currentUser.userId}}`);
-	};
-	const handderNotificationClick = () => {
-		navigate(`notification/${currentUser.userId}`);
 	};
 	// get user details
 	useEffect(() => {
@@ -174,8 +190,37 @@ const Topbar = ({ dataUser }) => {
 			link: '/friends',
 		},
 	];
+	const [anchorEl, setAnchorEl] = useState(null);
+	const handleClose = () => {
+		setAnchorEl(null);
+	};
+	const handleClick = (e) => {
+		setAnchorEl(e.currentTarget);
+	};
+	const handleReadNotification = async (item) => {
+		const res = await NotificationApi.readNotification({ user: currentUser, notificationId: item.notificationId });
+		if (res.success) {
+			console.log(res.data);
+			setAnchorEl(null);
+			//Chỉnh thông báo đó là đã đọc
+			const newListNotification = listNotification.map((notification) => {
+				if (notification.notificationId === item.notificationId) {
+					return { ...notification, isRead: true };
+				}
+				return notification;
+			});
+			setListNotification(newListNotification);
+
+			navigate(`${item.link}`);
+		} else {
+			toast.error('Đã có lỗi xảy ra');
+		}
+	};
+
+	const classParent = ['notification--item'];
 	return (
 		<>
+			<Toaster />
 			<div
 				className="topbarContainer"
 				style={{
@@ -296,13 +341,72 @@ const Topbar = ({ dataUser }) => {
 						</Badge>
 					</div>
 					<div className="button-right">
-						<Badge count={listNotification.length || 0}>
-							<Notifications
-								className="button-right-notifications"
-								titleAccess="Thông báo"
-								onClick={handderNotificationClick}
-							/>
+						<Badge
+							// chỉ tính những thông báo chưa đọc
+							count={listNotification.filter((item) => item.isRead === false).length}
+							aria-describedby="simple-popover"
+							onClick={(e) => handleClick(e)}
+						>
+							<Notifications className="button-right-notifications" titleAccess="Thông báo" />
 						</Badge>
+						<Popover
+							id="simple-popover"
+							open={Boolean(anchorEl)}
+							className="popper--member"
+							anchorEl={anchorEl}
+							onClose={handleClose}
+							anchorOrigin={{
+								vertical: 'bottom',
+								horizontal: 'right',
+							}}
+							transformOrigin={{
+								vertical: 'top',
+								horizontal: 'right',
+							}}
+						>
+							<div className="notification--container">
+								<div className="notification--header">
+									<Typography.Text strong>Thông báo</Typography.Text>
+
+									<Link to="/notification">Xem tất cả</Link>
+								</div>
+								<div className="notification--body">
+									{listNotification.length > 0 ? (
+										listNotification.map((item, index) => (
+											<div
+												className={classnames(item.isRead ? 'read' : 'unread', classParent)}
+												key={index}
+												onClick={() => handleReadNotification(item)}
+											>
+												<div className="notification--item-avatar">
+													<img src={item.photo || adver4} alt="avatarGroup"></img>
+												</div>
+												<div className="notification--item-content">
+													<Typography.Text>
+														<span className="notification--item-content-content">
+															{item.content}
+														</span>
+													</Typography.Text>
+												</div>
+											</div>
+										))
+									) : (
+										<div className="notification--item">
+											<div className="notification--item-avatar">
+												<img src={adver4} alt="avatarGroup"></img>
+											</div>
+											<div className="notification--item-content">
+												<Typography.Text>
+													<span className="notification--item-content-content">
+														Bạn không có thông báo nào
+													</span>
+												</Typography.Text>
+											</div>
+										</div>
+									)}
+								</div>
+							</div>
+						</Popover>
 					</div>
 
 					<Link to={`/profile/${currentUser.userId}`}>

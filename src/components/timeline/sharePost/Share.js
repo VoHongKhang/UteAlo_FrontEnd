@@ -27,9 +27,6 @@ const Share = ({ inforUser, newPosts, postGroupId }) => {
 		console.log('postGroupId', postGroupId);
 	}, [privacyLevel, postGroupId]);
 
-	//khai báo websocket
-	const { stompClient } = useWebSocket();
-
 	// Xử lý ảnh của bài post
 	const postDetails = (e) => {
 		const file = e.target.files[0];
@@ -95,7 +92,7 @@ const Share = ({ inforUser, newPosts, postGroupId }) => {
 			);
 			// Sau khi createPost hoàn thành, gọi fetchPosts để cập nhật danh sách bài viết
 			newPosts(res.result);
-			stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(res.result));
+
 			// Xóa nội dung và ảnh đã chọn
 			setLocation('');
 			setContent('');

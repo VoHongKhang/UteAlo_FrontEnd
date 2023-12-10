@@ -253,9 +253,6 @@ const Profile = () => {
 	return (
 		<>
 			<Helmet title={`${user?.userName ? user?.userName : 'User'} Profile | UTEALO`} />
-			<Toaster />
-
-			<Topbar dataUser={getUser} />
 			<div className="profile" style={{ color: theme.foreground, background: theme.background }}>
 				<div className="profileRight">
 					<div className="profileRightTop">

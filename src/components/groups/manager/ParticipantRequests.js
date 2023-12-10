@@ -52,53 +52,46 @@ const ParticipantRequests = () => {
 	return (
 		<>
 			<Helmet title={`Quản lý thành viên nhóm ||UTEALO`} />
-			<Toaster />
-			<Topbar />
-			<div div className="homeContainer">
-				<SidebarManagerGroup user={currentUser} groupId={params.postGroupId} />
-				<div
-					className="setting--group--member"
-					style={{ color: theme.foreground, background: theme.background }}
-				>
-					<List
-						style={{ color: theme.foreground, background: theme.background }}
-						className="list--member--required"
-						itemLayout="horizontal"
-						dataSource={memberGroup}
-						grid={{ gutter: 16, column: 3 }}
-						renderItem={(user) => (
-							<List.Item>
-								<UserCard user={user} postId={params.postGroupId} />
-							</List.Item>
-						)}
-					/>
-				</div>
-				<FloatButton.Group trigger="click" type="primary" style={{ right: 24 }} icon={<MoreHoriz />}>
-					<FloatButton title="Chấp nhận tất cả" icon={<DoneAll />} onClick={() => setOpenModal(true)} />
-					<FloatButton
-						title="Trợ giúp"
-						icon={<HelpOutline />}
-						onClick={() => navigate(`/groups/manager/${params.postGroupId}/help`)}
-					/>
-				</FloatButton.Group>
 
-				<Modal
-					title="Xác nhận"
-					open={openModal}
-					onOk={handleOk}
-					onCancel={handleCancel}
-					footer={[
-						<Button key="back" onClick={handleCancel}>
-							Hủy
-						</Button>,
-						<Button key="submit" type="primary" loading={loading} onClick={handleOk}>
-							Xác nhận
-						</Button>,
-					]}
-				>
-					<p>Bạn có chắc chắn muốn chấp nhận tất cả ?</p>
-				</Modal>
+			<div className="setting--group--member" style={{ color: theme.foreground, background: theme.background }}>
+				<List
+					style={{ color: theme.foreground, background: theme.background }}
+					className="list--member--required"
+					itemLayout="horizontal"
+					dataSource={memberGroup}
+					grid={{ gutter: 16, column: 3 }}
+					renderItem={(user) => (
+						<List.Item>
+							<UserCard user={user} postId={params.postGroupId} />
+						</List.Item>
+					)}
+				/>
 			</div>
+			<FloatButton.Group trigger="click" type="primary" style={{ right: 24 }} icon={<MoreHoriz />}>
+				<FloatButton title="Chấp nhận tất cả" icon={<DoneAll />} onClick={() => setOpenModal(true)} />
+				<FloatButton
+					title="Trợ giúp"
+					icon={<HelpOutline />}
+					onClick={() => navigate(`/groups/manager/${params.postGroupId}/help`)}
+				/>
+			</FloatButton.Group>
+
+			<Modal
+				title="Xác nhận"
+				open={openModal}
+				onOk={handleOk}
+				onCancel={handleCancel}
+				footer={[
+					<Button key="back" onClick={handleCancel}>
+						Hủy
+					</Button>,
+					<Button key="submit" type="primary" loading={loading} onClick={handleOk}>
+						Xác nhận
+					</Button>,
+				]}
+			>
+				<p>Bạn có chắc chắn muốn chấp nhận tất cả ?</p>
+			</Modal>
 		</>
 	);
 };

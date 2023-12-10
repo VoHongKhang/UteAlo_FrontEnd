@@ -54,8 +54,6 @@ const FriendRequest = () => {
 	return (
 		<div style={{ color: theme.foreground, background: theme.background }} className="friendUser">
 			<Helmet title={`${title}`} />
-			<Toaster />
-			<Topbar />
 			<div className="container" style={{ color: theme.foreground, background: theme.background }}>
 				<div className="leftbar">
 					<Card

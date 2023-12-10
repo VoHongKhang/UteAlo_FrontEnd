@@ -59,6 +59,18 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete,
 	const [content, setContent] = useState('');
 	const [comments, setCommentPost] = useState({});
 
+	// Danh sách người dùng thích bình luận
+	const [listUserLikeComment, setListUserLikeComment] = useState([]);
+	const [showModalLikeComment, setShowModalLikeComment] = useState(false);
+
+	const handleLikeCounterClick = () => {
+		setShowModalLikeComment(true);
+	};
+
+	const handleCloseModal = () => {
+		setShowModalLikeComment(false);
+	};
+
 	// Model xuất hiện khi nhấn chỉnh sửa bình luận
 	const showDeleteConfirm = (commentReply) => {
 		setCommentIdToDelete(commentReply);
@@ -85,7 +97,18 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete,
 		};
 
 		fetchData();
+		fetchLikeComment();
 	}, [checkUserLikeComment]);
+
+	// Lấy danh sách người dùng thích bình luận
+	const fetchLikeComment = async () => {
+		try {
+			const res = await axios.get(`${BASE_URL}/v1/comment/like/listUser/${comment.commentId}`);
+			setListUserLikeComment(res.data.result);
+		} catch (error) {
+			console.error(error);
+		}
+	};
 
 	// yêu thích và bỏ yêu thích bình luận
 	const likeCommentHandler = async (commentId) => {
@@ -97,6 +120,7 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete,
 
 		setLikeComment(isLikedComment ? isLikedComment - 1 : isLikedComment + 1);
 		setIsLikedComment(!isLikedComment);
+		fetchLikeComment();
 	};
 
 	// xóa bình luận trên bài post
@@ -477,7 +501,29 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete,
 							</Modal>
 						</div>
 					</div>
-					<div className="postLikeCommentCounter">{likeComment}</div>
+					<div className="postLikeCommentCounter">
+						<span onClick={handleLikeCounterClick} className="countCommentPostLike">
+							{likeComment}
+						</span>
+						<Modal
+							title="Danh sách người đã thích"
+							open={showModalLikeComment}
+							onCancel={handleCloseModal}
+							footer={null}
+						>
+							<ul>
+								{listUserLikeComment.length > 0 ? (
+									<ul>
+										{listUserLikeComment.map((user) => (
+											<li key={user.userId}>{user.userName}</li>
+										))}
+									</ul>
+								) : (
+									<p>Chưa có ai thích</p>
+								)}
+							</ul>
+						</Modal>
+					</div>
 				</div>
 
 				<div className="comment">

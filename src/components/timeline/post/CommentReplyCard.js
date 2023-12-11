@@ -405,7 +405,7 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete,
 
 							{isReplyCommentVisible && (
 								<div className="postCommentContReply">
-									<div className="postCommentCont-1">
+									<div className="postCommentCont-1" style={{width:'300px'}}>
 										<InputEmoji
 											value={content}
 											onChange={setContent}

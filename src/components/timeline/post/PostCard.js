@@ -23,6 +23,7 @@ import classnames from 'classnames';
 import { formatTime } from '../../utils/CommonFuc';
 import PostModal from '../../utils/PostModal';
 import { useWebSocket } from '../../../context/WebSocketContext';
+import UserAvatar from '../../action/UserAvatar';
 const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 	const navigate = useNavigate();
 	const [isModalVisible, setModalVisible] = useState(false);
@@ -39,17 +40,6 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 
 	const classPost = ['post'];
 	const classNameUser = [post?.postGroupId && 'hasGroup'];
-	// classPost.push(
-	// 	post.roleName === 'SinhVien'
-	// 		? 'postCardSV'
-	// 		: post.roleName === 'GiangVien'
-	// 		? 'postCardGV'
-	// 		: post.roleName === 'PhuHuynh'
-	// 		? 'postCardPH'
-	// 		: post.roleName === 'NhanVien'
-	// 		? 'postCardNV'
-	// 		: 'postCardADMIN'
-	// );
 
 	//=======Open Handler Button More=======
 
@@ -450,12 +440,8 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 								)}
 
 								<div className="post--header--left--item">
-									<img
-										className="postProfileImg"
-										src={post.avatarUser || sampleProPic}
-										alt="..."
-										onClick={() => navigate(`/profile/${post.userId}`)}
-									/>
+									<UserAvatar user={post} />
+									
 
 									<div className="postNameAndDate">
 										<span
@@ -669,7 +655,9 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 								}}
 							>
 								<a href={post.files} target="_blank" rel="noopener noreferrer">
-									{post.files.substr(post.files.lastIndexOf('/') + 1)}
+									{post.files.substr(post.files.lastIndexOf('/') + 1).length > 20
+										? post.files.substr(post.files.lastIndexOf('/') + 1).substring(0, 20) + '...'
+										: post.files.substr(post.files.lastIndexOf('/') + 1)}
 								</a>
 							</div>
 						)}
@@ -682,7 +670,9 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 								}}
 							>
 								<a href={post.files} target="_blank" rel="noopener noreferrer">
-									{post.files.substr(post.files.lastIndexOf('/') + 1)}
+									{post.files.substr(post.files.lastIndexOf('/') + 1).length > 20
+										? post.files.substr(post.files.lastIndexOf('/') + 1).substring(0, 20) + '...'
+										: post.files.substr(post.files.lastIndexOf('/') + 1)}
 								</a>
 							</div>
 						)}
@@ -695,7 +685,9 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 								}}
 							>
 								<a href={post.files} target="_blank" rel="noopener noreferrer">
-									{post.files.substr(post.files.lastIndexOf('/') + 1)}
+									{post.files.substr(post.files.lastIndexOf('/') + 1).length > 20
+										? post.files.substr(post.files.lastIndexOf('/') + 1).substring(0, 20) + '...'
+										: post.files.substr(post.files.lastIndexOf('/') + 1)}
 								</a>
 							</div>
 						)}

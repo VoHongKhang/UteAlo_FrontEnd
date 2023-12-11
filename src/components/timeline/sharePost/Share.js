@@ -9,7 +9,6 @@ import noAvatar from '../../../assets/appImages/user.png';
 import usePost from '../../../context/post/PostContext';
 import { Select } from 'antd';
 import useTheme from '../../../context/ThemeContext';
-import { useWebSocket } from '../../../context/WebSocketContext';
 
 const Share = ({ inforUser, newPosts, postGroupId }) => {
 	const [location, setLocation] = useState('');
@@ -20,7 +19,7 @@ const Share = ({ inforUser, newPosts, postGroupId }) => {
 	const [filesUrl, setFilesUrl] = useState();
 	const [privacyLevel, setPrivacyLevel] = useState('PUBLIC');
 	const [picLoading, setPicLoading] = useState(false);
-	const { createPost, createLoading } = usePost();
+	const { createPost, createLoading, loading } = usePost();
 	const { theme } = useTheme();
 	useEffect(() => {
 		console.log(privacyLevel);
@@ -223,7 +222,7 @@ const Share = ({ inforUser, newPosts, postGroupId }) => {
 								</label>
 							</div>
 						</div>
-						<button className="shareButton" type="submit" disabled={createLoading}>
+						<button className="shareButton" type="submit" loading={loading} disabled={createLoading}>
 							Đăng bài
 						</button>
 					</div>

@@ -41,4 +41,34 @@ export const postDetail = {
 			console.log(error);
 		}
 	},
+	getFileMediaById: async (groupId, page, size) => {
+		try {
+			const res = await axios.get(`${BASE_URL}/v1/groupPost/photos/${groupId}?page=${page}&size=${size}`);
+			return res;
+		} catch (error) {
+			return error.response ? error.response.data.message : error.message;
+		}
+	},
+	getFileDocumentById: async (groupId) => {
+		console.log('groupID', groupId);
+		try {
+			const res = await axios.get(`${BASE_URL}/v1/groupPost/files/${groupId}`);
+
+			return res;
+		} catch (error) {
+			return error.response ? error.response.data.message : error.message;
+		}
+	},
+	getListPostNoteById: async (postGroupId, page, size) => {
+		try {
+			const res = await axios.get(`${BASE_URL}/v1/groupPost/roleAdmin/${postGroupId}?page=${page}&size=${size}`);
+			if (res.data.success) {
+				return res.data.result;
+			} else {
+				return res.data.message;
+			}
+		} catch (error) {
+			return error.response ? error.response.data.message : error.message;
+		}
+	},
 };

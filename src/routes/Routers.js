@@ -26,6 +26,7 @@ import Feed from '../components/timeline/feed/Feed';
 import SidebarGroup from '../components/groups/sidebar/SidebarGroup';
 import NewFeedGroup from '../components/groups/NewFeedGroup';
 import SidebarManagerGroup from '../components/groups/manager/sidebarManagerGroup/SidebarManagerGroup';
+import ShareDetail from '../components/timeline/sharePost/ShareDetail';
 
 const privateRoutes = [
 	{ path: '/groups/manager/:postGroupId', component: ManagerGroup, topbar: Topbar, sidebar: SidebarManagerGroup },
@@ -41,6 +42,7 @@ const privateRoutes = [
 	{ path: '/', component: Feed, topbar: Topbar, sidebar: Sidebar, rightbar: Rightbar },
 	{ path: '/:url', component: Feed, topbar: Topbar, sidebar: Sidebar, rightbar: Rightbar },
 	{ path: '/post/:postId', component: PostDetail, topbar: Topbar, sidebar: Sidebar, rightbar: Rightbar },
+	{ path: '/share/:shareId', component: ShareDetail, topbar: Topbar, sidebar: Sidebar, rightbar: Rightbar },
 	{
 		path: '/groups/manager/:postGroupId/edit',
 		component: SettingManagerGroup,
@@ -67,6 +69,7 @@ const privateRoutes = [
 		sidebar: SidebarManagerGroup,
 	},
 	{ path: '/message/:userId', component: Meessage, topbar: Topbar },
+	{ path: '/messages', component: Meessage, topbar: Topbar },
 ];
 
 const publicRoutes = [

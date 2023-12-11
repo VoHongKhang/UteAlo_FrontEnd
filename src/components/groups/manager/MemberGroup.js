@@ -208,7 +208,7 @@ const MemberGroup = () => {
 													? 'Rời khỏi nhóm'
 													: 'Xóa khỏi nhóm'}
 											</Typography>
-											{selectedItem?.roleName !== 'Admin' &&
+											{selectedItem?.roleName !== 'Admin' && 
 												selectedItem?.userId !== currentUser.userId && (
 													<Typography
 														className="poper--member--item"

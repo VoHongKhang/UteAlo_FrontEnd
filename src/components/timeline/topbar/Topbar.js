@@ -61,7 +61,7 @@ const Topbar = ({ dataUser }) => {
 		localStorage.setItem('userTheme', theme === themes.light ? 'dark' : 'light');
 	};
 	const handderMessageClick = () => {
-		navigate(`/message/${currentUser.userId}}`);
+		navigate(`/messages`);
 	};
 	// get user details
 	useEffect(() => {

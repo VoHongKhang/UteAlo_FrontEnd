@@ -66,9 +66,6 @@ const ChatRoom = ({ user, data, Toggeinfo, currentUser }) => {
 		}
 	};
 	useEffect(() => {
-		console.log('messages', messages);
-	}, [messages]);
-	useEffect(() => {
 		const fetchData = async () => {
 			if (data?.userId && !messages.get(data?.userId)) {
 				setPage(0);
@@ -254,9 +251,9 @@ const ChatRoom = ({ user, data, Toggeinfo, currentUser }) => {
 			stompClient = over(Sock);
 			stompClient.connect({}, onConnected, (err) => console.log(err));
 		}
-		return () => {
+		return async () => {
 			if (stompClient !== null) {
-				stompClient.disconnect();
+				await stompClient.disconnect();
 			}
 			console.log('Disconnected');
 			setPage(0);
@@ -374,45 +371,10 @@ const ChatRoom = ({ user, data, Toggeinfo, currentUser }) => {
 
 	console.log('dropzone', dropzone);
 
-	const typingRef = useRef(null);
-	const emitStopTyping = () => {
-		// // emit stop typing event
-		// window.socket.emit('stopTypingMessage', {
-		// 	conversation: id,
-		// 	senderId: authUser?._id,
-		// });
-		// // clear typingRef
-		// typingRef.current = null;
-	};
-
-	const emitTyping = () => {
-		// // if typingRef is null, emit typing event
-		// if (!typingRef.current)
-		// 	window.socket.emit('typingMessage', {
-		// 		conversation: id,
-		// 		senderId: authUser?._id,
-		// 	});
-		// // if typingRef is not null, clear timeout
-		// else clearTimeout(typingRef.current);
-		// // set timeout to emit stop typing event after 1s
-		// typingRef.current = setTimeout(emitStopTyping, 1000);
-	};
+	const emitTyping = () => {};
 
 	// listen typing event from socket io
 	const [typingList, setTypingList] = useState([]);
-
-	// const fetchData = () => {
-	// 	// Simulate fetching data from an API
-	// 	// In a real application, you would make an API call here
-	// 	const newData = [];
-
-	// 	// Update state with new data
-	// 	// setData((prevData) => [...prevData, ...newData]);
-
-	// 	// Check if there is more data to load
-	// 	// Set hasMore to false when there is no more data
-	// 	// setHasMore(/* Check if there is more data */);
-	// };
 
 	return (
 		<div className="chatroom">

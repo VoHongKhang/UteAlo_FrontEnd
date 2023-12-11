@@ -30,6 +30,7 @@ import FileDoc from './FileDoc';
 import useTheme from '../../../context/ThemeContext';
 import { useWebSocket } from '../../../context/WebSocketContext';
 const GroupDetail = ({ inforUser }) => {
+	const { stompClient } = useWebSocket();
 	const isMounted = useRef(true);
 	const params = useParams();
 	const { user: currentUser } = useAuth();
@@ -213,9 +214,12 @@ const GroupDetail = ({ inforUser }) => {
 		}
 	};
 
-	const { stompClient } = useWebSocket();
 	// Hàm mời bạn bè vào nhóm
 	const inviteFriend = async () => {
+		if (selectedFriends.length === 0) {
+			toast.error('Bạn chưa chọn bạn bè nào');
+			return;
+		}
 		try {
 			const res = await InviteFriendApi.inviteFriendApi(
 				currentUser.accessToken,
@@ -227,8 +231,10 @@ const GroupDetail = ({ inforUser }) => {
 			setIsInviteModalVisible(false); // Đóng modal
 			console.log('res', res);
 			// lấy danh sách bạn bè đã được mời : selectedFriends - res.result
-			const invitedFriends = selectedFriends.filter((friend) => !res.result.includes(friend));
-
+			const invitedFriends = selectedFriends.filter(
+				(friendId) => !res.result.some((item) => item.userId === friendId)
+			);
+			console.log('invitedFriends', invitedFriends);
 			// Lặp qua mảng selectedFriends để lấy thông tin của từng người bạn
 			if (invitedFriends.length > 0) {
 				for (let i = 0; i < invitedFriends.length; i++) {
@@ -268,6 +274,42 @@ const GroupDetail = ({ inforUser }) => {
 				})
 					.then((res) => {
 						setPostGroup({ ...postGroup, roleGroup: res.result });
+						console.log('postGroup', postGroup);
+						if (res.result === 'Waiting Accept') {
+							// lặp qua biến postGroup.managerId để lấy thông tin của người quản lý nhóm
+							if (postGroup.managerId && postGroup.managerId.length > 0) {
+								for (let i = 0; i < postGroup.managerId.length; i++) {
+									const data = {
+										groupId: params.postGroupId,
+										userId: postGroup.managerId[i],
+										photo: inforUser.avatar,
+										content:
+											inforUser.userName + ' đã yêu cầu tham gia nhóm ' + postGroup.postGroupName,
+										link: `/groups/manager/${params.postGroupId}/participant_requests`,
+										isRead: false,
+										createAt: new Date().toISOString(),
+										updateAt: new Date().toISOString(),
+									};
+									stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
+								}
+							}
+						} else {
+							if (postGroup.managerId && postGroup.managerId.length > 0) {
+								for (let i = 0; i < postGroup.managerId.length; i++) {
+									const data = {
+										groupId: params.postGroupId,
+										userId: postGroup.managerId[i],
+										photo: inforUser.avatar,
+										content: inforUser.userName + ' đã tham gia nhóm ' + postGroup.postGroupName,
+										link: `/groups/manager/${params.postGroupId}/member`,
+										isRead: false,
+										createAt: new Date().toISOString(),
+										updateAt: new Date().toISOString(),
+									};
+									stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
+								}
+							}
+						}
 					})
 					.catch((error) => {
 						console.log(error);

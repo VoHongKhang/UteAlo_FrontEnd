@@ -9,30 +9,23 @@ import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { BASE_URL } from '../../context/apiCall';
 import FeedOfUser from '../timeline/feed/FeedOfUser';
-import Topbar from '../timeline/topbar/Topbar';
 import { Avatar, Popover } from '@material-ui/core';
 import { Cake, Edit, Email, Phone } from '@material-ui/icons';
 import { Helmet } from 'react-helmet';
-import toast, { Toaster } from 'react-hot-toast';
-import useAuth from '../../context/auth/AuthContext';
+import toast from 'react-hot-toast';
 import useTheme from '../../context/ThemeContext';
-import { Space, Button, Modal, List } from 'antd';
+import { Space, Button, Modal } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import userAction from '../../components/action/useUserAction';
 import TextArea from 'antd/es/input/TextArea';
 import useProfile from '../../context/profile/ProfileContext';
 import ListPhoto from './ListPhoto';
-const Profile = () => {
-	const [user, setUser] = useState({});
-	const getUser = (data) => {
-		setUser(data);
-	};
+import { useWebSocket } from '../../context/WebSocketContext';
+const Profile = ({ inforUser, currentUser }) => {
 	const [about, setAbout] = useState('');
 	const navigate = useNavigate();
-
+	const { stompClient } = useWebSocket();
 	const params = useParams();
-
-	const { user: currentUser } = useAuth();
 
 	const { theme } = useTheme();
 
@@ -135,6 +128,15 @@ const Profile = () => {
 			case 'Chấp nhận':
 				try {
 					await userAction({ currentUser: currentUser, user: params, action: 'accept' });
+
+					const data = {
+						userId: params.userId,
+						photo: inforUser.avatar,
+						content: `${inforUser.userName} đã chấp nhận lời mời kết bạn `,
+						link: `/profile/${inforUser.userId}`,
+						isRead: false,
+					};
+					stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
 					setStatus('Bạn bè');
 					setAnchorEl(null);
 				} catch {
@@ -148,9 +150,21 @@ const Profile = () => {
 				break;
 			case 'Kết bạn':
 				try {
-					await userAction({ currentUser: currentUser, user: params, action: 'add' });
-					setStatus('Đã gửi lời mời');
-					setAnchorEl(null);
+					const res = await userAction({ currentUser: currentUser, user: params, action: 'add' });
+					console.log('res', res);
+					if (res.status === 200) {
+						const data = {
+							userId: params.userId,
+							photo: inforUser.avatar,
+							friendRequestId: res.data.result.friendRequestId,
+							content: `${inforUser.userName} đã gửi lời mời kết bạn với bạn`,
+							link: `/profile/${inforUser.userId}`,
+							isRead: false,
+						};
+						stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
+						setStatus('Đã gửi lời mời');
+						setAnchorEl(null);
+					}
 				} catch {
 					console.log('Lỗi khi thực hiện hành động');
 				} finally {
@@ -252,7 +266,7 @@ const Profile = () => {
 	};
 	return (
 		<>
-			<Helmet title={`${user?.userName ? user?.userName : 'User'} Profile | UTEALO`} />
+			<Helmet title={`${inforUser?.userName ? inforUser?.userName : 'User'} Profile | UTEALO`} />
 			<div className="profile" style={{ color: theme.foreground, background: theme.background }}>
 				<div className="profileRight">
 					<div className="profileRightTop">
@@ -260,7 +274,7 @@ const Profile = () => {
 							<img className="profileCoverImg" src={useInParams?.background || noCover} alt="..." />
 
 							<img className="profileUserImg" src={useInParams?.avatar || sampleProPic} alt="..." />
-							{params.userId === user.userId && (
+							{params.userId === inforUser.userId && (
 								<div className="profile-edit-icon">
 									<Avatar style={{ cursor: 'pointer', backgroundColor: 'blue' }}>
 										<Link to={`/update/${currentUser.userId}`}>
@@ -500,7 +514,7 @@ const Profile = () => {
 										Xem tất cả bạn bè
 									</div>
 								</div>
-								<div className="textCountFriend">{user.friends?.length} bạn bè</div>
+								<div className="textCountFriend">{inforUser.friends?.length} bạn bè</div>
 								<div className="userPhotos">
 									{listImageFriend.map((item, index) => (
 										<div key={index} className="photoItem">
@@ -510,7 +524,7 @@ const Profile = () => {
 								</div>
 							</div>
 						</div>
-						{params.userId && <FeedOfUser inforUser={user} userProfile={params.userId} />}
+						{params.userId && <FeedOfUser inforUser={inforUser} userProfile={params.userId} />}
 					</div>
 				</div>
 			</div>

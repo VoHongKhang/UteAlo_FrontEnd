@@ -30,14 +30,9 @@ const notificationApi = {
 				},
 			};
 			const res = await axios.put(`${BASE_URL}/v1/notification/read/${notificationId}`, {}, config);
-			if (res.data.success) {
-				console.log(res.data);
-				return res.data;
-			} else {
-				throw new Error(res.data.message);
-			}
+			return res.data;
 		} catch (error) {
-			throw new Error(error.message);
+			return error.response.data;
 		}
 	},
 };

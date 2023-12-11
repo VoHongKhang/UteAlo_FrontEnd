@@ -2,33 +2,42 @@ import './ManagerGroup.css';
 import { useParams } from 'react-router-dom';
 import useAuth from '../../../context/auth/AuthContext';
 import { useState, useEffect } from 'react';
-import Topbar from '../../timeline/topbar/Topbar';
 import { Helmet } from 'react-helmet';
-import toast, { Toaster } from 'react-hot-toast';
-import SidebarManagerGroup from './sidebarManagerGroup/SidebarManagerGroup';
+import toast from 'react-hot-toast';
 import PostGroupApi from '../../../api/postGroups/PostGroupApi';
 import UserCard from './UserCard';
 import { FloatButton, List, Modal, Button } from 'antd';
 import { DoneAll, HelpOutline, MoreHoriz } from '@material-ui/icons';
 import { useNavigate } from 'react-router-dom';
 import useTheme from '../../../context/ThemeContext';
-const ParticipantRequests = () => {
+import { useWebSocket } from '../../../context/WebSocketContext';
+const ParticipantRequests = ({ inforUser }) => {
 	const params = useParams();
+	const { stompClient } = useWebSocket();
 	const navigate = useNavigate();
 	const { user: currentUser } = useAuth();
 	const [memberGroup, setMemberGroup] = useState();
 	const [openModal, setOpenModal] = useState(false);
 	const [loading, setLoading] = useState(false);
+	const [postGroup, setPostGroup] = useState();
 	useEffect(() => {
 		const fetchGroup = async () => {
 			const res = await PostGroupApi.listMemberRequiredGroup({ user: currentUser, postId: params.postGroupId });
 			setMemberGroup(res.result);
+			const response = await PostGroupApi.getGroup({ user: currentUser, postId: params.postGroupId });
+			setPostGroup(response.result);
 		};
 		fetchGroup();
 	}, [params, currentUser]);
 	const handleOk = async () => {
 		const toastId = toast.loading('Đang gửi yêu cầu...');
+		if (memberGroup.length === 0) {
+			toast.error('Không có yêu cầu nào!', { id: toastId });
+			return;
+		}
+
 		try {
+			setLoading(true);
 			const data = {
 				postGroupId: params.postGroupId,
 				userId: [],
@@ -39,7 +48,22 @@ const ParticipantRequests = () => {
 			console.log('data', data);
 			await PostGroupApi.acceptMemberGroup({ user: currentUser, data: data });
 			toast.success('Thêm thành viên thành công!', { id: toastId });
+			for (let i = 0; i < memberGroup.length; i++) {
+				const dataNotification = {
+					groupId: postGroup?.postGroupId,
+					userId: memberGroup[i].userId,
+					photo: postGroup?.avatar,
+					content: `Bạn đã được chấp nhận vào nhóm ${postGroup?.postGroupName}`,
+					link: `/groups/${postGroup?.postGroupId}`,
+					isRead: false,
+					createAt: new Date().toISOString(),
+					updateAt: new Date().toISOString(),
+				};
+				stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(dataNotification));
+			}
+
 			setMemberGroup([]);
+			setLoading(false);
 		} catch (e) {
 			toast.error(`Thêm thành viên thất bại! Lỗi: ${e}`, { id: toastId });
 		}
@@ -62,7 +86,7 @@ const ParticipantRequests = () => {
 					grid={{ gutter: 16, column: 3 }}
 					renderItem={(user) => (
 						<List.Item>
-							<UserCard user={user} postId={params.postGroupId} />
+							<UserCard user={user} group={postGroup} inforUser={inforUser} />
 						</List.Item>
 					)}
 				/>

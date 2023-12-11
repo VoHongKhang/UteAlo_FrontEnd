@@ -20,7 +20,6 @@ import { useWebSocket } from '../../../context/WebSocketContext';
 
 const CommentCard = ({ inforUser, comment, fetchCommentPost, post, onDelete, onCreate, commentLength }) => {
 	const isMounted = useRef(true);
-	console.log('inforUser', inforUser);
 	const { stompClient } = useWebSocket();
 	useEffect(() => {
 		return () => {
@@ -172,9 +171,7 @@ const CommentCard = ({ inforUser, comment, fetchCommentPost, post, onDelete, onC
 					// Thêm mới comment vào object comments
 					setCommentReplies({ ...commentReplies, [newComment.commentId]: newComment });
 					onCreate(commentLength + 1);
-					console.log('comment', comment);
-					console.log('post', post);
-					console.log('inforUser', inforUser);
+					
 
 					const dataComment = {
 						commentId: comment.commentId,
@@ -238,9 +235,6 @@ const CommentCard = ({ inforUser, comment, fetchCommentPost, post, onDelete, onC
 					// Thêm mới comment vào object comments
 					setCommentReplies({ ...commentReplies, [newComment.commentId]: newComment });
 					onCreate(commentLength + 1);
-					console.log('comment', comment);
-					console.log('post', post);
-					console.log('inforUser', inforUser);
 					const dataComment = {
 						commentId: comment.commentId,
 						userId: inforUser.userId,

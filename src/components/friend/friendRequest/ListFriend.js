@@ -4,7 +4,7 @@ import FriendCard from './FriendCard.js';
 import { useFetcher } from '../../action/userFetcher.js';
 import useTheme from '../../../context/ThemeContext.js';
 
-const ListFriend = ({ currentUser, type, title = 'Danh sách bạn bè' }) => {
+const ListFriend = ({ inforUser, currentUser, type, title = 'Danh sách bạn bè' }) => {
 	const [filter, setFilter] = useState();
 	const typingRef = useRef(null);
 	const [more, setMore] = useState(0);
@@ -48,7 +48,7 @@ const ListFriend = ({ currentUser, type, title = 'Danh sách bạn bè' }) => {
 					grid={{ gutter: 16, column: 3 }}
 					renderItem={(user) => (
 						<List.Item>
-							<FriendCard user={user} type={type} />
+							<FriendCard inforUser={inforUser} user={user} type={type} />
 						</List.Item>
 					)}
 					loadMore={

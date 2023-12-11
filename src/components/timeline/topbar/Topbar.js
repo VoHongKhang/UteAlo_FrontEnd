@@ -202,19 +202,19 @@ const Topbar = ({ dataUser }) => {
 		if (res.success) {
 			console.log(res.data);
 			setAnchorEl(null);
-			//Chỉnh thông báo đó là đã đọc
-			const newListNotification = listNotification.map((notification) => {
-				if (notification.notificationId === item.notificationId) {
-					return { ...notification, isRead: true };
-				}
-				return notification;
-			});
-			setListNotification(newListNotification);
 
 			navigate(`${item.link}`);
 		} else {
-			toast.error('Đã có lỗi xảy ra');
+			toast.error('Nội dung thông báo không còn tồn tại!!!');
 		}
+		//Chỉnh thông báo đó là đã đọc
+		const newListNotification = listNotification.map((notification) => {
+			if (notification.notificationId === item.notificationId) {
+				return { ...notification, isRead: true };
+			}
+			return notification;
+		});
+		setListNotification(newListNotification);
 	};
 
 	const classParent = ['notification--item'];

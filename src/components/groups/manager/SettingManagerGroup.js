@@ -48,7 +48,11 @@ const SettingManagerGroup = () => {
 				navigate('/groups');
 			})
 			.catch((err) => {
-				toast.error(`Xóa nhóm thất bại! Lỗi: ${err}`, { id: toastId });
+				if (err == 'Error: No Accept') {
+					toast.error('Bạn không có quyền xóa nhóm này!', { id: toastId });
+				} else {
+					toast.error(`Xóa nhóm thất bại! Lỗi: ${err}`, { id: toastId });
+				}
 			});
 
 		setOpenModal(false);

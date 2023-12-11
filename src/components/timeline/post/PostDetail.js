@@ -10,15 +10,12 @@ import { useParams } from 'react-router-dom';
 import PostApi from '../../../api/timeline/post/PostApi';
 import { useNavigate } from 'react-router-dom';
 import useTheme from '../../../context/ThemeContext';
-export default function PostDetail() {
+export default function PostDetail({ inforUser }) {
 	const { theme } = useTheme();
 	const navigate = useNavigate();
 	const { user: currentUser } = useAuth();
-	const [inforUser, setInforUser] = useState();
 	const [post, setPost] = useState();
-	const getUser = (data) => {
-		setInforUser(data);
-	};
+
 	const getPostUpdate = (data, action) => {
 		console.log('data', data);
 		if (action === 'delete') {
@@ -43,18 +40,10 @@ export default function PostDetail() {
 	return (
 		<>
 			<Helmet title="Chi tiết bài viết" />
-			<Toaster />
-			<Topbar dataUser={getUser} />
-			<div className="homeContainer">
-				<Sidebar />
-				<div className="feed" style={{ color: theme.foreground, background: theme.background }}>
-					<div className="feedWrapper">
-						{post && (
-							<PostCard inforUser={inforUser} post={post} newShare={getPostUpdate} modalDetail={3} />
-						)}
-					</div>
+			<div className="feed" style={{ color: theme.foreground, background: theme.background }}>
+				<div className="feedWrapper">
+					{post && <PostCard inforUser={inforUser} post={post} newShare={getPostUpdate} modalDetail={3} />}
 				</div>
-				<Rightbar user={currentUser} />
 			</div>
 		</>
 	);

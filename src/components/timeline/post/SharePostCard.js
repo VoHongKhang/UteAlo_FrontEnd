@@ -21,6 +21,7 @@ import classnames from 'classnames';
 import { useNavigate } from 'react-router-dom';
 import PostModal from '../../utils/PostModal';
 import { ModalShare } from '../sharePost/ModalShare';
+import { useWebSocket } from '../../../context/WebSocketContext';
 const SharePostCard = ({ inforUser, share, newSharePosts }) => {
 	const [isModalVisible, setModalVisible] = useState(false);
 	const [currentPost, setCurrentPost] = useState(null);
@@ -197,6 +198,7 @@ const SharePostCard = ({ inforUser, share, newSharePosts }) => {
 		//eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [currentUser.userId, currentUser.accessToken]);
 
+<<<<<<< HEAD
 	// yêu thích và bỏ yêu thích bài share post
 	const likePostHandler = async () => {
 		try {
@@ -209,6 +211,34 @@ const SharePostCard = ({ inforUser, share, newSharePosts }) => {
 		setLike(isLiked ? like - 1 : like + 1);
 		setIsLiked(!isLiked);
 		fetchLikeSharePost();
+=======
+	const { stompClient } = useWebSocket();
+	// yêu thích và bỏ yêu thích bài post
+	const likePostHandler = async () => {
+		try {
+			await LikeOrUnlikeApi.likeOrUnlike(share.shareId, currentUser.accessToken, currentUser.userId);
+			console.log('share', share);
+			console.log('inforUser', inforUser);
+			if (isLiked === false && inforUser.userId !== share.userId) {
+				const data = {
+					shareId: share.shareId,
+					userId: share.userId,
+					photo: inforUser.avatar,
+					content: inforUser.userName + ' đã thích bài chia sẻ của bạn',
+					link: `/share/${share.shareId}`,
+					isRead: false,
+					createAt: new Date().toISOString(),
+					updateAt: new Date().toISOString(),
+				};
+
+				stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
+			}
+			setLike(isLiked ? like - 1 : like + 1);
+			setIsLiked(!isLiked);
+		} catch (err) {
+			console.log(err);
+		}
+>>>>>>> 970fba896413605bc5264ab53e2f545d42754a3d
 	};
 
 	const toggleShowAllComments = () => {
@@ -246,6 +276,20 @@ const SharePostCard = ({ inforUser, share, newSharePosts }) => {
 					// Thêm mới comment vào object comments
 					setCommentPost({ ...comments, [newComment.commentId]: newComment });
 					setCommentLength(commentlength + 1);
+					if (inforUser.userId !== share.userId) {
+						const data = {
+							shareId: share.shareId,
+							userId: share.userId,
+							photo: inforUser.avatar,
+							content: inforUser.userName + ' đã bình luận bài chia sẻ của bạn',
+							link: `/share/${share.shareId}`,
+							isRead: false,
+							createAt: new Date().toISOString(),
+							updateAt: new Date().toISOString(),
+						};
+
+						stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
+					}
 					toast.success('Đăng bình luận thành công!', { id: toastId });
 				} else {
 					// Xử lý trường hợp API trả về lỗi
@@ -685,6 +729,7 @@ const SharePostCard = ({ inforUser, share, newSharePosts }) => {
 				{showAllComments
 					? Object.values(comments).map((comment) => (
 							<CommentCard
+								inforUser={inforUser}
 								comment={comment}
 								fetchCommentPost={fetchCommentSharePost}
 								post={share}
@@ -697,6 +742,7 @@ const SharePostCard = ({ inforUser, share, newSharePosts }) => {
 							.slice(0, 1)
 							.map((comment) => (
 								<CommentCard
+									inforUser={inforUser}
 									comment={comment}
 									fetchCommentPost={fetchCommentSharePost}
 									post={share}

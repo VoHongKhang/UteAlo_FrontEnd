@@ -17,14 +17,16 @@ import EditUser from './EditUser';
 import moment from 'moment';
 import ChangePasswordApi from '../../api/auth/ChangePasswordApi';
 import useAuth from '../../context/auth/AuthContext';
-const EditProfile = () => {
+const EditProfile = ({inforUser}) => {
 	const { editUser, updateUserAvatar, updateUserBackground } = useProfile();
 	const { theme } = useTheme();
 	const { user: currentUser } = useAuth();
-	const [profileUser, setProfileUser] = useState([]);
+	const [profileUser, setProfileUser] = useState(inforUser);
 	const [photosUrl, setPhotosUrl] = useState();
 	const [photos, setPhotos] = useState(null);
 	const [targetPhoto, setTargetPhoto] = useState(null);
+
+	console.log('profileUser', profileUser);
 	const hanldeEditPhoto = async () => {
 		if (targetPhoto === 'fileAvatar') {
 			try {
@@ -63,10 +65,7 @@ const EditProfile = () => {
 			toast.error('Please select an image with png/jpg type');
 		}
 	};
-	const getUserInfor = (data) => {
-		setProfileUser(data);
-		console.log(data);
-	};
+
 	const [visibleModalUpdate, setVisibleModalUpdate] = useState({
 		visible: false,
 		type: '',
@@ -172,8 +171,6 @@ const EditProfile = () => {
 	return (
 		<>
 			<Helmet title="Edit profile | UTEALO" />
-			<Toaster />
-			<Topbar dataUser={getUserInfor} />
 			{profileUser && (
 				<div style={{ color: theme.foreground, background: theme.background }}>
 					<div className="header--group">

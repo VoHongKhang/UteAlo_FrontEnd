@@ -35,8 +35,6 @@ const Meessage = () => {
 	return (
 		<div style={{ color: theme.foreground, background: theme.background }}>
 			<Helmet title={`Tin nhắn |UTEALO`} />
-			<Toaster />
-			<Topbar dataUser={getUser} />
 			<div className="homeContainer">
 				<SidebarChat user={currentUser} onChangeMessage={onChangeMessage} />
 				<ChatRoom user={user} data={data} Toggeinfo={isShowInfo} currentUser={currentUser} />

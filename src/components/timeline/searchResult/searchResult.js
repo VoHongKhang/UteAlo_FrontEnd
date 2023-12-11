@@ -60,8 +60,6 @@ const SearchResult = () => {
 	return (
 		<>
 			<Helmet title="UTEALO" />
-			<Toaster />
-			<Topbar />
 			<div className="homeContainer">
 				<SidebarSearch onFilterChange={(filter) => setSelectedFilter(filter)} />
 				{selectedFilter === 'all' && (
@@ -131,7 +129,9 @@ const SearchResult = () => {
 													</li>
 												))}
 											</ul>
-											<div className="textShowAll" onClick={() => setSelectedFilter('groups')}>Xem tất cả</div>
+											<div className="textShowAll" onClick={() => setSelectedFilter('groups')}>
+												Xem tất cả
+											</div>
 										</div>
 									</>
 								</div>
@@ -187,7 +187,12 @@ const SearchResult = () => {
 															</div>
 															<div className="search--join">
 																{item.checkStatusFriend !== 'isFriend' ? (
-																	<button style={{width:'95px'}} onClick={() => handleRequestFriend(item.userId)}>Thêm bạn bè</button>
+																	<button
+																		style={{ width: '95px' }}
+																		onClick={() => handleRequestFriend(item.userId)}
+																	>
+																		Thêm bạn bè
+																	</button>
 																) : (
 																	<button onClick={() => joinGroup(item.userId)}>
 																		Bạn bè
@@ -198,7 +203,9 @@ const SearchResult = () => {
 													</li>
 												))}
 											</ul>
-											<div className="textShowAll" onClick={() => setSelectedFilter('people')}>Xem tất cả</div>
+											<div className="textShowAll" onClick={() => setSelectedFilter('people')}>
+												Xem tất cả
+											</div>
 										</div>
 									</>
 								</div>
@@ -213,13 +220,16 @@ const SearchResult = () => {
 					<div className="menu--post" id="search--result-utealo">
 						<>
 							{Object.values(groupsData).length > 0 ? (
-								<div className="search--result-group" style={{background:'#f0f2f5'}}>
+								<div className="search--result-group" style={{ background: '#f0f2f5' }}>
 									<>
-										<div className="search--result-all" style={{background:'#f0f2f5'}}>
+										<div className="search--result-all" style={{ background: '#f0f2f5' }}>
 											<ul>
 												{Object.values(groupsData).map((item, index) => (
 													<li key={index}>
-														<div className="search--result-item" style={{marginBottom:'20px'}}>
+														<div
+															className="search--result-item"
+															style={{ marginBottom: '20px' }}
+														>
 															<div className="img--avatarGroup">
 																<img
 																	src={item.avatarGroup ? item.avatarGroup : adver4}
@@ -286,13 +296,16 @@ const SearchResult = () => {
 					<div className="menu--post" id="search--result-utealo">
 						<>
 							{Object.values(usersData).length > 0 ? (
-								<div className="search--result-people" style={{background:'#f0f2f5'}}>
+								<div className="search--result-people" style={{ background: '#f0f2f5' }}>
 									<>
-										<div className="search--result-all" style={{background:'#f0f2f5'}}>
+										<div className="search--result-all" style={{ background: '#f0f2f5' }}>
 											<ul>
 												{Object.values(usersData).map((item, index) => (
 													<li key={index}>
-														<div className="search--result-item" style={{marginBottom:'20px'}}>
+														<div
+															className="search--result-item"
+															style={{ marginBottom: '20px' }}
+														>
 															<div className="img--avatarGroup">
 																<img
 																	src={item.avatar ? item.avatar : adver4}
@@ -331,7 +344,12 @@ const SearchResult = () => {
 															</div>
 															<div className="search--join">
 																{item.checkStatusFriend !== 'isFriend' ? (
-																	<button style={{width:'95px'}} onClick={() => handleRequestFriend(item.userId)}>Thêm bạn bè</button>
+																	<button
+																		style={{ width: '95px' }}
+																		onClick={() => handleRequestFriend(item.userId)}
+																	>
+																		Thêm bạn bè
+																	</button>
 																) : (
 																	<button onClick={() => joinGroup(item.userId)}>
 																		Bạn bè

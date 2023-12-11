@@ -121,7 +121,7 @@ const ManagerGroup = () => {
 							) : (
 								<img className="groupUserImg" src={sampleProPic} alt="..." />
 							)}
-							<label htmlFor="fileAvatar" className="edit--group--avatar">
+							<label htmlFor="fileAvatar" className="edit--group--avatar--manager">
 								<Camera htmlColor="#65676B" />
 								<input
 									style={{ display: 'none' }}

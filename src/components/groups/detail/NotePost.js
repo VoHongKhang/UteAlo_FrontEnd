@@ -18,7 +18,7 @@ export default function NotePost({ postGroup, inforUser, currentUser }) {
 
 		try {
 			if (isMounted.current && hasMore) {
-				const res = await postDetail.getListPostById(currentUser, postGroup.postGroupId, newPage, 20);
+				const res = await postDetail.getListPostNoteById(postGroup.postGroupId, newPage, 20);
 				if (res) {
 					console.log('res', res);
 					setListPost((prevList) => [...prevList, ...res]);
@@ -38,8 +38,8 @@ export default function NotePost({ postGroup, inforUser, currentUser }) {
 	const fetchPosts = async () => {
 		console.log('fetchPosts');
 		try {
-			const res = await postDetail.getListPostById(currentUser, postGroup.postGroupId, page, 20);
-			if (res) {
+			const res = await postDetail.getListPostNoteById(postGroup.postGroupId, page, 20);
+			if (res != 'No posts found for admin of this group') {
 				console.log('res', res);
 				setListPost((prevList) => [...prevList, ...res]);
 				setPostLength((pre) => pre + res.length);
@@ -113,17 +113,18 @@ export default function NotePost({ postGroup, inforUser, currentUser }) {
 								/>
 							}
 						>
-							{sortedList?.map((p) => {
-								return (
-									<PostCard
-										inforUser={inforUser}
-										post={p}
-										key={`post-${p.postId}`}
-										group={postGroup}
-										newShare={getPostUpdate}
-									/>
-								);
-							})}
+							{sortedList.length > 0 &&
+								sortedList?.map((p) => {
+									return (
+										<PostCard
+											inforUser={inforUser}
+											post={p}
+											key={`post-${p.postId}`}
+											group={postGroup}
+											newShare={getPostUpdate}
+										/>
+									);
+								})}
 						</InfiniteScroll>
 					</div>
 				</div>

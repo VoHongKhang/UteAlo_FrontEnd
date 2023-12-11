@@ -9,7 +9,7 @@ const UserAvatar = ({ user: initUser, nickname, badgeProps, avtSize = 40, ...ava
 	const badgeSize = avtSize / 4;
 
 	const [user, setUser] = useState(initUser);
-	const profilePic = user?.avatar ? user?.avatar :(user?.avatarGroup ? user?.avatarGroup : user?.avatarUser);
+	const profilePic = user?.avatarUser || user?.avatar || user?.avatarGroup;
 	useEffect(() => {
 		setUser(initUser);
 	}, [initUser]);
@@ -29,7 +29,7 @@ const UserAvatar = ({ user: initUser, nickname, badgeProps, avtSize = 40, ...ava
 	if (!user) return <Skeleton.Avatar size={avtSize} shape="circle" active />;
 
 	return (
-		<Tooltip title={nickname || user?.username} placement="top">
+		<Tooltip title={user?.username || user?.userName || user?.postGroupName} placement="top">
 			<Badge
 				className={styles.badge}
 				count={
@@ -48,7 +48,11 @@ const UserAvatar = ({ user: initUser, nickname, badgeProps, avtSize = 40, ...ava
 				offset={[0 - badgeSize / 2, avtSize - badgeSize / 2]}
 				{...badgeProps}
 			>
-				<Link to={`/profile/${user?.userId}`} draggable onClick={(e) => e.stopPropagation()}>
+				<Link
+					to={user?.userId ? `/profile/${user?.userId}` : `/groups/${user?.postGroupId}`}
+					draggable
+					onClick={(e) => e.stopPropagation()}
+				>
 					<Avatar
 						shape="circle"
 						src={profilePic}

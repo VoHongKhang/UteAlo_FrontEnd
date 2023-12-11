@@ -9,7 +9,8 @@ import './Rightbar.css';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import GetFriendApi from '../../../api/profile/friend/getFriendApi';
-import { HiStatusOnline } from "react-icons/hi";
+import { HiStatusOnline } from 'react-icons/hi';
+import UserAvatar from '../../action/UserAvatar';
 const Rightbar = ({ user }) => {
 	const navigate = useNavigate();
 	const { theme } = useTheme();
@@ -163,12 +164,7 @@ const Rightbar = ({ user }) => {
 											}}
 											onClick={() => navigate(`/profile/${item.userId}`)}
 										>
-											<img
-												src={item?.avatar ? item?.avatar : noAvatar}
-												alt="..."
-												className="topbarImg"
-											/>
-											{item.isOnline && <HiStatusOnline className="online--icon" />}
+											<UserAvatar user={item} />
 											<Typography.Text
 												style={{
 													color: theme.foreground,

@@ -1,104 +1,100 @@
-import { Table } from 'antd';
+import { Button, Table } from 'antd';
 import useTheme from '../../../context/ThemeContext';
+import { useEffect, useState } from 'react';
+import { postDetail } from '../../../api/postGroups/postDetail';
+import moment from 'moment';
+import { HiEye } from 'react-icons/hi2';
+import { useNavigate } from 'react-router-dom';
 
-export default function FileDoc(params) {
+export default function FileDoc({ groupId }) {
+	const navigate = useNavigate();
+	const [data, setData] = useState([]);
 	const columns = [
 		{
-			title: 'Name',
-			dataIndex: 'name',
+			title: 'Người Tạo',
+			dataIndex: 'userName',
+			key: 'userName',
+			width: '30%',
+			render: (text, record) => (
+				<span
+					style={{ cursor: 'pointer', color: '#1677ff' }}
+					onClick={() => navigate(`/profile/${record.userId}`)}
+				>
+					{text}
+				</span>
+			),
 		},
 		{
-			title: 'Lần sửa đổi gần nhất',
+			title: 'Tên File',
+			dataIndex: 'files',
+			key: 'files',
+			render: (text) => (
+				<a href={text} target="_blank" rel="noopener noreferrer">
+					{text.length > 20 ? text.split('/').pop().substring(0, 20) + '...' : text}
+				</a>
+			),
+			width: '30%',
+		},
+		{
+			title: 'Thời Gian Cập Nhật',
 			dataIndex: 'updateAt',
+			key: 'updateAt',
 			sorter: (a, b) => new Date(b.updateAt) - new Date(a.updateAt),
+			width: '20%',
 		},
 		{
-			title: 'Loại',
-			dataIndex: 'category',
+			title: 'Loại File',
+			dataIndex: 'type',
 			filters: [
 				{
 					text: 'PDF',
-					value: 'PDF',
+					value: 'pdf',
 				},
 				{
 					text: 'Word',
 					value: 'docx',
 				},
+				{
+					text: 'TXT',
+					value: 'txt',
+				},
+				{
+					text: 'PowerPoint',
+					value: 'ppt',
+				},
+				{
+					text: 'Excel',
+					value: 'xlsx',
+				},
 			],
-			onFilter: (value, record) => record.category.startsWith(value),
+			onFilter: (value, record) => record.type.startsWith(value),
 			filterSearch: true,
-			width: '40%',
+			width: '10%',
+		},
+		{
+			title: 'Xem bài viết ',
+			dataIndex: 'postId',
+			render: (text) => (
+				<Button type="primary" onClick={() => navigate(`/post/${text}`)}>
+					<HiEye />
+				</Button>
+			),
+			width: '10%',
 		},
 	];
 
-	const data = [
-		{
-			key: '1',
-			name: 'Thức ăn cho chó',
-			updateAt: '2021/09/19',
-			category: 'PDF',
-		},
-		{
-			key: '2',
-			name: 'Thức ăn cho mèo',
-			updateAt: '2021/09/17',
-			category: 'docx',
-		},
-		{
-			key: '3',
-			name: 'Thức ăn cho chim',
-			updateAt: '2021/09/14',
-			category: 'PDF',
-		},
-		{
-			key: '4',
-			name: 'Thức ăn cho cá',
-			updateAt: '2021/09/18',
-			category: 'docx',
-		},
-		{
-			key: '5',
-			name: 'Thức ăn cho cá',
-			updateAt: '2021/09/17',
-			category: 'docx',
-		},
-		{
-			key: '6',
-			name: 'Thức ăn cho cá',
-			updateAt: '2021/09/16',
-			category: 'docx',
-		},
-		{
-			key: '7',
-			name: 'Thức ăn cho cá',
-			updateAt: '2021/09/14',
-			category: 'docx',
-		},
-		{
-			key: '8',
-			name: 'Thức ăn cho cá',
-			updateAt: '2021/09/15',
-			category: 'docx',
-		},
-		{
-			key: '9',
-			name: 'Thức ăn cho cá',
-			updateAt: '2021/09/11',
-			category: 'docx',
-		},
-		{
-			key: '10',
-			name: 'Thức ăn cho cá',
-			updateAt: '2021/09/13',
-			category: 'docx',
-		},
-		{
-			key: '11',
-			name: 'Thức ăn cho cá',
-			updateAt: '2021/09/12',
-			category: 'docx',
-		},
-	];
+	useEffect(() => {
+		const fetchData = async () => {
+			const result = await postDetail.getFileDocumentById(groupId);
+			const res = result.data.map((item) => {
+				const type = item.files.split('.').pop();
+				const updateAt = moment(item.updateAt).format('DD/MM/YYYY');
+				return { ...item, type, updateAt };
+			});
+			setData(res);
+		};
+		fetchData();
+	}, [groupId]);
 
 	const onChange = (pagination, filters, sorter, extra) => {
 		console.log('params', pagination, filters, sorter, extra);

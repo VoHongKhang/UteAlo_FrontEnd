@@ -6,7 +6,7 @@ import './PostCard.css';
 import sampleProPic from '../../../assets/appImages/user.png';
 import PostGroupApi from '../../../api/postGroups/PostGroupApi';
 import TextArea from 'antd/es/input/TextArea';
-import { AttachFile, PermMedia, Public, Room } from '@material-ui/icons';
+import { AttachFile, Cancel, PermMedia, Public, Room } from '@material-ui/icons';
 import vietnamProvinces from '../../../vietnamProvinces.json';
 import toast from 'react-hot-toast';
 export const ShareModal = ({ post, user, currentUser, visible, onClose, onShare, action }) => {
@@ -220,13 +220,15 @@ export const ShareModal = ({ post, user, currentUser, visible, onClose, onShare,
 									</div>
 								)}
 								{post?.photos && (
-									<Image
-										width="100%"
-										className="postImg"
-										src={post?.photos} // Sử dụng selectedPost.photos thay vì cố định URL như bạn đã đề cập
-										alt={post?.content}
-										style={{ objectFit: 'cover' }}
-									/>
+									<>
+										<Image
+											width="100%"
+											className="postImg"
+											src={post?.photos} // Sử dụng selectedPost.photos thay vì cố định URL như bạn đã đề cập
+											alt={post?.content}
+											style={{ objectFit: 'cover' }}
+										/>
+									</>
 								)}
 							</div>
 						</Space>
@@ -320,14 +322,25 @@ export const ShareModal = ({ post, user, currentUser, visible, onClose, onShare,
 								/>
 							</label>
 
-							{(file?.files || post?.files) && (
+							{(file?.files || editPost?.files) && (
 								<>
 									<div className="postFile">
-										<a href={file?.files || post?.files} target="_blank" rel="noopener noreferrer">
+										<a
+											href={file?.files || editPost?.files}
+											target="_blank"
+											rel="noopener noreferrer"
+										>
 											{file?.files
 												? editPost?.files.name
 												: post?.files.substr(post?.files.lastIndexOf('/') + 1)}
 										</a>
+										<Cancel
+											className="shareCancelFile"
+											onClick={() => {
+												setEditPost({ ...editPost, files: null });
+												setFile({ ...file, files: null });
+											}}
+										/>
 									</div>
 								</>
 							)}
@@ -343,14 +356,23 @@ export const ShareModal = ({ post, user, currentUser, visible, onClose, onShare,
 									onChange={(e) => uploadFiles(e.target.files[0], 'photo')}
 								/>
 							</label>
-							{(file?.photos || post?.photos) && (
-								<Image
-									width="100%"
-									className="editPostImg"
-									src={file?.photos || post?.photos}
-									alt={'photos'}
-									style={{ objectFit: 'cover' }}
-								/>
+							{(file?.photos || editPost?.photos) && (
+								<div className="shareImgContainer">
+									<Image
+										width="100%"
+										className="editPostImg"
+										src={file?.photos || editPost?.photos}
+										alt={'photos'}
+										style={{ objectFit: 'cover' }}
+									/>
+									<Cancel
+										className="shareCancelImg"
+										onClick={() => {
+											setEditPost({ ...editPost, photos: null });
+											setFile({ ...file, photos: null });
+										}}
+									/>
+								</div>
 							)}
 						</div>
 					</div>

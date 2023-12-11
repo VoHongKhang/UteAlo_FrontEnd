@@ -7,12 +7,12 @@ import GetFriendApi from '../../api/profile/friend/getFriendApi';
 import toast from 'react-hot-toast';
 import { BottomNavigation, BottomNavigationAction, Popover } from '@material-ui/core';
 import PostGroupApi from '../../api/postGroups/PostGroupApi';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import useTheme from '../../context/ThemeContext';
 const SidebarChat = ({ user, onChangeMessage }) => {
 	const navigate = useNavigate();
 	const [friend, setFriend] = useState();
-
+	const params = useParams();
 	const [group, setGroup] = useState();
 	const [isGroup, setIsGroup] = useState(0);
 	const [selectItem, setSelectItem] = useState(null);
@@ -45,17 +45,51 @@ const SidebarChat = ({ user, onChangeMessage }) => {
 			elementCurrent.classList.add('active--message');
 		}
 	}, [isGroup]);
+	// useEffect(() => {
+	// 	const element = document.querySelector('.item--message--sidebar');
+	// 	if (element) {
+	// 		element.classList.add('active--message');
+	// 		setSelectItem(element.id);
+	// 		onChangeMessage({
+	// 			isGroup: false,
+	// 			id: element.id,
+	// 		});
+	// 	}
+	// }, [friend]);
 	useEffect(() => {
-		const element = document.querySelector('.item--message--sidebar');
-		if (element) {
-			element.classList.add('active--message');
-			setSelectItem(element.id);
-			onChangeMessage({
-				isGroup: false,
-				id: element.id,
-			});
+		//Nếu params.userId mà nhỏ hơn 30 kí tự thì là id của group
+		//nếu là id của group thì tự động ấn qua cộng đồng và chọn group đó
+		if (params.userId) {
+			const element = document.getElementById(params.userId);
+			if (element) {
+				element.classList.add('active--message');
+			}
+			setSelectItem(params.userId);
+			if (params.userId?.length < 30) {
+				setIsGroup(1);
+				onChangeMessage({
+					isGroup: true,
+					id: params.userId,
+				});
+			} else {
+				setIsGroup(0);
+				onChangeMessage({
+					isGroup: false,
+					id: params.userId,
+				});
+			}
+		} else {
+			const element = document.querySelector('.item--message--sidebar');
+			if (element) {
+				element.classList.add('active--message');
+				setSelectItem(element.id);
+				onChangeMessage({
+					isGroup: false,
+					id: element.id,
+				});
+			}
 		}
-	}, [friend]);
+	}, [params.userId, friend]);
 	useEffect(() => {
 		const fetchData = async () => {
 			try {

@@ -485,7 +485,7 @@ const GroupDetail = ({ inforUser }) => {
 		{
 			key: '2',
 			label: <span style={{ color: theme.foreground, background: theme.background }}>Đáng chú ý</span>,
-			children: <NotePost postGroup={postGroup} inforUser={inforUser} currentUser={currentUser} />,
+			children: postGroup && <NotePost postGroup={postGroup} inforUser={inforUser} currentUser={currentUser} />,
 		},
 		{
 			key: '3',
@@ -499,12 +499,12 @@ const GroupDetail = ({ inforUser }) => {
 		{
 			key: '5',
 			label: <span style={{ color: theme.foreground, background: theme.background }}>File phương tiện</span>,
-			children: <FileMedia />,
+			children: <FileMedia groupId={postGroup.postGroupId}/>,
 		},
 		{
 			key: '6',
 			label: <span style={{ color: theme.foreground, background: theme.background }}>File tài liệu</span>,
-			children: <FileDoc />,
+			children: <FileDoc groupId={postGroup.postGroupId}/>,
 		},
 	];
 	const operations = {

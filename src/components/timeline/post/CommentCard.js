@@ -16,9 +16,11 @@ import InputEmoji from 'react-input-emoji';
 import GetCommentReplyApi from '../../../api/timeline/commentPost/getCommentReply';
 import GetCommentReplyShareApi from '../../../api/timeline/commentSharePost/getCommentReplyShare';
 import CommentReplyCard from './CommentReplyCard';
+import { useWebSocket } from '../../../context/WebSocketContext';
 
-const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, commentLength }) => {
+const CommentCard = ({ inforUser, comment, fetchCommentPost, post, onDelete, onCreate, commentLength }) => {
 	const isMounted = useRef(true);
+	const { stompClient } = useWebSocket();
 	useEffect(() => {
 		return () => {
 			// Cleanup: Set isMounted to false when the component unmounts
@@ -169,6 +171,41 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 					// Thêm mới comment vào object comments
 					setCommentReplies({ ...commentReplies, [newComment.commentId]: newComment });
 					onCreate(commentLength + 1);
+					
+
+					const dataComment = {
+						commentId: comment.commentId,
+						userId: comment.userId,
+						photo: inforUser.avatar,
+						content: inforUser.userName + ' đã phản hồi bình luận của bạn',
+						link: `/post/${post.postId}`,
+						isRead: false,
+						createAt: new Date().toISOString(),
+						updateAt: new Date().toISOString(),
+					};
+					const dataPost = {
+						postId: post.postId,
+						userId: post.userId,
+						photo: inforUser.avatar,
+						content: inforUser.userName + ' đã bình luận bài viết của bạn',
+						link: `/post/${post.postId}`,
+						isRead: false,
+						createAt: new Date().toISOString(),
+						updateAt: new Date().toISOString(),
+					};
+					if (comment.userId === post.userId) {
+						if (comment.userId !== currentUser.userId) {
+							stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(dataComment));
+						}
+					} else {
+						if (comment.userId !== currentUser.userId) {
+							stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(dataComment));
+						}
+						if (post.userId !== currentUser.userId) {
+							stompClient.send('/app/userNotify/' + post.userId, {}, JSON.stringify(dataPost));
+						}
+					}
+
 					toast.success('Đăng bình luận thành công!', { id: toastId });
 				} else {
 					// Xử lý trường hợp API trả về lỗi
@@ -198,6 +235,39 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 					// Thêm mới comment vào object comments
 					setCommentReplies({ ...commentReplies, [newComment.commentId]: newComment });
 					onCreate(commentLength + 1);
+					const dataComment = {
+						commentId: comment.commentId,
+						userId: inforUser.userId,
+						photo: inforUser.avatar,
+						content: inforUser.userName + ' đã phản hồi bình luận của bạn',
+						link: `/post/${comment.postId}`,
+						isRead: false,
+						createAt: new Date().toISOString(),
+						updateAt: new Date().toISOString(),
+					};
+					const dataPost = {
+						shareId: post.shareId,
+						userId: post.userId,
+						photo: inforUser.avatar,
+						content: inforUser.userName + ' đã bình luận bài chia sẻ của bạn',
+						link: `/share/${post.postId}`,
+						isRead: false,
+						createAt: new Date().toISOString(),
+						updateAt: new Date().toISOString(),
+					};
+					if (comment.userId === post.userId) {
+						if (comment.userId !== currentUser.userId) {
+							stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(dataComment));
+						}
+					} else {
+						if (comment.userId !== currentUser.userId) {
+							stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(dataComment));
+						}
+						if (post.userId !== currentUser.userId) {
+							stompClient.send('/app/userNotify/' + post.userId, {}, JSON.stringify(dataPost));
+						}
+					}
+
 					toast.success('Đăng bình luận thành công!', { id: toastId });
 				} else {
 					// Xử lý trường hợp API trả về lỗi
@@ -545,6 +615,7 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 				{showAllComments
 					? Object.values(commentReplies).map((commentReply) => (
 							<CommentReplyCard
+								inforUser={inforUser}
 								commentReply={commentReply}
 								fetchCommentReply={fetchCommentReply}
 								comment={commentReply}
@@ -559,6 +630,7 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 							.slice(0, 1)
 							.map((commentReply) => (
 								<CommentReplyCard
+									inforUser={inforUser}
 									commentReply={commentReply}
 									fetchCommentReply={fetchCommentReply}
 									comment={commentReply}

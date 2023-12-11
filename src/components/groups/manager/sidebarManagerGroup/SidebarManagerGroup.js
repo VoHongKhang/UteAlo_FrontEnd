@@ -1,11 +1,12 @@
 import { Button, Divider, List, Space, Typography } from 'antd';
 import useTheme from '../../../../context/ThemeContext';
 import './SidebarManagerGroup.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowBack, Settings, GraphicEq, Group, VerifiedUser, ViewAgenda, Help } from '@material-ui/icons';
-const SidebarManagerGroup = ({ user, groupId }) => {
+const SidebarManagerGroup = ({ user }) => {
 	const { theme } = useTheme();
 	const navigate = useNavigate();
+	const params = useParams();
 	const handlerAddMember = () => {
 		console.log('Add member');
 	};
@@ -13,34 +14,34 @@ const SidebarManagerGroup = ({ user, groupId }) => {
 		{
 			postGroupName: 'Tổng quan',
 			avatarGroup: <ViewAgenda style={{ fontSize: '25px', margin: 'auto' }} />,
-			href: `/groups/manager/${groupId}`,
+			href: `/groups/manager/${params.postGroupId}`,
 		},
 		{
 			postGroupName: 'Cài đặt nhóm ',
 			avatarGroup: <Settings style={{ fontSize: '25px', margin: 'auto' }} />,
-			href: `/groups/manager/${groupId}/edit`,
+			href: `/groups/manager/${params.postGroupId}/edit`,
 		},
 		{
 			postGroupName: 'Xem thành viên nhóm',
 			avatarGroup: <Group style={{ fontSize: '25px', margin: 'auto' }} />,
-			href: `/groups/manager/${groupId}/member`,
+			href: `/groups/manager/${params.postGroupId}/member`,
 		},
 
 		{
 			postGroupName: 'Yêu cầu tham gia nhóm',
 			avatarGroup: <VerifiedUser style={{ fontSize: '25px', margin: 'auto' }} />,
-			href: `/groups/manager/${groupId}/participant_requests`,
+			href: `/groups/manager/${params.postGroupId}/participant_requests`,
 		},
 		{
 			postGroupName: 'Phân tích dữ liệu',
 			avatarGroup: <GraphicEq style={{ fontSize: '25px', margin: 'auto' }} />,
-			href: `/groups/manager/${groupId}/analysis`,
+			href: `/groups/manager/${params.postGroupId}/analysis`,
 		},
 
 		{
 			postGroupName: 'Hỗ trợ',
 			avatarGroup: <Help style={{ fontSize: '25px', margin: 'auto' }} />,
-			href: `/groups/manager/${groupId}/help`,
+			href: `/groups/manager/${params.postGroupId}/help`,
 		},
 	];
 	const lists = [
@@ -59,7 +60,7 @@ const SidebarManagerGroup = ({ user, groupId }) => {
 				style={{ color: theme.foreground, background: theme.background }}
 			>
 				<div className="topSidebar--back" style={{ color: theme.foreground, background: theme.background }}>
-					<div className="icon-back" onClick={() => navigate(`/groups/${groupId}`)}>
+					<div className="icon-back" onClick={() => navigate(`/groups/${params.postGroupId}`)}>
 						<ArrowBack
 							style={{ fontSize: '25px', color: theme.foreground, background: theme.background }}
 							className="topSidebar--back-icon"

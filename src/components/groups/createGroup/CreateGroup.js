@@ -97,7 +97,6 @@ const CreateGroup = () => {
 					<div className="create--group--sidebar--header">
 						<div className="topbar--create-group-left">
 							<Close onClick={handlerClose} className="close--button" />
-							<img src={noAvatar} alt="icon" onClick={() => navigate('/')} />
 						</div>
 						<span className="link--create-group">Nhóm {'>'} Tạo nhóm </span>
 						<h2>Tạo nhóm</h2>
@@ -196,26 +195,6 @@ const CreateGroup = () => {
 					</div>
 				</div>
 				<div className="create-group-right">
-					<div className="topbar--create-group-right">
-						<div className="button-right">
-							<Message
-								className="button-right-message"
-								titleAccess="Tin nhắn"
-								onClick={handderMessageClick}
-							/>
-						</div>
-						<div className="button-right">
-							<Notifications
-								className="button-right-notifications"
-								titleAccess="Thông báo"
-								onClick={handderNotificationClick}
-							/>
-						</div>
-
-						<Link to={`/profile/${currentUser.userId}`}>
-							<img src={user?.avatar ? user?.avatar : noAvatar} alt="..." className="topbarImg" />
-						</Link>
-					</div>
 					<CreateGroupCard nameGroup={nameGroup} role={role} />
 				</div>
 			</div>

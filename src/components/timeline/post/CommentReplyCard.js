@@ -14,8 +14,18 @@ import { Image, Modal } from 'antd';
 import { PermMedia, Cancel } from '@material-ui/icons';
 import { Send } from '@material-ui/icons';
 import InputEmoji from 'react-input-emoji';
+import { useWebSocket } from '../../../context/WebSocketContext';
 
-const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete, onCreate, commentReplyLength }) => {
+const CommentCard = ({
+	inforUser,
+	commentReply,
+	fetchCommentReply,
+	comment,
+	post,
+	onDelete,
+	onCreate,
+	commentReplyLength,
+}) => {
 	const { user: currentUser } = useAuth();
 	console.log('commentReplyLength', commentReplyLength);
 	// Hàm kiểm tra xem người dùng đã like bài comment chưa
@@ -39,6 +49,7 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete,
 		}
 	}, [currentUser.accessToken, commentReply.commentId]);
 
+	const { stompClient } = useWebSocket();
 	const [isLikedComment, setIsLikedComment] = useState(false);
 	const [likeComment, setLikeComment] = useState(comment.likes?.length || 0);
 	const [isModalVisible, setIsModalVisible] = useState(false);
@@ -155,6 +166,40 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete,
 					setCommentPost({ ...comments, [newComment.commentId]: newComment });
 					onCreate(commentReplyLength + 1);
 					//setCommentLength(commentlength + 1);
+
+					const dataComment = {
+						commentId: comment.commentId,
+						userId: comment.userId,
+						photo: inforUser.avatar,
+						content: inforUser.userName + ' đã phản hồi bình luận của bạn',
+						link: `/post/${post.postId}`,
+						isRead: false,
+						createAt: new Date().toISOString(),
+						updateAt: new Date().toISOString(),
+					};
+					const dataPost = {
+						postId: post.postId,
+						userId: post.userId,
+						photo: inforUser.avatar,
+						content: inforUser.userName + ' đã bình luận bài viết của bạn',
+						link: `/post/${post.postId}`,
+						isRead: false,
+						createAt: new Date().toISOString(),
+						updateAt: new Date().toISOString(),
+					};
+					if (comment.userId === post.userId) {
+						if (comment.userId !== currentUser.userId) {
+							stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(dataComment));
+						}
+					} else {
+						if (comment.userId !== currentUser.userId) {
+							stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(dataComment));
+						}
+						if (post.userId !== currentUser.userId) {
+							stompClient.send('/app/userNotify/' + post.userId, {}, JSON.stringify(dataPost));
+						}
+					}
+
 					toast.success('Đăng bình luận thành công!', { id: toastId });
 				} else {
 					// Xử lý trường hợp API trả về lỗi
@@ -185,6 +230,40 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete,
 					setCommentPost({ ...comments, [newComment.commentId]: newComment });
 					onCreate(commentReplyLength + 1);
 					//setCommentLength(commentlength + 1);
+
+					const dataComment = {
+						commentId: comment.commentId,
+						userId: inforUser.userId,
+						photo: inforUser.avatar,
+						content: inforUser.userName + ' đã phản hồi bình luận của bạn',
+						link: `/post/${comment.postId}`,
+						isRead: false,
+						createAt: new Date().toISOString(),
+						updateAt: new Date().toISOString(),
+					};
+					const dataPost = {
+						shareId: post.shareId,
+						userId: post.userId,
+						photo: inforUser.avatar,
+						content: inforUser.userName + ' đã bình luận bài chia sẻ của bạn',
+						link: `/share/${post.postId}`,
+						isRead: false,
+						createAt: new Date().toISOString(),
+						updateAt: new Date().toISOString(),
+					};
+					if (comment.userId === post.userId) {
+						if (comment.userId !== currentUser.userId) {
+							stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(dataComment));
+						}
+					} else {
+						if (comment.userId !== currentUser.userId) {
+							stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(dataComment));
+						}
+						if (post.userId !== currentUser.userId) {
+							stompClient.send('/app/userNotify/' + post.userId, {}, JSON.stringify(dataPost));
+						}
+					}
+
 					toast.success('Đăng bình luận thành công!', { id: toastId });
 				} else {
 					// Xử lý trường hợp API trả về lỗi

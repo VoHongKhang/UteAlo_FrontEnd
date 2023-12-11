@@ -15,7 +15,8 @@ import {
 import UserAvatar from '../../action/UserAvatar';
 import { useState, useEffect } from 'react';
 import useTheme from '../../../context/ThemeContext';
-const FriendCard = ({ user, type }) => {
+import { useWebSocket } from '../../../context/WebSocketContext';
+const FriendCard = ({ inforUser, user, type }) => {
 	const { user: currentUser } = useAuth();
 	const [userState, setUserState] = useState(user);
 	const [loading, setLoading] = useState({});
@@ -24,11 +25,37 @@ const FriendCard = ({ user, type }) => {
 	const handleFriend = ({ tempt, relationship }) => {
 		setFriendHandler({ tempt, relationship });
 	};
+	const { stompClient } = useWebSocket();
 	useEffect(() => {
 		if (Object.keys(friendHandler).length > 0) {
 			const handleFriend = async (friendHandler) => {
 				setLoading({ ...loading, [friendHandler.tempt]: true });
-				await userAction({ currentUser: currentUser, user: userState, action: friendHandler.tempt });
+				const res = await userAction({
+					currentUser: currentUser,
+					user: userState,
+					action: friendHandler.tempt,
+				});
+				if (friendHandler.tempt === 'accept') {
+					const data = {
+						userId: userState.userId,
+						photo: inforUser.avatar,
+						content: `${inforUser.userName} đã chấp nhận lời mời kết bạn `,
+						link: `/profile/${inforUser.userId}`,
+						isRead: false,
+					};
+					stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
+				} else if (friendHandler.tempt === 'add') {
+					const data = {
+						userId: userState.userId,
+						photo: inforUser.avatar,
+						friendRequestId: res.data.result.friendRequestId,
+						content: `${inforUser.userName} đã gửi lời mời kết bạn với bạn`,
+						link: `/profile/${inforUser.userId}`,
+						isRead: false,
+					};
+					stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
+				}
+
 				setLoading({ ...loading, [friendHandler.tempt]: false });
 				setRelationship(friendHandler.relationship);
 			};

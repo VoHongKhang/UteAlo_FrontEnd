@@ -66,7 +66,7 @@ const GetFriendApi = {
 			throw new Error(error.message);
 		}
 	},
-	getSuggestionFriend: async ( user) => {
+	getSuggestionFriend: async (user) => {
 		try {
 			const config = {
 				headers: {
@@ -143,24 +143,19 @@ const GetFriendApi = {
 			});
 	},
 	sendFriendRequest: async ({ token, userId }) => {
-		const config = {
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Bearer ${token}`,
-			},
-		};
-		await axios
-			.post(`${BASE_URL}/v1/friend/request/send/${userId}`, {}, config)
-			.then((res) => {
-				if (res.data.success) {
-					return res.data.result;
-				} else {
-					throw new Error(res.data.message);
-				}
-			})
-			.catch((err) => {
-				throw new Error(err.response.data.message);
-			});
+		try {
+			const config = {
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${token}`,
+				},
+			};
+			const res = await axios.post(`${BASE_URL}/v1/friend/request/send/${userId}`, {}, config);
+
+			return res;
+		} catch (err) {
+			throw new Error(err.response ? err.response.data.message : err.message);
+		}
 	},
 	unFriend: async ({ token, userId }) => {
 		const config = {

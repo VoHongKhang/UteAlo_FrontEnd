@@ -4,34 +4,45 @@ import { Link } from 'react-router-dom';
 import useAuth from '../../../context/auth/AuthContext';
 import { HiArrowDownOnSquareStack, HiChatBubbleOvalLeft, HiExclamationTriangle, HiUser } from 'react-icons/hi2';
 import UserAvatar from '../../action/UserAvatar';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import sampleProPic from '../../../assets/appImages/cover1.png';
 import toast from 'react-hot-toast';
 import PostGroupApi from '../../../api/postGroups/PostGroupApi';
-const UserCard = ({ user, postId }) => {
+import { useWebSocket } from '../../../context/WebSocketContext';
+const UserCard = ({ user, group, inforUser }) => {
 	const { user: currentUser } = useAuth();
-	const [loading, setLoading] = useState({});
 	const [title, setTitle] = useState('Yêu cầu vào nhóm');
+	const { stompClient } = useWebSocket();
 	const handleFriend = async (tempt) => {
 		if (tempt === 'accept') {
 			const toastId = toast.loading('Đang gửi yêu cầu...');
 			try {
 				const data = {
-					postGroupId: postId,
+					postGroupId: group?.postGroupId,
 					userId: [user.userId],
 				};
 				await PostGroupApi.acceptMemberGroup({ user: currentUser, data: data });
+				const dataNotification = {
+					groupId: group?.postGroupId,
+					userId: user.userId,
+					photo: group?.avatar,
+					content: `Bạn đã được chấp nhận vào nhóm ${group?.postGroupName}`,
+					link: `/groups/${group?.postGroupId}`,
+					isRead: false,
+					createAt: new Date().toISOString(),
+					updateAt: new Date().toISOString(),
+				};
+				stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(dataNotification));
 				toast.success('Thêm thành viên thành công!', { id: toastId });
 				setTitle('Đã chấp nhận');
 			} catch (e) {
 				toast.error(`Thêm thành viên thất bại! Lỗi: ${e}`, { id: toastId });
-
 			}
 		} else if (tempt === 'decline') {
 			const toastId = toast.loading('Đang gửi yêu cầu...');
 			try {
 				const data = {
-					postGroupId: postId,
+					postGroupId: group?.postId,
 					userId: [user.userId],
 				};
 				await PostGroupApi.declineMemberRequired({ user: currentUser, data: data });
@@ -90,15 +101,10 @@ const UserCard = ({ user, postId }) => {
 						icon={<HiChatBubbleOvalLeft />}
 						onClick={() => handleFriend({ tempt: 'chat' })}
 						disabled={false}
-						loading={loading.chat}
 					/>
 				</Tooltip>,
 				<Dropdown key="more" menu={{ items: poperHandle }} arrow disabled={false} trigger={['click']}>
-					<Button
-						icon={<HiDotsHorizontal />}
-						disabled={false}
-						loading={Object.keys(loading).some((item) => item !== 'chat' && loading[item])} // loading doesn't include chat
-					/>
+					<Button icon={<HiDotsHorizontal />} disabled={false} />
 				</Dropdown>,
 			]}
 			bodyStyle={{ padding: 12 }}

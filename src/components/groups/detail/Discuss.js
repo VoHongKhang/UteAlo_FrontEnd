@@ -105,7 +105,7 @@ export default function Discuss({
 				</div>
 			)}
 			{postGroup && (
-				<div className="rightbar--group" style={{ color: theme.foreground, background: theme.background }}>
+				<div className="rightbar--group">
 					<div className="group--infor" style={{ color: theme.foreground, background: theme.background }}>
 						<div className="group--infor-introduce">Giới thiệu</div>
 						<div className="group--infor-bio">

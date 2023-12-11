@@ -1,9 +1,12 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { publicRoutes, privateRoutes, notFoundRoute } from './routes/Routers';
 import useAuth from './context/auth/AuthContext';
 import { useWebSocket } from './context/WebSocketContext';
-export default function App() {
+import DefaultLayout from './layouts/DefaultLayout';
+import { Toaster } from 'react-hot-toast';
+import { Helmet } from 'react-helmet';
+export default function Application() {
 	const { user: currentUser } = useAuth();
 	const Page404 = notFoundRoute.component;
 	const { connectWebSocket, disconnectWebSocket, notification } = useWebSocket();
@@ -32,36 +35,39 @@ export default function App() {
 			}
 		};
 	}, [currentUser]);
-
+	const [inforUser, setInforUser] = useState();
 	return (
 		<BrowserRouter>
 			<Routes>
-				{publicRoutes.map((route, index) => {
-					const Page = route.component;
-					return <Route key={index} path={route.path} element={<Page />} />;
-				})}
-				,
-				{privateRoutes.map((route, index) => {
-					const Page = route.component;
-					return (
-						<Route
-							key={index}
-							path={route.path}
-							element={
-								currentUser ? (
-									// <DefaultLayout Topbar={topbar} SideBar={sidebar} RightBar={rightbar}>
-									// 	<Page />
-									// </DefaultLayout>
-									<Page />
-								) : (
-									<Navigate to="/login" replace />
-								)
-							}
-						/>
-					);
-				})}
-				,
-				<Route key={notFoundRoute.path} path={notFoundRoute.path} element={<Page404 />} />,
+				<>
+					{publicRoutes.map((route, index) => {
+						const Page = route.component;
+						return <Route key={index} path={route.path} element={<Page />} />;
+					})}
+					,
+					{privateRoutes.map((route, index) => {
+						return (
+							<Route
+								key={index}
+								path={route.path}
+								element={
+									currentUser ? (
+										<DefaultLayout
+											Topbar={route.topbar}
+											Page={route.component}
+											SideBar={route.sidebar}
+											RightBar={route.rightbar}
+										/>
+									) : (
+										<Navigate to="/login" replace />
+									)
+								}
+							/>
+						);
+					})}
+					,
+					<Route key={notFoundRoute.path} path={notFoundRoute.path} element={<Page404 />} />,
+				</>
 			</Routes>
 		</BrowserRouter>
 	);

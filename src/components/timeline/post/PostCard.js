@@ -22,9 +22,9 @@ import { ShareModal } from './ShareModal';
 import classnames from 'classnames';
 import { formatTime } from '../../utils/CommonFuc';
 import PostModal from '../../utils/PostModal';
+import { useWebSocket } from '../../../context/WebSocketContext';
 const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 	const navigate = useNavigate();
-
 	const [isModalVisible, setModalVisible] = useState(false);
 	const [currentPost, setCurrentPost] = useState(null);
 	const handleButtonClick = (post) => {
@@ -32,6 +32,7 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 		setModalVisible(true);
 	};
 
+	const { stompClient } = useWebSocket();
 	const handleModalClose = () => {
 		setModalVisible(false);
 	};
@@ -172,12 +173,27 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 	const likePostHandler = async () => {
 		try {
 			await LikeOrUnlikeApi.likeOrUnlike(post.postId, currentUser.accessToken, currentUser.userId);
+			console.log('post', post);
+			console.log('inforUser', inforUser);
+			setLike(isLiked ? like - 1 : like + 1);
+			if (isLiked === false && inforUser.userId !== post.userId) {
+				const data = {
+					postId: post.postId,
+					userId: post.userId,
+					photo: inforUser.avatar,
+					content: inforUser.userName + ' đã thích bài viết của bạn',
+					link: `/post/${post.postId}`,
+					isRead: false,
+					createAt: new Date().toISOString(),
+					updateAt: new Date().toISOString(),
+				};
+
+				stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
+			}
+			setIsLiked(!isLiked);
 		} catch (err) {
 			console.log(err);
 		}
-
-		setLike(isLiked ? like - 1 : like + 1);
-		setIsLiked(!isLiked);
 	};
 
 	// Xử lý xem thêm bình luận
@@ -220,6 +236,21 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 					// Thêm mới comment vào object comments
 					setCommentPost({ ...comments, [newComment.commentId]: newComment });
 					setCommentLength(commentlength + 1);
+					if (inforUser.userId !== post.userId) {
+						const data = {
+							postId: post.postId,
+							userId: post.userId,
+							photo: inforUser.avatar,
+							content: inforUser.userName + ' đã bình luận bài viết của bạn',
+							link: `/post/${post.postId}`,
+							isRead: false,
+							createAt: new Date().toISOString(),
+							updateAt: new Date().toISOString(),
+						};
+
+						stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
+					}
+
 					toast.success('Đăng bình luận thành công!', { id: toastId });
 				} else {
 					// Xử lý trường hợp API trả về lỗi
@@ -721,6 +752,7 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 					{showAllComments
 						? Object.values(comments).map((comment) => (
 								<CommentCard
+									inforUser={inforUser}
 									comment={comment}
 									fetchCommentPost={fetchCommentPost}
 									post={post}
@@ -734,6 +766,7 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 								.slice(0, 1)
 								.map((comment) => (
 									<CommentCard
+										inforUser={inforUser}
 										comment={comment}
 										fetchCommentPost={fetchCommentPost}
 										post={post}

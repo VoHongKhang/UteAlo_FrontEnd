@@ -198,20 +198,6 @@ const SharePostCard = ({ inforUser, share, newSharePosts }) => {
 		//eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [currentUser.userId, currentUser.accessToken]);
 
-<<<<<<< HEAD
-	// yêu thích và bỏ yêu thích bài share post
-	const likePostHandler = async () => {
-		try {
-			await LikeOrUnlikeApi.likeOrUnlike(share.shareId, currentUser.accessToken, currentUser.userId);
-			
-		} catch (err) {
-			console.log(err);
-		}
-
-		setLike(isLiked ? like - 1 : like + 1);
-		setIsLiked(!isLiked);
-		fetchLikeSharePost();
-=======
 	const { stompClient } = useWebSocket();
 	// yêu thích và bỏ yêu thích bài post
 	const likePostHandler = async () => {
@@ -235,10 +221,10 @@ const SharePostCard = ({ inforUser, share, newSharePosts }) => {
 			}
 			setLike(isLiked ? like - 1 : like + 1);
 			setIsLiked(!isLiked);
+			fetchLikeSharePost();
 		} catch (err) {
 			console.log(err);
 		}
->>>>>>> 970fba896413605bc5264ab53e2f545d42754a3d
 	};
 
 	const toggleShowAllComments = () => {

@@ -197,16 +197,7 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 	const likePostHandler = async () => {
 		try {
 			await LikeOrUnlikeApi.likeOrUnlike(post.postId, currentUser.accessToken, currentUser.userId);
-<<<<<<< HEAD
-			
-		} catch (err) {
-			console.log(err);
-		}
 
-		setLike(isLiked ? like - 1 : like + 1);
-		setIsLiked(!isLiked);
-		fetchLikePost();
-=======
 			console.log('post', post);
 			console.log('inforUser', inforUser);
 			setLike(isLiked ? like - 1 : like + 1);
@@ -224,11 +215,12 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 
 				stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
 			}
+			setLike(isLiked ? like - 1 : like + 1);
 			setIsLiked(!isLiked);
+			fetchLikePost();
 		} catch (err) {
 			console.log(err);
 		}
->>>>>>> 970fba896413605bc5264ab53e2f545d42754a3d
 	};
 
 	// Xử lý xem thêm bình luận

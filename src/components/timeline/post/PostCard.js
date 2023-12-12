@@ -16,7 +16,7 @@ import useAuth from '../../../context/auth/AuthContext';
 import LikeOrUnlikeApi from '../../../api/timeline/commentPost/likeOrUnlike';
 import GetCommentPostApi from '../../../api/timeline/commentPost/getCommentPost';
 import CommentCard from './CommentCard';
-import { Image, Skeleton, theme, Typography } from 'antd';
+import { Image, Skeleton, theme, Typography, Modal } from 'antd';
 import PostApi from '../../../api/timeline/post/PostApi';
 import { ShareModal } from './ShareModal';
 import classnames from 'classnames';
@@ -125,6 +125,19 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 	// Màu nền cho xem chi tiết ảnh
 	const { token } = theme.useToken();
 
+	// Danh sách người dùng thích bài post
+	const [listUserLikePost, setListUserLikePost] = useState([]);
+
+	const [showModalLikePost, setShowModalLikePost] = useState(false);
+
+	const handleLikeCounterClick = () => {
+		setShowModalLikePost(true);
+	};
+
+	const handleCloseModal = () => {
+		setShowModalLikePost(false);
+	};
+
 	// Hàm kiểm tra xem người dùng đã like bài post chưa
 	useEffect(() => {
 		const fetchData = async () => {
@@ -153,8 +166,19 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 		}
 	};
 
+	// Lấy danh sách người dùng thích bài post
+	const fetchLikePost = async () => {
+		try {
+			const res = await axios.get(`${BASE_URL}/v1/post/like/listUser/${post.postId}`);
+			setListUserLikePost(res.data.result);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
 	// lấy danh sách bình luận trên bài post
 	useEffect(() => {
+		fetchLikePost();
 		fetchCommentPost();
 		//eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [currentUser.userId, currentUser.accessToken]);
@@ -163,6 +187,7 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 	const likePostHandler = async () => {
 		try {
 			await LikeOrUnlikeApi.likeOrUnlike(post.postId, currentUser.accessToken, currentUser.userId);
+
 			console.log('post', post);
 			console.log('inforUser', inforUser);
 
@@ -180,11 +205,14 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 
 				stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
 			}
+			setLike(isLiked ? like - 1 : like + 1);
+			setIsLiked(!isLiked);
+			fetchLikePost();
+
 		} catch (err) {
 			console.log(err);
 		}
-		setLike(isLiked ? like - 1 : like + 1);
-		setIsLiked(!isLiked);
+		
 	};
 
 	// Xử lý xem thêm bình luận
@@ -686,9 +714,28 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 									color: theme.foreground,
 									background: theme.background,
 								}}
+								onClick={handleLikeCounterClick}
 							>
 								{like} người đã thích
 							</span>
+							<Modal
+								title="Danh sách người đã thích"
+								open={showModalLikePost}
+								onCancel={handleCloseModal}
+								footer={null}
+							>
+								<ul>
+									{listUserLikePost.length > 0 ? (
+										<ul>
+											{listUserLikePost.map((user) => (
+												<li key={user.userId}>{user.userName}</li>
+											))}
+										</ul>
+									) : (
+										<p>Chưa có ai thích</p>
+									)}
+								</ul>
+							</Modal>
 						</div>
 						<div className="postBottomRight">
 							<span

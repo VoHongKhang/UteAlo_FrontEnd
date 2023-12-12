@@ -120,6 +120,19 @@ const SharePostCard = ({ inforUser, share, newSharePosts }) => {
 	const [photosCommetUrl, setPhotosCommetUrl] = useState('');
 	const [content, setContent] = useState('');
 
+	// Danh sách người dùng thích bài share post
+	const [listUserLikePost, setListUserLikePost] = useState([]);
+
+	const [showModalLikePost, setShowModalLikePost] = useState(false);
+
+	const handleLikeCounterClick = () => {
+		setShowModalLikePost(true);
+	};
+
+	const handleCloseModal = () => {
+		setShowModalLikePost(false);
+	};
+
 	// Chức năng xem chi tiết chia sẻ bài viết
 	const [showSharePostDetailModal, setShowSharePostDetailModal] = useState(false);
 	const [selectedSharePost, setSelectedSharePost] = useState(null);
@@ -168,8 +181,19 @@ const SharePostCard = ({ inforUser, share, newSharePosts }) => {
 		}
 	};
 
-	// lấy danh sách bình luận trên bài post
+	// Lấy danh sách người dùng thích bài post
+	const fetchLikeSharePost = async () => {
+		try {
+			const res = await axios.get(`${BASE_URL}/v1/share/like/listUser/${share.shareId}`);
+			setListUserLikePost(res.data.result);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	// lấy danh sách bình luận trên bài share post
 	useEffect(() => {
+		fetchLikeSharePost();
 		fetchCommentSharePost();
 		//eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [currentUser.userId, currentUser.accessToken]);
@@ -195,11 +219,14 @@ const SharePostCard = ({ inforUser, share, newSharePosts }) => {
 
 				stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
 			}
+			setLike(isLiked ? like - 1 : like + 1);
+			setIsLiked(!isLiked);
+			fetchLikeSharePost();
+
 		} catch (err) {
 			console.log(err);
 		}
-		setLike(isLiked ? like - 1 : like + 1);
-		setIsLiked(!isLiked);
+
 	};
 
 	const toggleShowAllComments = () => {
@@ -621,7 +648,27 @@ const SharePostCard = ({ inforUser, share, newSharePosts }) => {
 							src={isLiked ? heart : heartEmpty}
 							alt="heart"
 						/>
-						<span className="postLikeCounter">{like} người đã thích</span>
+						<span className="postLikeCounter" onClick={handleLikeCounterClick}>
+							{like} người đã thích
+						</span>
+						<Modal
+							title="Danh sách người đã thích"
+							open={showModalLikePost}
+							onCancel={handleCloseModal}
+							footer={null}
+						>
+							<ul>
+								{listUserLikePost.length > 0 ? (
+									<ul>
+										{listUserLikePost.map((user) => (
+											<li key={user.userId}>{user.userName}</li>
+										))}
+									</ul>
+								) : (
+									<p>Chưa có ai thích</p>
+								)}
+							</ul>
+						</Modal>
 					</div>
 					<div className="postBottomRight">
 						<span className="postCommentText" onClick={toggleShowAllComments}>

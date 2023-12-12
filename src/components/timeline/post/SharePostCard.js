@@ -222,9 +222,11 @@ const SharePostCard = ({ inforUser, share, newSharePosts }) => {
 			setLike(isLiked ? like - 1 : like + 1);
 			setIsLiked(!isLiked);
 			fetchLikeSharePost();
+
 		} catch (err) {
 			console.log(err);
 		}
+
 	};
 
 	const toggleShowAllComments = () => {

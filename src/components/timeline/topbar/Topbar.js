@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Topbar.css';
 import axios from 'axios';
-import { NightsStay, Search, WbSunny, Home, Group, GroupAdd, Notifications } from '@material-ui/icons';
+import { NightsStay, Search, WbSunny, Home, Group, GroupAdd, Notifications, MoreHoriz } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 import useAuth from '../../../context/auth/AuthContext';
 import useTheme, { themes } from '../../../context/ThemeContext';
@@ -11,12 +11,13 @@ import { BASE_URL } from '../../../context/apiCall';
 import { useNavigate } from 'react-router-dom';
 import adver4 from '../../../assets/appImages/adver4.jpg';
 import { HiChatBubbleOvalLeft } from 'react-icons/hi2';
-import { Badge, Typography } from 'antd';
+import { Badge, Button, List, Typography } from 'antd';
 import { useWebSocket } from '../../../context/WebSocketContext';
 import NotificationApi from '../../../api/notification/NotificationApi';
 import { Popover } from '@material-ui/core';
 import toast, { Toaster } from 'react-hot-toast';
 import classnames from 'classnames';
+import moment from 'moment';
 const Topbar = ({ dataUser }) => {
 	const [user, setUser] = useState();
 	const { user: currentUser } = useAuth();
@@ -31,6 +32,8 @@ const Topbar = ({ dataUser }) => {
 	const [listNotification, setListNotification] = useState([]);
 	const [page, setPage] = useState(0);
 	const { notification } = useWebSocket();
+	const [loading, setLoading] = useState(false);
+	const [hasMore, setHasMore] = useState(true);
 	useEffect(() => {
 		console.log('notification', notification);
 		if (notification) {
@@ -40,20 +43,26 @@ const Topbar = ({ dataUser }) => {
 	}, [notification]);
 
 	useEffect(() => {
-		console.log('listNotification', listNotification);
-	}, [currentUser]);
-	useEffect(() => {
 		const fetchNotifications = async () => {
+			setLoading(true);
 			const res = await NotificationApi.getNotifications({ user: currentUser, page: page, size: 10 });
+			console.log('res', res);
 			if (res.success) {
 				console.log(res.data);
-				setListNotification(res.result);
+				// thêm vào cuối mảng
+				setListNotification([...listNotification, ...res.result]);
+				if (res.result.length < 10) {
+					setHasMore(false);
+				} else {
+					setHasMore(true);
+				}
 			} else {
 				throw new Error(res.message);
 			}
+			setLoading(false);
 		};
 		fetchNotifications();
-	}, [currentUser]);
+	}, [currentUser, page]);
 
 	// Toggle theme switch
 	const themeModeHandler = () => {
@@ -332,7 +341,7 @@ const Topbar = ({ dataUser }) => {
 
 				<div className="topbarRight">
 					<div className="button-right">
-						<Badge count={5}>
+						<Badge count={0}>
 							<HiChatBubbleOvalLeft
 								className="button-right-message"
 								titleAccess="Tin nhắn"
@@ -368,33 +377,68 @@ const Topbar = ({ dataUser }) => {
 								<div className="notification--header">
 									<Typography.Text strong>Thông báo</Typography.Text>
 
-									<Link to="/notification">Xem tất cả</Link>
+									<MoreHoriz className="notification--header-icon" />
 								</div>
 								<div className="notification--body">
 									{listNotification.length > 0 ? (
-										listNotification.map((item, index) => (
-											<div
-												className={classnames(item.isRead ? 'read' : 'unread', classParent)}
-												key={index}
-												onClick={() => handleReadNotification(item)}
-											>
-												<div className="notification--item-avatar">
-													<img src={item.photo || adver4} alt="avatarGroup"></img>
+										<List
+											itemLayout="horizontal"
+											dataSource={listNotification}
+											loadMore={
+												<div
+													style={{
+														textAlign: 'center',
+														marginTop: 12,
+														height: 32,
+														lineHeight: '32px',
+														marginBottom: 12,
+													}}
+												>
+													<Button
+														disabled={!hasMore}
+														type="primary"
+														onClick={() => setPage((pre) => pre + 1)}
+														loading={loading}
+													>
+														Xem thêm
+													</Button>
 												</div>
-												<div className="notification--item-content">
-													<Typography.Text>
-														<span className="notification--item-content-content">
-															{item.content}
-														</span>
-													</Typography.Text>
-												</div>
-											</div>
-										))
+											}
+											renderItem={(item) => (
+												<List.Item
+													className={classnames(item.isRead ? 'read' : 'unread', classParent)}
+													onClick={() => handleReadNotification(item)}
+												>
+													<List.Item.Meta
+														avatar={
+															<img
+																src={item.photo || adver4}
+																alt="avatarGroup"
+																className="notification--item-avatar"
+															></img>
+														}
+														description={
+															<div style={{ display: 'flex', flexDirection: 'column' }}>
+																<span className="notification--item-content">
+																	{item.content}
+																</span>
+																<span className="notification--item-time">
+																	Thời gian:{' '}
+																	{moment(item.createdAt).format('DD/MM/YYYY')}
+																</span>
+															</div>
+														}
+													/>
+												</List.Item>
+											)}
+										/>
 									) : (
 										<div className="notification--item">
-											<div className="notification--item-avatar">
-												<img src={adver4} alt="avatarGroup"></img>
-											</div>
+											<img
+												src={adver4}
+												alt="avatarGroup"
+												className="notification--item-avatar"
+											></img>
 											<div className="notification--item-content">
 												<Typography.Text>
 													<span className="notification--item-content-content">

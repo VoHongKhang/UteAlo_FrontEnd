@@ -16,6 +16,7 @@ import { Modal } from 'antd';
 import MessageApi from '../../api/messages/MessageApi';
 import useTheme from '../../context/ThemeContext';
 import moment from 'moment';
+import PostGroupApi from '../../api/postGroups/PostGroupApi';
 
 var stompClient = null;
 const ChatRoom = ({ user, data, Toggeinfo, currentUser }) => {
@@ -27,10 +28,19 @@ const ChatRoom = ({ user, data, Toggeinfo, currentUser }) => {
 	const [page, setPage] = useState(0);
 	const checkGroup = data?.postGroupId ? true : false;
 	const [hasMore, setHasMore] = useState(false);
+	const [memberGroup, setMemberGroup] = useState();
 	const handleClickInfo = () => {
 		setInfo(!info);
 		Toggeinfo(info);
 	};
+	useEffect(() => {
+		const fetchGroup = async () => {
+			const res = await PostGroupApi.listMemberGroup({ user: currentUser, postId: data?.postGroupId });
+			setMemberGroup(res.result);
+		};
+		fetchGroup();
+	}, [currentUser, data]);
+
 	const loadMore = async (isGroup) => {
 		try {
 			// Tăng trang để tải dữ liệu mới
@@ -290,10 +300,37 @@ const ChatRoom = ({ user, data, Toggeinfo, currentUser }) => {
 				msgPlaceholder.updatedAt = utcDate.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 				messages.get(data?.userId).unshift(msgPlaceholder);
 				setMessages(new Map(messages.entries()));
-				console.log('sent');
+				if (user.userId !== data?.userId) {
+					const dataMessage = {
+						content: `${user?.userName} đã gửi tin nhắn cho bạn`,
+						userId: data?.userId,
+						photo: user?.avatar,
+						link: `/message/${user?.userId}`,
+						isRead: false,
+						createdAt: new Date().toISOString(),
+						updatedAt: new Date().toISOString(),
+					};
+					stompClient.send('/app/userNotify/' + user?.userId, {}, JSON.stringify(dataMessage));
+				}
 			}
 			if (data?.postGroupId) {
-				console.log('sent group');
+				// lặp qua memberGroup để gửi thông báo
+				memberGroup.map((member) => {
+					if (member.userId !== user?.userId) {
+						const dataMessage = {
+							content: `${user?.userName} đã gửi tin nhắn trong nhóm ${data?.postGroupName}`,
+							userId: member.userId,
+							groupId: data?.postGroupId,
+							photo: user?.avatar,
+							link: `/message/${data?.postGroupId}`,
+							isRead: false,
+							createdAt: new Date().toISOString(),
+							updatedAt: new Date().toISOString(),
+						};
+						stompClient.send('/app/userNotify/' + member.userId, {}, JSON.stringify(dataMessage));
+					}
+				});
+
 				stompClient.send('/app/sendMessage/' + data?.postGroupId, {}, JSON.stringify(msgPlaceholder));
 			}
 		} catch (error) {

@@ -165,7 +165,7 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 			await LikeOrUnlikeApi.likeOrUnlike(post.postId, currentUser.accessToken, currentUser.userId);
 			console.log('post', post);
 			console.log('inforUser', inforUser);
-			setLike(isLiked ? like - 1 : like + 1);
+
 			if (isLiked === false && inforUser.userId !== post.userId) {
 				const data = {
 					postId: post.postId,
@@ -180,10 +180,11 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 
 				stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
 			}
-			setIsLiked(!isLiked);
 		} catch (err) {
 			console.log(err);
 		}
+		setLike(isLiked ? like - 1 : like + 1);
+		setIsLiked(!isLiked);
 	};
 
 	// Xử lý xem thêm bình luận
@@ -414,7 +415,6 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 
 								<div className="post--header--left--item">
 									<UserAvatar user={post} />
-									
 
 									<div className="postNameAndDate">
 										<span

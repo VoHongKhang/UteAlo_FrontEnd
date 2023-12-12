@@ -195,11 +195,11 @@ const SharePostCard = ({ inforUser, share, newSharePosts }) => {
 
 				stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
 			}
-			setLike(isLiked ? like - 1 : like + 1);
-			setIsLiked(!isLiked);
 		} catch (err) {
 			console.log(err);
 		}
+		setLike(isLiked ? like - 1 : like + 1);
+		setIsLiked(!isLiked);
 	};
 
 	const toggleShowAllComments = () => {

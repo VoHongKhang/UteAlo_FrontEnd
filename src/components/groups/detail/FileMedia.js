@@ -18,26 +18,13 @@ export default function FileMedia({ groupId }) {
 			setLoading(true);
 			const res = await postDetail.getFileMediaById(groupId, page, 10);
 			setLoading(false);
-			setHasMore(res.data.totalElements <= res.data.totalPages ? false : true);
+			setHasMore(page <= res.data.totalPages ? false : true);
+
 			console.log('res', res);
-			setData(res.data.content);
+			setData([...data, ...res.data.content]);
 		};
 		fetch();
 	}, [groupId, page]);
-	// const data = [
-	// 	{
-	// 		title: 'File 1',
-	// 		imageUrl: 'https://picsum.photos/200/300',
-	// 	},
-	// 	{
-	// 		title: 'File 2',
-	// 		imageUrl: 'https://picsum.photos/200/300',
-	// 	},
-	// 	{
-	// 		title: 'File 3',
-	// 		imageUrl: 'https://picsum.photos/200/300',
-	// 	},
-	// ];
 	const { theme } = useTheme();
 	return (
 		//List file media

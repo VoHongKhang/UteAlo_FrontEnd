@@ -144,7 +144,7 @@ function MessageItem({ isOwner, message, stompClient, currentUser, onRetry }) {
 					style={{ color: theme.foreground, background: theme.background }}
 					className={classnames(classes)}
 				>
-					{message.isDeleted ? (
+					{message?.isDeleted ? (
 						<Typography.Text className="text removeMessage">Tin nhắn đã bị thu hồi</Typography.Text>
 					) : (
 						<>

@@ -20,7 +20,7 @@ const LikeOrUnlikeApi = {
                 }
             })
             .catch((err) => {
-                throw new Error(err.response.data.message);
+                throw new Error(err.response ? err.response.data.message : err.message);
             });
     }
 

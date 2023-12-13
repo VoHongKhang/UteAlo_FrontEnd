@@ -11,7 +11,7 @@ import { BASE_URL } from '../../../context/apiCall';
 import { useNavigate } from 'react-router-dom';
 import adver4 from '../../../assets/appImages/adver4.jpg';
 import { HiChatBubbleOvalLeft } from 'react-icons/hi2';
-import { Badge, Button, List, Typography } from 'antd';
+import { Badge, Button, Dropdown, List, Typography } from 'antd';
 import { useWebSocket } from '../../../context/WebSocketContext';
 import NotificationApi from '../../../api/notification/NotificationApi';
 import { Popover } from '@material-ui/core';
@@ -225,6 +225,18 @@ const Topbar = ({ dataUser }) => {
 		});
 		setListNotification(newListNotification);
 	};
+	const unReadAllNotification = async () => {
+		const res = await NotificationApi.unReadAllNotification({ user: currentUser });
+		if (res.success) {
+			//chỉnh tất cả thông báo là đã đọc
+			const newListNotification = listNotification.map((notification) => {
+				return { ...notification, isRead: true };
+			});
+			setListNotification(newListNotification);
+		} else {
+			toast.error('Đã có lỗi xảy ra!!!');
+		}
+	};
 
 	const classParent = ['notification--item'];
 	return (
@@ -335,7 +347,7 @@ const Topbar = ({ dataUser }) => {
 						) : (
 							<WbSunny className="button-center-theme" titleAccess="Chế độ sáng" />
 						)}
-						<span className="button-center-title">Theme</span>
+						<span className="button-center-title">Chủ đề</span>
 					</div>
 				</div>
 
@@ -377,7 +389,12 @@ const Topbar = ({ dataUser }) => {
 								<div className="notification--header">
 									<Typography.Text strong>Thông báo</Typography.Text>
 
-									<MoreHoriz className="notification--header-icon" />
+									<Typography.Text
+										style={{ color: '#1e90ff', cursor: 'pointer' }}
+										onClick={unReadAllNotification}
+									>
+										Đánh dấu tất cả đã đọc
+									</Typography.Text>
 								</div>
 								<div className="notification--body">
 									{listNotification.length > 0 ? (

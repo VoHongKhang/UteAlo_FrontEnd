@@ -257,10 +257,10 @@ const CommentCard = ({
 
 					const dataComment = {
 						commentId: comment.commentId,
-						userId: inforUser.userId,
+						userId: comment.userId,
 						photo: inforUser.avatar,
 						content: inforUser.userName + ' đã phản hồi bình luận của bạn',
-						link: `/post/${comment.postId}`,
+						link: `/share/${post.shareId}`,
 						isRead: false,
 						createAt: new Date().toISOString(),
 						updateAt: new Date().toISOString(),

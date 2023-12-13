@@ -292,3 +292,6 @@
 	font-size: 12px;
 	color: #65676b;
 }
+.notification--header-icon {
+	cursor: pointer;
+}

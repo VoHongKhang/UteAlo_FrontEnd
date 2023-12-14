@@ -205,12 +205,14 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 
 				stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
 			}
-			setLike(isLiked ? like - 1 : like + 1);
-			setIsLiked(!isLiked);
-			fetchLikePost();
+
 		} catch (err) {
 			console.log(err);
 		}
+		setLike(isLiked ? like - 1 : like + 1);
+		setIsLiked(!isLiked);
+		fetchLikePost();
+
 	};
 
 	// Xử lý xem thêm bình luận

@@ -230,10 +230,15 @@ const SidebarGroup = ({ user }) => {
 									<span className="span-2">Chỉnh sửa</span>
 								</div>
 								<div className="search-dropdown-history">
-									<ul>
+									<ul style={{ width: '100%' }}>
 										{/* Lịch sử tìm kiếm */}
 										{searchHistory.map((item, index) => (
-											<li key={index} onClick={() => setSearchKey(item)}>
+											<li
+												key={index}
+												onClick={() => {
+													setSearchKey(item);
+												}}
+											>
 												<ClockCircleOutlined className="icon--clock" />
 												<span>{item}</span>
 												<CloseOutlined
@@ -242,32 +247,21 @@ const SidebarGroup = ({ user }) => {
 												/>
 											</li>
 										))}
-										{/* Tiên đoán */}
-										{/* {suggestedValues.map((item, index) => (
-											<li key={index} onClick={() => setSearchKey(item)}>
-												{item}
-											</li>
-										))} */}
-										{/* Kết quả tìm kiếm */}
+
 										{Object.values(searchFriends).map((item, index) => (
-											<li key={index} onClick={() => setSearchKey(item.postGroupName)}>
+											<li
+												key={index}
+												onClick={() => {
+													setSearchKey(item.postGroupName);
+													navigate(`/groups/${item.postGroupId}`);
+												}}
+											>
 												<img
 													className="search--avatarGroup"
 													src={item.avatarGroup ? item.avatarGroup : adver4}
 													alt="avatarGroup"
 												></img>
-												<span
-													style={{
-														color: theme.foreground,
-														background: theme.background,
-													}}
-													className="item--postGroupName"
-													onClick={() => {
-														navigate(`/groups/${item.postGroupId}`);
-													}}
-												>
-													{item.postGroupName}
-												</span>
+												<span className="item--postGroupName">{item.postGroupName}</span>
 											</li>
 										))}
 									</ul>

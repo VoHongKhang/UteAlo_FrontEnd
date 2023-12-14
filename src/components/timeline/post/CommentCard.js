@@ -184,7 +184,6 @@ const CommentCard = ({ inforUser, comment, fetchCommentPost, post, onDelete, onC
 					// Thêm mới comment vào object comments
 					setCommentReplies({ ...commentReplies, [newComment.commentId]: newComment });
 					onCreate(commentLength + 1);
-					
 
 					const dataComment = {
 						commentId: comment.commentId,
@@ -513,7 +512,7 @@ const CommentCard = ({ inforUser, comment, fetchCommentPost, post, onDelete, onC
 
 							{isReplyCommentVisible && (
 								<div className="postCommentContReply">
-									<div className="postCommentCont-1" style={{width:'300px'}}>
+									<div className="postCommentCont-1" style={{ width: '300px' }}>
 										<InputEmoji
 											value={content}
 											onChange={setContent}
@@ -610,7 +609,9 @@ const CommentCard = ({ inforUser, comment, fetchCommentPost, post, onDelete, onC
 						</div>
 					</div>
 					<div className="postLikeCommentCounter">
-						<span onClick={handleLikeCounterClick} className="countCommentPostLike">{likeComment}</span>
+						<span onClick={handleLikeCounterClick} className="countCommentPostLike">
+							{likeComment}
+						</span>
 						<Modal
 							title="Danh sách người đã thích"
 							open={showModalLikeComment}
@@ -621,7 +622,22 @@ const CommentCard = ({ inforUser, comment, fetchCommentPost, post, onDelete, onC
 								{listUserLikeComment.length > 0 ? (
 									<ul>
 										{listUserLikeComment.map((user) => (
-											<li key={user.userId}>{user.userName}</li>
+											<li key={user.userId} style={{ display: 'flex', marginTop: '10px' }}>
+												<img
+													src={user.avatar ? user.avatar : sampleProPic}
+													alt="Avatar"
+													style={{ width: '40px', height: '40px', borderRadius: '50%' }}
+												/>
+												<span
+													style={{
+														display: 'flex',
+														alignItems: 'center',
+														marginLeft: '20px',
+													}}
+												>
+													{user.userName}
+												</span>
+											</li>
 										))}
 									</ul>
 								) : (

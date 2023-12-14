@@ -208,11 +208,9 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 			setLike(isLiked ? like - 1 : like + 1);
 			setIsLiked(!isLiked);
 			fetchLikePost();
-
 		} catch (err) {
 			console.log(err);
 		}
-		
 	};
 
 	// Xử lý xem thêm bình luận
@@ -728,7 +726,14 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 									{listUserLikePost.length > 0 ? (
 										<ul>
 											{listUserLikePost.map((user) => (
-												<li key={user.userId}>{user.userName}</li>
+												<li key={user.userId} style={{display:'flex', marginTop: '10px'}}>
+													<img
+														src={user.avatar ? user.avatar : sampleProPic}
+														alt="Avatar"
+														style={{ width: '40px', height: '40px', borderRadius: '50%' }}
+													/>
+													<span style={{display:'flex', alignItems: 'center', marginLeft: '20px'}}>{user.userName}</span>
+												</li>
 											))}
 										</ul>
 									) : (

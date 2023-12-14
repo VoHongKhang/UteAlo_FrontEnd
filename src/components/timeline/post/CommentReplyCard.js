@@ -484,7 +484,7 @@ const CommentCard = ({
 
 							{isReplyCommentVisible && (
 								<div className="postCommentContReply">
-									<div className="postCommentCont-1" style={{width:'300px'}}>
+									<div className="postCommentCont-1" style={{ width: '300px' }}>
 										<InputEmoji
 											value={content}
 											onChange={setContent}
@@ -594,7 +594,22 @@ const CommentCard = ({
 								{listUserLikeComment.length > 0 ? (
 									<ul>
 										{listUserLikeComment.map((user) => (
-											<li key={user.userId}>{user.userName}</li>
+											<li key={user.userId} style={{ display: 'flex', marginTop: '10px' }}>
+												<img
+													src={user.avatar ? user.avatar : sampleProPic}
+													alt="Avatar"
+													style={{ width: '40px', height: '40px', borderRadius: '50%' }}
+												/>
+												<span
+													style={{
+														display: 'flex',
+														alignItems: 'center',
+														marginLeft: '20px',
+													}}
+												>
+													{user.userName}
+												</span>
+											</li>
 										))}
 									</ul>
 								) : (

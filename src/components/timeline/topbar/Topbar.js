@@ -111,6 +111,7 @@ const Topbar = ({ dataUser }) => {
 		// Lắng nghe sự kiện click trên toàn bộ trang
 		const handleClickOutside = (e) => {
 			if (inputRef.current && !inputRef.current.contains(e.target)) {
+				document.querySelector('.hide--on-click').classList.remove('hide');
 				setShowDropdown(false);
 			}
 		};
@@ -146,11 +147,13 @@ const Topbar = ({ dataUser }) => {
 		}
 	}, []);
 
-	const handleRemoveSearchItem = (itemToRemove) => {
+	const handleRemoveSearchItem = (e, itemToRemove) => {
+		// ngăn chặn sự kiện click lan ra ngoài
+		e.stopPropagation();
 		// Xóa mục khỏi searchHistory trong trạng thái của component
 		const updatedSearchHistory = searchHistory.filter((item) => item !== itemToRemove);
 		setSearchHistory(updatedSearchHistory);
-
+		setSearchKey('');
 		// Cập nhật Local Storage với mảng mới sau khi xóa
 		localStorage.setItem('searchHistory', JSON.stringify(updatedSearchHistory));
 	};
@@ -172,6 +175,7 @@ const Topbar = ({ dataUser }) => {
 		localStorage.setItem('searchHistory', JSON.stringify(updatedSearchHistory));
 
 		// Đóng dropdown
+		document.querySelector('.hide--on-click').classList.remove('hide');
 		setShowDropdown(false);
 		navigate('/groups/searchResult', { state: { searchData: searchFriends } });
 	};
@@ -237,6 +241,25 @@ const Topbar = ({ dataUser }) => {
 			toast.error('Đã có lỗi xảy ra!!!');
 		}
 	};
+	const clickSearchHistory = async (e) => {
+		const item = e.target.innerText;
+		setSearchKey(item);
+		try {
+			const config = {
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${currentUser.accessToken}`,
+				},
+			};
+			const res = await axios.get(`${BASE_URL}/v1/user/search/key?search=${item}`, config);
+
+			navigate('/groups/searchResult', {
+				state: { searchData: res.data.result },
+			});
+		} catch (error) {
+			console.log(error);
+		}
+	};
 
 	const classParent = ['notification--item'];
 	return (
@@ -254,80 +277,72 @@ const Topbar = ({ dataUser }) => {
 						<span className="topbarLogo">UTEALO</span>
 					</Link>
 					<div className="topbarLeft__search">
-						<div className="group--infor-introduce">
-							<Search className="icon__search" />
-							{showDropdown && (
-								<div className="search-dropdown">
-									<div className="search-dropdown-title">
-										<span className="span-1">Gần đây</span>
-										<span className="span-2">Chỉnh sửa</span>
-									</div>
-									<div className="search-dropdown-history">
-										<ul>
-											{/* Lịch sử tìm kiếm */}
-											{searchHistory.map((item, index) => (
-												<li key={index} onClick={() => setSearchKey(item)}>
-													<ClockCircleOutlined className="icon--clock" />
-													<span>{item}</span>
-													<CloseOutlined
-														className="icon--remove"
-														onClick={() => handleRemoveSearchItem(item)}
-													/>
-												</li>
-											))}
-											{/* Tiên đoán */}
-											{/* {suggestedValues.map((item, index) => (
-											<li key={index} onClick={() => setSearchKey(item)}>
-												{item}
-											</li>
-										))} */}
-											{/* Kết quả tìm kiếm */}
-											{Object.values(searchFriends).map((item, index) => (
-												<li
-													key={index}
-													onClick={() =>
-														setSearchKey(
-															item.postGroupName ? item.postGroupName : item.userName
-														)
-													}
-												>
-													<img
-														className="search--avatarGroup"
-														src={item.avatarGroup || item.avatar || adver4}
-														alt="avatarGroup"
-													></img>
-													<span
-														className="item--postGroupName"
-														onClick={() => {
-															navigate(
-																item.postGroupName
-																	? `/groups/${item.postGroupId}`
-																	: `/profile/${item.userId}`
-															);
-														}}
-													>
-														{item.postGroupName ? item.postGroupName : item.userName}
-													</span>
-												</li>
-											))}
-										</ul>
-									</div>
-								</div>
-							)}
-						</div>
-						<form onSubmit={handleSearchSubmit}>
-							<div ref={inputRef}>
-								<input
-									type="text"
-									placeholder="Tìm kiếm trên UteAlo"
-									className="input__search__utealo"
-									style={{ fontSize: '14px' }}
-									value={searchKey}
-									onChange={handleSearchInputChange}
-									onClick={handleInputClick}
-								/>
+						<div className="topbarLeft--search">
+							<div className="group--infor-introduce">
+								<Search className="icon__search" />
 							</div>
-						</form>
+							<form onSubmit={handleSearchSubmit} style={{ flex: 1 }}>
+								<div ref={inputRef}>
+									<input
+										type="text"
+										placeholder="Tìm kiếm trên UteAlo"
+										className="input__search__utealo"
+										style={{ fontSize: '14px' }}
+										value={searchKey}
+										onChange={handleSearchInputChange}
+										onClick={handleInputClick}
+									/>
+								</div>
+							</form>
+						</div>
+						{showDropdown && (
+							<div className="search-dropdown">
+								<div className="search-dropdown-title" style={{ color: '#000' }}>
+									<span className="span-1">Gần đây</span>
+								</div>
+								<div className="search-dropdown-history">
+									<ul className="search-dropdown-history-ul" style={{ color: '#000' }}>
+										{/* Lịch sử tìm kiếm */}
+
+										{[...new Set(searchHistory)].map((item, index) => (
+											<li key={index} onClick={clickSearchHistory}>
+												{item}
+												<CloseOutlined
+													className="search-dropdown-history-close"
+													onClick={(e) => handleRemoveSearchItem(e, item)}
+												/>
+											</li>
+										))}
+
+										{/* Kết quả tìm kiếm */}
+										{Object.values(searchFriends).map((item, index) => (
+											<li
+												key={index}
+												onClick={() => {
+													setSearchKey(
+														item.postGroupName ? item.postGroupName : item.userName
+													);
+													navigate(
+														item.postGroupName
+															? `/groups/${item.postGroupId}`
+															: `/profile/${item.userId}`
+													);
+												}}
+											>
+												<img
+													className="search--avatarGroup"
+													src={item.avatarGroup || item.avatar || adver4}
+													alt="avatarGroup"
+												></img>
+												<span className="item--postGroupName">
+													{item.postGroupName ? item.postGroupName : item.userName}
+												</span>
+											</li>
+										))}
+									</ul>
+								</div>
+							</div>
+						)}
 					</div>
 				</div>
 				<div className="topbarCenter">

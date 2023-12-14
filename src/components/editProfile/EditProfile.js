@@ -3,8 +3,6 @@ import './EditProfile.css';
 import '../profile/Profile.css';
 import noCover from '../../assets/appImages/noCover.jpg';
 import sampleProPic from '../../assets/appImages/user.png';
-import Topbar from '../timeline/topbar/Topbar';
-import { Toaster } from 'react-hot-toast';
 import { Helmet } from 'react-helmet';
 import useTheme from '../../context/ThemeContext';
 import toast from 'react-hot-toast';

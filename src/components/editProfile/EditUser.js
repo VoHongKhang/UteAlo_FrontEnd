@@ -1,27 +1,8 @@
-import { Button, DatePicker, Form, Input, Radio, theme } from 'antd';
-import moment from 'moment';
-import { useCallback } from 'react';
+import { Button, DatePicker, Form, Input, Radio } from 'antd';
 
 export default function EditUser({ profileUser, updateUser, setVisibleModalUpdate }) {
 	const [form] = Form.useForm();
-	const { token } = theme.useToken();
-	const style = {
-		border: `1px solid ${token.colorPrimary}`,
-		borderRadius: '50%',
-	};
-	const cellRender = useCallback((current, info) => {
-		if (info.type !== 'date') {
-			return info.originNode;
-		}
-		if (typeof current === 'number') {
-			return <div className="ant-picker-cell-inner">{current}</div>;
-		}
-		return (
-			<div className="ant-picker-cell-inner" style={current.date() === 1 ? style : {}}>
-				{current.date()}
-			</div>
-		);
-	}, []);
+
 	return (
 		<Form
 			layout="vertical"
@@ -31,7 +12,7 @@ export default function EditUser({ profileUser, updateUser, setVisibleModalUpdat
 				address: profileUser?.address,
 				gender: profileUser?.gender,
 				phone: profileUser?.phone,
-				dayOfBirth: moment(profileUser?.dayOfBirth),
+				//dateOfBirth: moment(profileUser?.dateOfBirth),
 			}}
 			name="info"
 			onFinish={() => {
@@ -86,8 +67,8 @@ export default function EditUser({ profileUser, updateUser, setVisibleModalUpdat
 			>
 				<Input allowClear />
 			</Form.Item>
-			<Form.Item label="Ngày sinh" name="dayOfBirth">
-				<DatePicker cellRender={cellRender} format={'DD/MM/YYYY'} />
+			<Form.Item label="Ngày sinh" name="dateOfBirth">
+				<Input type="date" allowClear />
 			</Form.Item>
 			<div>
 				<Button className="button--cancel" onClick={() => setVisibleModalUpdate({ visible: false, type: '' })}>

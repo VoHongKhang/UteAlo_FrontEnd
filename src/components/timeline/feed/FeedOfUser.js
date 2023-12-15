@@ -161,6 +161,7 @@ const FeedOfUser = ({ inforUser, userProfile }) => {
 				<InfiniteScroll
 					scrollableTarget="messages-history"
 					dataLength={postLength}
+					style={{ overflow: 'visible' }}
 					next={loadMore}
 					hasMore={hasMore.posts || hasMore.share}
 					loader={

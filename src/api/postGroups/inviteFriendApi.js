@@ -29,7 +29,7 @@ const InviteFriendApi = {
 					toast.success(`Người dùng ${name} không thể gửi lời mời!!!`, { id: toastId });
 					return response.data;
 				} else {
-					toast.success('Gửi lời mời thành công', { id: toastId });
+					toast.success('Gửi lời mời thành công!!!', { id: toastId });
 					return response.data;
 				}
 			} else {

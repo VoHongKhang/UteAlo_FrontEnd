@@ -9,6 +9,7 @@ const DefaultLayout = ({ Title, Topbar, SideBar, RightBar, Page }) => {
 	const getUser = (data) => {
 		setInforUser(data);
 	};
+
 	return (
 		<>
 			<Helmet title={Title} />

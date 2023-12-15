@@ -58,13 +58,13 @@ export default function Discuss({
 						{(postGroup.roleGroup === 'Admin' ||
 							postGroup.roleGroup === 'Member' ||
 							postGroup.roleGroup === 'Deputy') && (
-							<Share newPosts={getNewPost} postGroupId={postGroup.postGroupId} />
+							<Share inforUser={inforUser} newPosts={getNewPost} postGroupId={postGroup.postGroupId} />
 						)}
 						<InfiniteScroll
 							scrollableTarget="feed--group--scroll"
 							className="feed__scroll"
 							dataLength={postLength}
-							style={{ color: theme.foreground, background: theme.background }}
+							style={{ color: theme.foreground, background: theme.background, overflow:"visible" }}
 							next={loadMore}
 							hasMore={hasMore.posts || hasMore.share}
 							loader={

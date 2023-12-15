@@ -560,3 +560,6 @@ ul {
 	padding: 8px;
 	cursor: pointer;
 }
+.receivedMessage{
+	width: 80%;
+}

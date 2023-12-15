@@ -5,13 +5,13 @@ import { NightsStay, Search, WbSunny, Home, Group, GroupAdd, Notifications, More
 import { Link } from 'react-router-dom';
 import useAuth from '../../../context/auth/AuthContext';
 import useTheme, { themes } from '../../../context/ThemeContext';
-import { CloseOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { CloseOutlined } from '@ant-design/icons';
 import noAvatar from '../../../assets/appImages/user.png';
 import { BASE_URL } from '../../../context/apiCall';
 import { useNavigate } from 'react-router-dom';
 import adver4 from '../../../assets/appImages/adver4.jpg';
 import { HiChatBubbleOvalLeft } from 'react-icons/hi2';
-import { Badge, Button, Dropdown, List, Typography } from 'antd';
+import { Badge, Button, List, Typography } from 'antd';
 import { useWebSocket } from '../../../context/WebSocketContext';
 import NotificationApi from '../../../api/notification/NotificationApi';
 import { Popover } from '@material-ui/core';
@@ -211,7 +211,9 @@ const Topbar = ({ dataUser }) => {
 		setAnchorEl(e.currentTarget);
 	};
 	const handleReadNotification = async (item) => {
+		const toastId = toast.loading('Đang xử lý...');
 		const res = await NotificationApi.readNotification({ user: currentUser, notificationId: item.notificationId });
+		toast.dismiss(toastId);
 		if (res.success) {
 			console.log(res.data);
 			setAnchorEl(null);

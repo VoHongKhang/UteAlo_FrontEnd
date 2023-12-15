@@ -130,10 +130,10 @@ const Profile = ({ inforUser, currentUser }) => {
 					await userAction({ currentUser: currentUser, user: params, action: 'accept' });
 
 					const data = {
-						userId: params.userId,
-						photo: inforUser.avatar,
-						content: `${inforUser.userName} đã chấp nhận lời mời kết bạn `,
-						link: `/profile/${inforUser.userId}`,
+						userId: params?.userId,
+						photo: inforUser?.avatar,
+						content: `${inforUser?.userName} đã chấp nhận lời mời kết bạn `,
+						link: `/profile/${inforUser?.userId}`,
 						isRead: false,
 					};
 					stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
@@ -154,11 +154,11 @@ const Profile = ({ inforUser, currentUser }) => {
 					console.log('res', res);
 					if (res.status === 200) {
 						const data = {
-							userId: params.userId,
-							photo: inforUser.avatar,
+							userId: params?.userId,
+							photo: inforUser?.avatar,
 							friendRequestId: res.data.result.friendRequestId,
-							content: `${inforUser.userName} đã gửi lời mời kết bạn với bạn`,
-							link: `/profile/${inforUser.userId}`,
+							content: `${inforUser?.userName} đã gửi lời mời kết bạn với bạn`,
+							link: `/profile/${inforUser?.userId}`,
 							isRead: false,
 						};
 						stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
@@ -195,15 +195,15 @@ const Profile = ({ inforUser, currentUser }) => {
 					Authorization: `Bearer ${currentUser.accessToken}`,
 				},
 			};
-			const getStatus = await axios.get(`${BASE_URL}/v1/friend/status/${params.userId}`, config);
-			const res = await axios.get(`${BASE_URL}/v1/user/profile/${params.userId}`, config);
+			const getStatus = await axios.get(`${BASE_URL}/v1/friend/status/${params?.userId}`, config);
+			const res = await axios.get(`${BASE_URL}/v1/user/profile/${params?.userId}`, config);
 			setUseInParams(res.data.result);
 			console.log(res.data.result);
 			setAbout(res.data.result.about);
 			setStatus(getStatus.data.message);
 		};
 		fetchUsers();
-	}, [params.userId, currentUser.accessToken]);
+	}, [params?.userId, currentUser.accessToken]);
 
 	// Lấy danh sách ảnh của người dùng
 	useEffect(() => {
@@ -216,7 +216,7 @@ const Profile = ({ inforUser, currentUser }) => {
 					},
 				};
 
-				const res = await axios.get(`${BASE_URL}/v1/post/getPhotos/${params.userId}`, config);
+				const res = await axios.get(`${BASE_URL}/v1/post/getPhotos/${params?.userId}`, config);
 				// Lấy danh sách ảnh từ kết quả và đặt vào state
 				setListImage(res.data.result);
 			} catch (error) {
@@ -224,7 +224,7 @@ const Profile = ({ inforUser, currentUser }) => {
 			}
 		};
 		fetchPhotosOfUser();
-	}, [params.userId]);
+	}, [params?.userId]);
 
 	// Lấy danh sách ảnh đại diện bạn bè của người dùng
 	useEffect(() => {
@@ -235,7 +235,7 @@ const Profile = ({ inforUser, currentUser }) => {
 						'Content-Type': 'application/json',
 					},
 				};
-				const res = await axios.get(`${BASE_URL}/v1/friend/list/pageable/${params.userId}`, config);
+				const res = await axios.get(`${BASE_URL}/v1/friend/list/pageable/${params?.userId}`, config);
 				// Lấy danh sách avatar từ kết quả và đặt vào state
 				const avatars = res.data.result.map((friend) => friend.avatar);
 				setListImageFriend(avatars);
@@ -244,7 +244,7 @@ const Profile = ({ inforUser, currentUser }) => {
 			}
 		};
 		fetchFriendOfUser();
-	}, [params.userId]);
+	}, [params?.userId]);
 
 	const [bio, setBio] = useState(false);
 	const handleBio = () => {
@@ -274,7 +274,7 @@ const Profile = ({ inforUser, currentUser }) => {
 							<img className="profileCoverImg" src={useInParams?.background || noCover} alt="..." />
 
 							<img className="profileUserImg" src={useInParams?.avatar || sampleProPic} alt="..." />
-							{params.userId === inforUser.userId && (
+							{params?.userId === inforUser?.userId && (
 								<div className="profile-edit-icon">
 									<Avatar style={{ cursor: 'pointer', backgroundColor: 'blue' }}>
 										<Link to={`/update/${currentUser.userId}`}>
@@ -320,7 +320,7 @@ const Profile = ({ inforUser, currentUser }) => {
 								<p className="profileInfoDesc">Giới thiệu: {useInParams?.about || '----'}</p>
 							)}
 						</div>
-						{params.userId !== currentUser.userId && (
+						{params?.userId !== currentUser.userId && (
 							<Space className="button--space">
 								<Button type="default" onClick={handleButtonFriend} aria-describedby="simple-popover">
 									{status}
@@ -409,7 +409,7 @@ const Profile = ({ inforUser, currentUser }) => {
 						<div className="profileILeft">
 							<div className="profileInfor">
 								<div className="textGioiThieu">Giới thiệu</div>
-								{params.userId === currentUser.userId && (
+								{params?.userId === currentUser.userId && (
 									<div className="textTieuSu" onClick={handleBio}>
 										Thêm tiểu sử
 									</div>
@@ -452,11 +452,11 @@ const Profile = ({ inforUser, currentUser }) => {
 										) || '----'}
 									</small>
 								</div>
-								{params.userId === currentUser.userId && (
+								{params?.userId === currentUser.userId && (
 									<div
 										className="textChinhSua"
 										onClick={() => {
-											navigate(`/update/${useInParams.userId}`);
+											navigate(`/update/${useInParams?.userId}`);
 										}}
 									>
 										Chỉnh sửa chi tiết
@@ -514,7 +514,7 @@ const Profile = ({ inforUser, currentUser }) => {
 										Xem tất cả bạn bè
 									</div>
 								</div>
-								<div className="textCountFriend">{inforUser.friends?.length} bạn bè</div>
+								<div className="textCountFriend">{inforUser?.friends?.length} bạn bè</div>
 								<div className="userPhotos">
 									{listImageFriend.map((item, index) => (
 										<div key={index} className="photoItem">
@@ -524,7 +524,7 @@ const Profile = ({ inforUser, currentUser }) => {
 								</div>
 							</div>
 						</div>
-						{params.userId && <FeedOfUser inforUser={inforUser} userProfile={params.userId} />}
+						{params?.userId && <FeedOfUser inforUser={inforUser} userProfile={params?.userId} />}
 					</div>
 				</div>
 			</div>

@@ -424,6 +424,40 @@ const GroupDetail = ({ inforUser }) => {
 				console.log('res', { ...postGroup, roleGroup: res.result });
 				setPostGroup({ ...postGroup, roleGroup: res.result });
 				console.log('postGroup', postGroup);
+				if (res.result === 'Waiting Accept') {
+					// lặp qua biến postGroup.managerId để lấy thông tin của người quản lý nhóm
+					if (postGroup.managerId && postGroup.managerId.length > 0) {
+						for (let i = 0; i < postGroup.managerId.length; i++) {
+							const data = {
+								groupId: params.postGroupId,
+								userId: postGroup.managerId[i],
+								photo: inforUser.avatar,
+								content: inforUser.userName + ' đã yêu cầu tham gia nhóm ' + postGroup.postGroupName,
+								link: `/groups/manager/${params.postGroupId}/participant_requests`,
+								isRead: false,
+								createAt: new Date().toISOString(),
+								updateAt: new Date().toISOString(),
+							};
+							stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
+						}
+					}
+				} else {
+					if (postGroup.managerId && postGroup.managerId.length > 0) {
+						for (let i = 0; i < postGroup.managerId.length; i++) {
+							const data = {
+								groupId: params.postGroupId,
+								userId: postGroup.managerId[i],
+								photo: inforUser.avatar,
+								content: inforUser.userName + ' đã tham gia nhóm ' + postGroup.postGroupName,
+								link: `/groups/manager/${params.postGroupId}/member`,
+								isRead: false,
+								createAt: new Date().toISOString(),
+								updateAt: new Date().toISOString(),
+							};
+							stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
+						}
+					}
+				}
 			})
 			.catch((error) => {
 				toast.error(error.message || error.toString(), { id: toastId });
@@ -499,12 +533,12 @@ const GroupDetail = ({ inforUser }) => {
 		{
 			key: '5',
 			label: <span style={{ color: theme.foreground, background: theme.background }}>File phương tiện</span>,
-			children: <FileMedia groupId={postGroup.postGroupId}/>,
+			children: <FileMedia groupId={postGroup.postGroupId} />,
 		},
 		{
 			key: '6',
 			label: <span style={{ color: theme.foreground, background: theme.background }}>File tài liệu</span>,
-			children: <FileDoc groupId={postGroup.postGroupId}/>,
+			children: <FileDoc groupId={postGroup.postGroupId} />,
 		},
 	];
 	const operations = {
@@ -514,6 +548,7 @@ const GroupDetail = ({ inforUser }) => {
 	return (
 		<>
 			<Helmet title={`Nhóm ${postGroup.postGroupName} |UTEALO`} />
+			<Toaster />
 			<div className="menu--post">
 				{postGroup && (
 					<div

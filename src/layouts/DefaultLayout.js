@@ -19,7 +19,7 @@ const DefaultLayout = ({ Title, Topbar, SideBar, RightBar, Page }) => {
 				<div className="homeContainer">
 					{SideBar && <SideBar user={currentUser} />}
 					{Page && <Page inforUser={inforUser ? inforUser : null} currentUser={currentUser} />}
-					{RightBar && <RightBar user={currentUser} />}
+					{RightBar && <RightBar user={currentUser} inforUser={inforUser ? inforUser : null} />}
 				</div>
 			) : (
 				<Page inforUser={inforUser ? inforUser : null} currentUser={currentUser} />

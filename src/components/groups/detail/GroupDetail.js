@@ -533,12 +533,12 @@ const GroupDetail = ({ inforUser }) => {
 		{
 			key: '5',
 			label: <span style={{ color: theme.foreground, background: theme.background }}>File phương tiện</span>,
-			children: <FileMedia groupId={postGroup.postGroupId} />,
+			children: <FileMedia groupId={postGroup.postGroupId} listPost={listPost} />,
 		},
 		{
 			key: '6',
 			label: <span style={{ color: theme.foreground, background: theme.background }}>File tài liệu</span>,
-			children: <FileDoc groupId={postGroup.postGroupId} />,
+			children: <FileDoc groupId={postGroup.postGroupId} listPost={listPost} />,
 		},
 	];
 	const operations = {

@@ -6,7 +6,7 @@ import moment from 'moment';
 import { HiEye } from 'react-icons/hi2';
 import { useNavigate } from 'react-router-dom';
 
-export default function FileDoc({ groupId }) {
+export default function FileDoc({ groupId, listPost }) {
 	const navigate = useNavigate();
 	const [data, setData] = useState([]);
 	const columns = [
@@ -94,7 +94,7 @@ export default function FileDoc({ groupId }) {
 			setData(res);
 		};
 		fetchData();
-	}, [groupId]);
+	}, [groupId, listPost]);
 
 	const onChange = (pagination, filters, sorter, extra) => {
 		console.log('params', pagination, filters, sorter, extra);

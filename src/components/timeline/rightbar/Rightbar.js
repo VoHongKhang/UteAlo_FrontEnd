@@ -9,9 +9,9 @@ import './Rightbar.css';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import GetFriendApi from '../../../api/profile/friend/getFriendApi';
-import { HiStatusOnline } from 'react-icons/hi';
 import UserAvatar from '../../action/UserAvatar';
-const Rightbar = ({ user }) => {
+import { useWebSocket } from '../../../context/WebSocketContext';
+const Rightbar = ({ user, inforUser }) => {
 	const navigate = useNavigate();
 	const { theme } = useTheme();
 	const [listFriend, setListFriend] = useState([]);
@@ -51,10 +51,20 @@ const Rightbar = ({ user }) => {
 		setIsModalVisible(true);
 		setIsAccept(item);
 	};
+	const { stompClient } = useWebSocket();
 	const handlerAccepts = async (item) => {
 		try {
 			await GetFriendApi.acceptFriendRequest({ token: user.accessToken, userId: item.userId });
 			toast.success('Kết bạn thành công', { id: 'success' });
+
+			const data = {
+				userId: item?.userId,
+				photo: inforUser?.avatar,
+				content: `${inforUser?.userName} đã chấp nhận lời mời kết bạn `,
+				link: `/profile/${inforUser?.userId}`,
+				isRead: false,
+			};
+			stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
 			getListFriendRequests();
 			getListFriendTop();
 		} catch (error) {

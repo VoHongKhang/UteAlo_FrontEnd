@@ -3,19 +3,18 @@ import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 import toast, { Toaster } from 'react-hot-toast';
 import useAuth from '../../../context/auth/AuthContext';
-import useTheme from '../../../context/ThemeContext';
 import noAvatar from '../../../assets/appImages/user.png';
 import { useNavigate } from 'react-router-dom';
 import { BASE_URL } from '../../../context/apiCall';
-import { Notifications, Message, Public, Lock } from '@material-ui/icons';
+import { Public, Lock } from '@material-ui/icons';
 import './CreateGroup.css';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { Close } from '@material-ui/icons';
 import { Button, Form, Input, Select } from 'antd';
 import GetFriendApi from '../../../api/profile/friend/getFriendApi';
 import PostGroupApi from '../../../api/postGroups/PostGroupApi';
-const CreateGroup = () => {
+import { useWebSocket } from '../../../context/WebSocketContext';
+const CreateGroup = ({ inforUser }) => {
 	const { user: currentUser } = useAuth();
 	const [user, setUser] = useState();
 	const [nameGroup, setNameGroup] = useState('Tên nhóm');
@@ -23,12 +22,6 @@ const CreateGroup = () => {
 	const [loading, setLoading] = useState(false);
 	const [role, setRole] = useState('Quyền riêng tư nhóm');
 	const navigate = useNavigate();
-	const handderMessageClick = () => {
-		navigate(`/message/${currentUser.userId}`);
-	};
-	const handderNotificationClick = () => {
-		navigate(`/notification/${currentUser.userId}`);
-	};
 	const [form] = Form.useForm();
 	const handlerSelectFriend = async () => {
 		try {
@@ -68,6 +61,7 @@ const CreateGroup = () => {
 		setRole(e);
 	};
 
+	const { stompClient } = useWebSocket();
 	const handlefinishForm = async () => {
 		const toastId = toast.loading('Đang gửi yêu cầu...');
 		const message = 'Tạo nhóm thất bại !!!';
@@ -77,10 +71,25 @@ const CreateGroup = () => {
 			userId: form.getFieldValue().listFriend,
 		};
 		try {
-			console.log(dataGroup);
-			await PostGroupApi.createGroup({ user: currentUser, data: dataGroup });
+			console.log('dataGroup', dataGroup);
+			const res = await PostGroupApi.createGroup({ user: currentUser, data: dataGroup });
 			toast.success('Tạo nhóm thành công!!!', { id: toastId });
-			navigate(`/groups`);
+			console.log('res', res);
+			for (let i = 0; i < dataGroup.userId.length; i++) {
+				const data = {
+					groupId: res.data.result.postGroupId,
+					userId: dataGroup.userId[i],
+					photo: inforUser.avatar,
+					content: inforUser.userName + ' đã mời bạn vào nhóm ' + dataGroup.postGroupName,
+					link: `/groups/${res.data.result.postGroupId}`,
+					isRead: false,
+					createAt: new Date().toISOString(),
+					updateAt: new Date().toISOString(),
+				};
+				// Gửi thông báo cho từng người bạn
+				stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
+			}
+			navigate(`/groups/${res.data.result.postGroupId}`);
 		} catch (e) {
 			toast.error(`${message} ${e}`, { id: toastId });
 		}

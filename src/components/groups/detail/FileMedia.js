@@ -4,7 +4,7 @@ import useTheme from '../../../context/ThemeContext';
 import { useEffect, useState } from 'react';
 import { postDetail } from '../../../api/postGroups/postDetail';
 
-export default function FileMedia({ groupId }) {
+export default function FileMedia({ groupId, listPost }) {
 	const navigate = useNavigate();
 	const [page, setPage] = useState(0);
 	const [data, setData] = useState([]);
@@ -25,6 +25,18 @@ export default function FileMedia({ groupId }) {
 		};
 		fetch();
 	}, [groupId, page]);
+	useEffect(() => {
+		const fetch = async () => {
+			setLoading(true);
+			const res = await postDetail.getFileMediaById(groupId, 0, 10);
+			setLoading(false);
+			setHasMore(page <= res.data.totalPages ? false : true);
+
+			console.log('res', res);
+			setData([...res.data.content]);
+		};
+		fetch();
+	}, [groupId, listPost]);
 	const { theme } = useTheme();
 	return (
 		//List file media

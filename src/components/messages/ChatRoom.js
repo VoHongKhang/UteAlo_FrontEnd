@@ -153,7 +153,7 @@ const ChatRoom = ({ user, data, Toggeinfo }) => {
 		fetchData();
 	}, [data]);
 	const connect = () => {
-		let Sock = new SockJS('http://localhost:8089/ws');
+		let Sock = new SockJS('http://localhost:8088/ws');
 		stompClient = over(Sock);
 		stompClient.connect({}, onConnected, onError);
 	};

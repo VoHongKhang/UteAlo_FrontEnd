@@ -161,7 +161,7 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete,
 					toast.error(response.message, { id: toastId });
 				}
 			}
-			if (post.postId && post.shareId) {
+			if (!post.postId && post.shareId) {
 				const formData = new FormData();
 				formData.append('content', content || '');
 				if (photosComment) {
@@ -335,6 +335,8 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete,
 
 	const likeButtonClass = isLikedComment ? 'liked' : 'not-liked';
 
+	console.log('commentReply', commentReply);
+
 	return (
 		<div id="comment" className={`comment_${commentReply.commentId}`} key={commentReply.commentId}>
 			<div className="commentParent">
@@ -350,7 +352,7 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete,
 								<span className="postCommentUserName">{commentReply.userName}</span>
 							</div>
 							<div className="postCommentContent">
-								<span className="postCommentContentUserName">{commentReply.userName}</span>
+								<span className="postCommentContentUserName">{commentReply.userOwner}</span>
 								<span>{commentReply.content}</span>
 								{commentReply.photos && (
 									<Image

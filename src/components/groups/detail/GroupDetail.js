@@ -28,7 +28,9 @@ import MemberGroup from './MemberGroup';
 import FileMedia from './FileMedia';
 import FileDoc from './FileDoc';
 import useTheme from '../../../context/ThemeContext';
-const GroupDetail = () => {
+import { useWebSocket } from '../../../context/WebSocketContext';
+const GroupDetail = ({ inforUser }) => {
+	const { stompClient } = useWebSocket();
 	const isMounted = useRef(true);
 	const params = useParams();
 	const { user: currentUser } = useAuth();
@@ -187,10 +189,6 @@ const GroupDetail = () => {
 		setSelectedFriends(selectedValues);
 		setIsFriendSelected(selectedValues.length > 0);
 	};
-	const [inforUser, setInforUser] = useState();
-	const getUser = (data) => {
-		setInforUser(data);
-	};
 	const [anchorEl, setAnchorEl] = useState(null);
 	const handleClose = () => {
 		setAnchorEl(null);
@@ -218,11 +216,43 @@ const GroupDetail = () => {
 
 	// Hàm mời bạn bè vào nhóm
 	const inviteFriend = async () => {
+		if (selectedFriends.length === 0) {
+			toast.error('Bạn chưa chọn bạn bè nào');
+			return;
+		}
 		try {
-			await InviteFriendApi.inviteFriendApi(currentUser.accessToken, params.postGroupId, selectedFriends);
+			const res = await InviteFriendApi.inviteFriendApi(
+				currentUser.accessToken,
+				params.postGroupId,
+				selectedFriends
+			);
 			// Nếu gửi lời mời thành công, thực hiện các bước sau:
 			setSelectedFriends([]); // Đặt selectedFriends thành mảng rỗng
 			setIsInviteModalVisible(false); // Đóng modal
+			console.log('res', res);
+			// lấy danh sách bạn bè đã được mời : selectedFriends - res.result
+			const invitedFriends = selectedFriends.filter(
+				(friendId) => !res.result.some((item) => item.userId === friendId)
+			);
+			console.log('invitedFriends', invitedFriends);
+			// Lặp qua mảng selectedFriends để lấy thông tin của từng người bạn
+			if (invitedFriends.length > 0) {
+				for (let i = 0; i < invitedFriends.length; i++) {
+					const data = {
+						groupId: params.postGroupId,
+						userId: invitedFriends[i],
+						photo: inforUser.avatar,
+						content: inforUser.userName + ' đã mời bạn vào nhóm ' + postGroup.postGroupName,
+						link: `/groups/${params.postGroupId}`,
+						isRead: false,
+						createAt: new Date().toISOString(),
+						updateAt: new Date().toISOString(),
+					};
+					// Gửi thông báo cho từng người bạn
+					stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
+				}
+			}
+			console.log('selectedFriends', selectedFriends);
 		} catch (err) {
 			console.log(err);
 		}
@@ -244,6 +274,42 @@ const GroupDetail = () => {
 				})
 					.then((res) => {
 						setPostGroup({ ...postGroup, roleGroup: res.result });
+						console.log('postGroup', postGroup);
+						if (res.result === 'Waiting Accept') {
+							// lặp qua biến postGroup.managerId để lấy thông tin của người quản lý nhóm
+							if (postGroup.managerId && postGroup.managerId.length > 0) {
+								for (let i = 0; i < postGroup.managerId.length; i++) {
+									const data = {
+										groupId: params.postGroupId,
+										userId: postGroup.managerId[i],
+										photo: inforUser.avatar,
+										content:
+											inforUser.userName + ' đã yêu cầu tham gia nhóm ' + postGroup.postGroupName,
+										link: `/groups/manager/${params.postGroupId}/participant_requests`,
+										isRead: false,
+										createAt: new Date().toISOString(),
+										updateAt: new Date().toISOString(),
+									};
+									stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
+								}
+							}
+						} else {
+							if (postGroup.managerId && postGroup.managerId.length > 0) {
+								for (let i = 0; i < postGroup.managerId.length; i++) {
+									const data = {
+										groupId: params.postGroupId,
+										userId: postGroup.managerId[i],
+										photo: inforUser.avatar,
+										content: inforUser.userName + ' đã tham gia nhóm ' + postGroup.postGroupName,
+										link: `/groups/manager/${params.postGroupId}/member`,
+										isRead: false,
+										createAt: new Date().toISOString(),
+										updateAt: new Date().toISOString(),
+									};
+									stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
+								}
+							}
+						}
 					})
 					.catch((error) => {
 						console.log(error);
@@ -358,6 +424,40 @@ const GroupDetail = () => {
 				console.log('res', { ...postGroup, roleGroup: res.result });
 				setPostGroup({ ...postGroup, roleGroup: res.result });
 				console.log('postGroup', postGroup);
+				if (res.result === 'Waiting Accept') {
+					// lặp qua biến postGroup.managerId để lấy thông tin của người quản lý nhóm
+					if (postGroup.managerId && postGroup.managerId.length > 0) {
+						for (let i = 0; i < postGroup.managerId.length; i++) {
+							const data = {
+								groupId: params.postGroupId,
+								userId: postGroup.managerId[i],
+								photo: inforUser.avatar,
+								content: inforUser.userName + ' đã yêu cầu tham gia nhóm ' + postGroup.postGroupName,
+								link: `/groups/manager/${params.postGroupId}/participant_requests`,
+								isRead: false,
+								createAt: new Date().toISOString(),
+								updateAt: new Date().toISOString(),
+							};
+							stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
+						}
+					}
+				} else {
+					if (postGroup.managerId && postGroup.managerId.length > 0) {
+						for (let i = 0; i < postGroup.managerId.length; i++) {
+							const data = {
+								groupId: params.postGroupId,
+								userId: postGroup.managerId[i],
+								photo: inforUser.avatar,
+								content: inforUser.userName + ' đã tham gia nhóm ' + postGroup.postGroupName,
+								link: `/groups/manager/${params.postGroupId}/member`,
+								isRead: false,
+								createAt: new Date().toISOString(),
+								updateAt: new Date().toISOString(),
+							};
+							stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
+						}
+					}
+				}
 			})
 			.catch((error) => {
 				toast.error(error.message || error.toString(), { id: toastId });
@@ -419,7 +519,7 @@ const GroupDetail = () => {
 		{
 			key: '2',
 			label: <span style={{ color: theme.foreground, background: theme.background }}>Đáng chú ý</span>,
-			children: <NotePost postGroup={postGroup} inforUser={inforUser} currentUser={currentUser} />,
+			children: postGroup && <NotePost postGroup={postGroup} inforUser={inforUser} currentUser={currentUser} />,
 		},
 		{
 			key: '3',
@@ -433,12 +533,12 @@ const GroupDetail = () => {
 		{
 			key: '5',
 			label: <span style={{ color: theme.foreground, background: theme.background }}>File phương tiện</span>,
-			children: <FileMedia />,
+			children: <FileMedia groupId={postGroup.postGroupId} />,
 		},
 		{
 			key: '6',
 			label: <span style={{ color: theme.foreground, background: theme.background }}>File tài liệu</span>,
-			children: <FileDoc />,
+			children: <FileDoc groupId={postGroup.postGroupId} />,
 		},
 	];
 	const operations = {
@@ -449,328 +549,279 @@ const GroupDetail = () => {
 		<>
 			<Helmet title={`Nhóm ${postGroup.postGroupName} |UTEALO`} />
 			<Toaster />
-			<Topbar dataUser={getUser} />
-			<div className="homeContainer">
-				<SidebarGroup user={currentUser} />
-				<div className="menu--post">
-					{postGroup && (
-						<div
-							className="header--group"
-							style={{ color: theme.foreground, background: theme.background, margin: 0 }}
-						>
-							<div
-								className="groupCover"
-								style={{ color: theme.foreground, background: theme.background }}
-							>
-								{postGroup.background !== null ? (
-									<Image
-										hoverable={true}
-										cover={true}
-										width="100%"
-										className="groupCoverImg"
-										src={postGroup.background} // Sử dụng selectedPost.photos thay vì cố định URL như bạn đã đề cập
-										alt={'backgroup'}
-										style={{ objectFit: 'cover' }}
-									/>
-								) : (
-									<img className="groupCoverImg" src={noCover} alt="..." />
-								)}
-								{postGroup.avatar !== null ? (
-									<Image
-										hoverable={true}
-										cover={true}
-										width="100%"
-										className="groupUserImg"
-										src={postGroup.avatar} // Sử dụng selectedPost.photos thay vì cố định URL như bạn đã đề cập
-										alt={'backgroup'}
-										style={{
-											objectFit: 'cover',
-
-											top: '-80px',
-										}}
-									/>
-								) : (
-									<img className="groupUserImg" src={sampleProPic} alt="..." />
-								)}
-							</div>
-							<div className="group--contanier--top">
-								<div className="group--detail">
-									<span className="group--name">{postGroup.postGroupName}</span>
-									<div className="group--name-info">
-										{postGroup.groupType === 'Public' ? (
-											<>
-												<Public htmlColor="#65676B" className="group--public-icon" />
-												<span className="group--public-text">Nhóm Công khai</span>
-											</>
-										) : (
-											<>
-												<Lock htmlColor="#65676B" className="group--public-icon" />
-												<span className="group--public-text">Nhóm riêng tư</span>
-											</>
-										)}
-										<People htmlColor="#65676B" className="group--member-icon" />
-										<span className="group--member">{postGroup.countMember} thành viên</span>
-									</div>
-								</div>
-								{postGroup.roleGroup !== 'None' ? (
-									<div className="group--header--button">
-										<button
-											variant="contained"
-											className="group--button-joined"
-											onClick={handleGroup}
-											aria-describedby="simple-popover"
-										>
-											<p>
-												{postGroup?.roleGroup === 'Admin' || postGroup?.roleGroup === 'Deputy'
-													? 'Quản lý nhóm'
-													: postGroup?.roleGroup === 'Member'
-													? 'Đã Tham gia'
-													: postGroup?.roleGroup === 'Waiting Accept'
-													? 'Chờ xác nhận'
-													: 'Chấp nhận lời mời'}
-											</p>
-										</button>
-										<Popover
-											id="simple-popover"
-											className="popover--list"
-											anchorOrigin={{
-												vertical: 'bottom',
-												horizontal: 'right',
-											}}
-											transformOrigin={{
-												vertical: 'top',
-												horizontal: 'right',
-											}}
-											anchorEl={anchorEl}
-											onClose={handleClose}
-											open={Boolean(anchorEl)}
-										>
-											{popoverItem === 'Đã Tham gia' && (
-												<>
-													<Typography
-														className="title--popper"
-														onClick={() => openModalGroup()}
-													>
-														Rời khỏi nhóm
-													</Typography>
-												</>
-											)}
-											{popoverItem === 'Chờ xác nhận' && (
-												<>
-													<Typography
-														className="title--popper"
-														onClick={() => {
-															openCancelLegageModal();
-														}}
-													>
-														Hủy yêu cầu tham gia
-													</Typography>
-												</>
-											)}
-											{popoverItem === 'Chấp nhận lời mời' && (
-												<>
-													<Typography
-														className="title--popper"
-														onClick={() => {
-															openAcceptInviteModal();
-														}}
-													>
-														Chấp nhận lời mời
-													</Typography>
-													<Typography
-														className="title--popper"
-														onClick={() => {
-															openCancelInviteModal();
-														}}
-													>
-														Từ chối lời mời
-													</Typography>
-												</>
-											)}
-
-											<Typography
-												className="title--popper"
-												onClick={() => {
-													toast.error('Chức năng đang phát triển');
-													setAnchorEl(null);
-												}}
-											>
-												Hủy theo dõi nhóm
-											</Typography>
-										</Popover>
-
-										{(postGroup?.roleGroup === 'Admin' || postGroup?.roleGroup === 'Member') && (
-											<button
-												variant="contained"
-												className="group--button-add"
-												onClick={() => showInviteModal()}
-											>
-												<p> + Mời</p>
-											</button>
-										)}
-										<Modal
-											className="modal--invite--friend"
-											title={
-												<span className="custom-modal-title">Mời bạn bè tham gia nhóm này</span>
-											}
-											open={isInviteModalVisible}
-											onCancel={() => {
-												setIsInviteModalVisible(false);
-											}}
-											okText="Gửi lời mời"
-											onOk={inviteFriend}
-											cancelText="Hủy"
-										>
-											<div className="line--top"></div>
-											<p className="filter--text">Lọc bạn bè để mời theo hạng mục</p>
-											<div className="filter--seletion">
-												<div className="filter--seletion-option">
-													<img src={building} alt="building" />
-													<p>Long Xuyên</p>
-												</div>
-												<div className="filter--seletion-option">
-													<img src={people} alt="people" />
-													<p>Nhóm chung</p>
-												</div>
-												<div className="filter--seletion-option">
-													<img src={home} alt="home" />
-													<p>Chaudok</p>
-												</div>
-											</div>
-											<div className="invite--friend">
-												<div className="invite--friend-search">
-													<div className="input--search">
-														<Search
-															className="icon__search"
-															style={{
-																marginLeft: '10px',
-																fontSize: '24px',
-																color: 'rgb(186 193 205)',
-															}}
-														/>
-														<input
-															type="text"
-															placeholder="Tìm bạn bè theo tên"
-															className="input__search"
-														/>
-													</div>
-													<div className="select-friend">
-														<Select
-															className="select-list--friend"
-															showSearch
-															mode="multiple"
-															loading={loading}
-															placeholder="Mời bạn bè (Không bắt buộc)"
-															optionFilterProp="label"
-															onClick={handlerSelectFriend}
-															onChange={handleSelectChange}
-														>
-															{listFriends.map((item) => (
-																<Select.Option
-																	key={item.userId}
-																	value={item.userId}
-																	label={item.username}
-																>
-																	<div
-																		style={{
-																			display: 'flex',
-																			alignItems: 'center',
-																		}}
-																	>
-																		<Checkbox style={{ marginRight: '10px' }} />
-																		<img
-																			src={item.avatar ? item.avatar : noAvatar}
-																			alt="avatar"
-																		/>
-																		<p>{item.username}</p>
-																	</div>
-																</Select.Option>
-															))}
-														</Select>
-													</div>
-												</div>
-
-												<div className="number--friend-selected">
-													<div className="friend--seleted-text">
-														{`ĐÃ CHỌN ${selectedFriends.length} NGƯỜI BẠN`}
-													</div>
-													{isFriendSelected && (
-														<div className="friend--selected">
-															{selectedFriends.map((friendId) => {
-																const friend = listFriends.find(
-																	(item) => item.userId === friendId
-																);
-																return (
-																	<div key={friendId} className="selected">
-																		<Checkbox
-																			// Thêm sự kiện onClick cho checkbox để xóa bạn đã chọn
-																			onClick={() => {
-																				const updatedSelectedFriends =
-																					selectedFriends.filter(
-																						(id) => id !== friendId
-																					);
-																				setSelectedFriends(
-																					updatedSelectedFriends
-																				);
-																			}}
-																		/>
-																		<img
-																			src={
-																				friend?.avatar
-																					? friend.avatar
-																					: noAvatar
-																			}
-																			alt="avatar"
-																		/>
-																		<p>{friend?.username}</p>
-																	</div>
-																);
-															})}
-														</div>
-													)}
-												</div>
-											</div>
-											<div className="line--mid"></div>
-											<div className="invite--friend-qr">
-												<div className="icon--qr">
-													<img src={qrCode} alt="QR Code" />
-												</div>
-												<div className="qr--text">
-													<p className="qr--text-one">Mời qua mã QR</p>
-													<p className="qr--text-two">
-														Bạn có thể tạo mã QR cho mọi người quét để truy cập vào nhóm của
-														bạn
-													</p>
-												</div>
-											</div>
-											<div className="line--bottom"></div>
-										</Modal>
-									</div>
-								) : (
-									<div className="group--header--button">
-										<button
-											variant="contained"
-											className="group--button-joined"
-											onClick={handleGroup}
-										>
-											<p>Tham gia nhóm</p>
-										</button>
-									</div>
-								)}
-							</div>
-							<hr />
-							<div className="list--feature--group">
-								<Tabs
-									defaultActiveKey="1"
-									style={{ color: theme.foreground, background: theme.background, width: '99%' }}
-									items={items}
-									onChange={onChange}
-									tabBarExtraContent={operations}
+			<div className="menu--post">
+				{postGroup && (
+					<div
+						className="header--group"
+						style={{ color: theme.foreground, background: theme.background, margin: 0 }}
+					>
+						<div className="groupCover" style={{ color: theme.foreground, background: theme.background }}>
+							{postGroup.background !== null ? (
+								<Image
+									hoverable={true}
+									cover={true}
+									width="100%"
+									className="groupCoverImg"
+									src={postGroup.background} // Sử dụng selectedPost.photos thay vì cố định URL như bạn đã đề cập
+									alt={'backgroup'}
+									style={{ objectFit: 'cover' }}
 								/>
-							</div>
+							) : (
+								<img className="groupCoverImg" src={noCover} alt="..." />
+							)}
+							{postGroup.avatar !== null ? (
+								<Image
+									hoverable={true}
+									cover={true}
+									width="100%"
+									className="groupUserImg"
+									src={postGroup.avatar} // Sử dụng selectedPost.photos thay vì cố định URL như bạn đã đề cập
+									alt={'backgroup'}
+									style={{
+										objectFit: 'cover',
+
+										top: '-80px',
+									}}
+								/>
+							) : (
+								<img className="groupUserImg" src={sampleProPic} alt="..." />
+							)}
 						</div>
-					)}
-				</div>
+						<div className="group--contanier--top">
+							<div className="group--detail">
+								<span className="group--name">{postGroup.postGroupName}</span>
+								<div className="group--name-info">
+									{postGroup.groupType === 'Public' ? (
+										<>
+											<Public htmlColor="#65676B" className="group--public-icon" />
+											<span className="group--public-text">Nhóm Công khai</span>
+										</>
+									) : (
+										<>
+											<Lock htmlColor="#65676B" className="group--public-icon" />
+											<span className="group--public-text">Nhóm riêng tư</span>
+										</>
+									)}
+									<People htmlColor="#65676B" className="group--member-icon" />
+									<span className="group--member">{postGroup.countMember} thành viên</span>
+								</div>
+							</div>
+							{postGroup.roleGroup !== 'None' ? (
+								<div className="group--header--button">
+									<button
+										variant="contained"
+										className="group--button-joined"
+										onClick={handleGroup}
+										aria-describedby="simple-popover"
+									>
+										<p>
+											{postGroup?.roleGroup === 'Admin' || postGroup?.roleGroup === 'Deputy'
+												? 'Quản lý nhóm'
+												: postGroup?.roleGroup === 'Member'
+												? 'Đã Tham gia'
+												: postGroup?.roleGroup === 'Waiting Accept'
+												? 'Chờ xác nhận'
+												: 'Chấp nhận lời mời'}
+										</p>
+									</button>
+									<Popover
+										id="simple-popover"
+										className="popover--list"
+										anchorOrigin={{
+											vertical: 'bottom',
+											horizontal: 'right',
+										}}
+										transformOrigin={{
+											vertical: 'top',
+											horizontal: 'right',
+										}}
+										anchorEl={anchorEl}
+										onClose={handleClose}
+										open={Boolean(anchorEl)}
+									>
+										{popoverItem === 'Đã Tham gia' && (
+											<>
+												<Typography className="title--popper" onClick={() => openModalGroup()}>
+													Rời khỏi nhóm
+												</Typography>
+											</>
+										)}
+										{popoverItem === 'Chờ xác nhận' && (
+											<>
+												<Typography
+													className="title--popper"
+													onClick={() => {
+														openCancelLegageModal();
+													}}
+												>
+													Hủy yêu cầu tham gia
+												</Typography>
+											</>
+										)}
+										{popoverItem === 'Chấp nhận lời mời' && (
+											<>
+												<Typography
+													className="title--popper"
+													onClick={() => {
+														openAcceptInviteModal();
+													}}
+												>
+													Chấp nhận lời mời
+												</Typography>
+												<Typography
+													className="title--popper"
+													onClick={() => {
+														openCancelInviteModal();
+													}}
+												>
+													Từ chối lời mời
+												</Typography>
+											</>
+										)}
+
+										<Typography
+											className="title--popper"
+											onClick={() => {
+												toast.error('Chức năng đang phát triển');
+												setAnchorEl(null);
+											}}
+										>
+											Hủy theo dõi nhóm
+										</Typography>
+									</Popover>
+
+									{(postGroup?.roleGroup === 'Admin' || postGroup?.roleGroup === 'Member') && (
+										<button
+											variant="contained"
+											className="group--button-add"
+											onClick={() => showInviteModal()}
+										>
+											<p> + Mời</p>
+										</button>
+									)}
+									<Modal
+										className="modal--invite--friend"
+										title={<span className="custom-modal-title">Mời bạn bè tham gia nhóm này</span>}
+										open={isInviteModalVisible}
+										onCancel={() => {
+											setIsInviteModalVisible(false);
+										}}
+										okText="Gửi lời mời"
+										onOk={inviteFriend}
+										cancelText="Hủy"
+									>
+										<div className="line--top"></div>
+										<p className="filter--text">Lọc bạn bè để mời theo hạng mục</p>
+										<div className="filter--seletion">
+											<div className="filter--seletion-option">
+												<img src={building} alt="building" />
+												<p>Long Xuyên</p>
+											</div>
+											<div className="filter--seletion-option">
+												<img src={people} alt="people" />
+												<p>Nhóm chung</p>
+											</div>
+											<div className="filter--seletion-option">
+												<img src={home} alt="home" />
+												<p>Chaudok</p>
+											</div>
+										</div>
+										<div className="invite--friend">
+											<div className="invite--friend-search">
+												<div className="select-friend">
+													<Select
+														className="select-list--friend"
+														showSearch
+														mode="multiple"
+														loading={loading}
+														placeholder="Mời bạn bè (Không bắt buộc)"
+														optionFilterProp="label"
+														onClick={handlerSelectFriend}
+														onChange={handleSelectChange}
+													>
+														{listFriends.map((item) => (
+															<Select.Option
+																key={item.userId}
+																value={item.userId}
+																label={item.username}
+															>
+																<div
+																	style={{
+																		display: 'flex',
+																		alignItems: 'center',
+																	}}
+																>
+																	<img
+																		src={item.avatar ? item.avatar : noAvatar}
+																		alt="avatar"
+																	/>
+																	<p>{item.username}</p>
+																</div>
+															</Select.Option>
+														))}
+													</Select>
+												</div>
+											</div>
+
+											<div className="number--friend-selected">
+												<div className="friend--seleted-text">
+													{`ĐÃ CHỌN ${selectedFriends.length} NGƯỜI BẠN`}
+												</div>
+												{isFriendSelected && (
+													<div className="friend--selected">
+														{selectedFriends.map((friendId) => {
+															const friend = listFriends.find(
+																(item) => item.userId === friendId
+															);
+															return (
+																<div key={friendId} className="selected">
+																	<img
+																		src={friend?.avatar ? friend.avatar : noAvatar}
+																		alt="avatar"
+																	/>
+																	<p>{friend?.username}</p>
+																</div>
+															);
+														})}
+													</div>
+												)}
+											</div>
+										</div>
+										<div className="line--mid"></div>
+										<div className="invite--friend-qr">
+											<div className="icon--qr">
+												<img src={qrCode} alt="QR Code" />
+											</div>
+											<div className="qr--text">
+												<p className="qr--text-one">Mời qua mã QR</p>
+												<p className="qr--text-two">
+													Bạn có thể tạo mã QR cho mọi người quét để truy cập vào nhóm của bạn
+												</p>
+											</div>
+										</div>
+										<div className="line--bottom"></div>
+									</Modal>
+								</div>
+							) : (
+								<div className="group--header--button">
+									<button variant="contained" className="group--button-joined" onClick={handleGroup}>
+										<p>Tham gia nhóm</p>
+									</button>
+								</div>
+							)}
+						</div>
+						<hr />
+						<div className="list--feature--group">
+							<Tabs
+								defaultActiveKey="1"
+								style={{ color: theme.foreground, background: theme.background, width: '99%' }}
+								items={items}
+								onChange={onChange}
+								tabBarExtraContent={operations}
+							/>
+						</div>
+					</div>
+				)}
 			</div>
 		</>
 	);

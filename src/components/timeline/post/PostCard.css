@@ -12,6 +12,7 @@
 	display: inline-block;
 	overflow-wrap: break-word;
 }
+
 .postWrapper {
 	padding: 10px;
 }
@@ -43,6 +44,7 @@
 	margin: 0 10px;
 	display: block;
 }
+
 .postGroupname {
 	cursor: pointer;
 	font-weight: bold;
@@ -50,15 +52,18 @@
 	margin-left: 50px;
 	width: fit-content;
 }
+
 .post--header--left {
 	display: flex;
 	flex-direction: column;
 	flex: 2;
 }
+
 .post--header--left--item {
 	display: flex;
 	align-items: flex-end;
 }
+
 .postLoAndName {
 	font-size: 12px;
 	font-weight: bold;
@@ -68,6 +73,7 @@
 	align-items: center;
 	flex: 1;
 }
+
 .postPrivacyLevel {
 	font-size: 12px;
 	font-weight: bold;
@@ -77,9 +83,11 @@
 	align-items: center;
 	flex: 1;
 }
+
 .postPrivacyLevel span {
 	margin-left: 5px;
 }
+
 .postLocation {
 	display: block;
 	font-size: 12px;
@@ -88,17 +96,20 @@
 .postGroupName {
 	font-size: 12px;
 }
+
 .hasGroup {
 	font-size: 12px !important;
 	font-weight: lighter !important;
 	color: #65676b !important;
 }
+
 .postPostGroupId {
 	font-size: 12px;
 	font-weight: bold;
 	color: #5699f0;
 	margin-left: 10px;
 }
+
 .postDateShare,
 .postDate {
 	margin-top: 4px;
@@ -190,6 +201,14 @@
 	cursor: pointer;
 }
 
+<<<<<<< HEAD
+=======
+.countCommentPostLike:hover {
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+>>>>>>> f3df2193a993672a12410d466b4ef38dc99afb7b
 .postCommentText {
 	cursor: pointer;
 	border-bottom: 1px dashed gray;
@@ -274,8 +293,11 @@
 	font-size: 15px;
 	word-spacing: 2px;
 	margin-top: -20px;
-	display: flex;
+	/* display: flex; */
 	flex-direction: column;
+	max-width: 400px;
+	display: inline-block;
+	overflow-wrap: break-word
 }
 
 .postCommentTextDelete,
@@ -510,10 +532,12 @@
 	margin-left: 40px;
 	margin-bottom: 20px;
 }
+
 .modal--body {
 	display: flex;
 	flex-direction: column;
 }
+
 .postShare--body {
 	margin-top: 30px;
 	width: 100%;
@@ -521,10 +545,11 @@
 	box-shadow: 0px 0px 17px -8px rgba(0, 0, 0, 0.67);
 	padding: 20px;
 }
-.icon--edit--file {
-}
-.editPostImg {
-}
+
+.icon--edit--file {}
+
+.editPostImg {}
+
 .postNameAndDateEdit {
 	height: 100%;
 	width: 100%;
@@ -534,6 +559,7 @@
 	align-items: center;
 	justify-content: space-between;
 }
+
 .roleName {
 	font-size: 25px;
 	font-weight: 600;
@@ -542,9 +568,11 @@
 	display: block;
 	padding: 0px 0px 20px 0px;
 }
+
 .imageEdit {
 	padding-bottom: 16px;
 }
+
 .roleNamePost {
 	display: flex;
 	font-size: 20px;
@@ -552,28 +580,36 @@
 	align-items: center;
 	justify-content: center;
 }
+
 .postsv {
 	background-color: #5699f0 !important;
 }
+
 .postCardSV {
 	background-color: #5699f0 !important;
 }
+
 .postCardGV {
 	background-color: #ffffff !important;
 }
+
 .postCardPH {
 	background-color: #868b96 !important;
 }
+
 .postCardNV {
 	background-color: rgb(151, 250, 164) !important;
 }
+
 .postCardADMIN {
 	background-color: #f0565ecc !important;
 }
+
 .modal--post--body {
 	display: flex;
 	align-items: center;
 }
+
 .MuiIconButton-root {
 	color: inherit !important;
 }

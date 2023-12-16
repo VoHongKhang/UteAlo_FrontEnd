@@ -2,12 +2,10 @@ import { useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Card, Menu } from 'antd';
 import ListFriend from './ListFriend';
-import Topbar from '../../timeline/topbar/Topbar';
 import './friendRequest.css';
 import useAuth from '../../../context/auth/AuthContext';
-import { Toaster } from 'react-hot-toast';
 import useTheme from '../../../context/ThemeContext';
-const FriendRequest = () => {
+const FriendRequest = ({ inforUser }) => {
 	const { user: currentUser } = useAuth();
 	const [type, setType] = useState('friend');
 	const [title, setTitle] = useState('Bạn bè');
@@ -54,8 +52,6 @@ const FriendRequest = () => {
 	return (
 		<div style={{ color: theme.foreground, background: theme.background }} className="friendUser">
 			<Helmet title={`${title}`} />
-			<Toaster />
-			<Topbar />
 			<div className="container" style={{ color: theme.foreground, background: theme.background }}>
 				<div className="leftbar">
 					<Card
@@ -84,7 +80,7 @@ const FriendRequest = () => {
 				</div>
 
 				<div className="centerbar" style={{ color: theme.foreground, background: theme.background }}>
-					<ListFriend currentUser={currentUser} title={title} type={type} />
+					<ListFriend inforUser={inforUser} currentUser={currentUser} title={title} type={type} />
 				</div>
 			</div>
 		</div>

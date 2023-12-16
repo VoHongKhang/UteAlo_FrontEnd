@@ -136,145 +136,134 @@ const MemberGroup = () => {
 	return (
 		<>
 			<Helmet title={`Quản lý thành viên nhóm ||UTEALO`} />
-			<Toaster />
-			<Topbar />
-			<div div className="homeContainer">
-				<SidebarManagerGroup user={currentUser} groupId={params.postGroupId} />
-				<div
-					className="setting--group--member"
-					style={{ color: theme.foreground, background: theme.background }}
-				>
-					<div className="member--contaner">
-						<div className="setting--group__title">Thành viên nhóm</div>
-						<div className="setting--group__search">
-							<Search
-								placeholder="Tìm kiếm thành viên"
-								allowClear={true}
-								enterButton="Search"
-								size="large"
-								onSearch={onSearch}
-							/>
-						</div>
-						<List className="list--friend">
-							{memberGroup?.map((item) => (
-								<ListItem key={item.userId}>
-									<Avatar className="avatarMember" alt={item.username} src={item.avatarUser} />
-									<ListItemText
-										primary={item.username}
-										secondary={
-											item.roleName === 'Admin'
-												? 'Quản trị viên'
-												: item.roleName === 'Member'
-												? 'Thành viên'
-												: 'Phó quản trị viên'
-										}
-									/>
-									<div>
-										<IconButton
-											aria-describedby="simple-popover"
-											onClick={(e) => handleClick(e, item)}
-										>
-											<MoreHoriz />
-										</IconButton>
-										<Popover
-											id="simple-popover"
-											open={Boolean(anchorEl)}
-											className="popper--member"
-											anchorEl={anchorEl}
-											onClose={handleClose}
-											anchorOrigin={{
-												vertical: 'bottom',
-												horizontal: 'right',
-											}}
-											transformOrigin={{
-												vertical: 'top',
-												horizontal: 'right',
-											}}
-										>
-											<div>
-												{selectedItem?.roleName === 'Member' && (
+			<div className="setting--group--member" style={{ color: theme.foreground, background: theme.background }}>
+				<div className="member--contaner">
+					<div className="setting--group__title">Thành viên nhóm</div>
+					<div className="setting--group__search">
+						<Search
+							placeholder="Tìm kiếm thành viên"
+							allowClear={true}
+							enterButton="Search"
+							size="large"
+							onSearch={onSearch}
+						/>
+					</div>
+					<List className="list--friend">
+						{memberGroup?.map((item) => (
+							<ListItem key={item.userId}>
+								<Avatar className="avatarMember" alt={item.username} src={item.avatarUser} />
+								<ListItemText
+									primary={item.username}
+									secondary={
+										item.roleName === 'Admin'
+											? 'Quản trị viên'
+											: item.roleName === 'Member'
+											? 'Thành viên'
+											: 'Phó quản trị viên'
+									}
+								/>
+								<div>
+									<IconButton aria-describedby="simple-popover" onClick={(e) => handleClick(e, item)}>
+										<MoreHoriz />
+									</IconButton>
+									<Popover
+										id="simple-popover"
+										open={Boolean(anchorEl)}
+										className="popper--member"
+										anchorEl={anchorEl}
+										onClose={handleClose}
+										anchorOrigin={{
+											vertical: 'bottom',
+											horizontal: 'right',
+										}}
+										transformOrigin={{
+											vertical: 'top',
+											horizontal: 'right',
+										}}
+									>
+										<div>
+											{selectedItem?.roleName === 'Member' && (
+												<Typography
+													className="poper--member--item"
+													onClick={() => handleOpenConfirmation('appointDeputy')}
+												>
+													Chỉ định làm phó quản trị viên
+												</Typography>
+											)}
+											{selectedItem?.roleName === 'Deputy' &&
+												selectedItem?.userId !== currentUser.userId && (
 													<Typography
 														className="poper--member--item"
-														onClick={() => handleOpenConfirmation('appointDeputy')}
+														onClick={() => handleOpenConfirmation('removeDeputy')}
 													>
-														Chỉ định làm phó quản trị viên
+														Hủy quyền phó quản trị viên
 													</Typography>
 												)}
+											<Typography
+												className="poper--member--item"
+												onClick={() => handleOpenConfirmation('removeMember')}
+											>
 												{selectedItem?.roleName === 'Deputy' &&
-													selectedItem?.userId !== currentUser.userId && (
-														<Typography
-															className="poper--member--item"
-															onClick={() => handleOpenConfirmation('removeDeputy')}
-														>
-															Hủy quyền phó quản trị viên
-														</Typography>
-													)}
-												<Typography
-													className="poper--member--item"
-													onClick={() => handleOpenConfirmation('removeMember')}
-												>
-													{selectedItem?.roleName === 'Deputy' &&
-													selectedItem?.userId === currentUser.userId
-														? 'Rời khỏi nhóm'
-														: 'Xóa khỏi nhóm'}
-												</Typography>
-												{selectedItem?.roleName !== 'Admin' &&
-													selectedItem?.userId !== currentUser.userId && (
-														<Typography
-															className="poper--member--item"
-															onClick={() => handleOpenConfirmation('appointAdmin')}
-														>
-															Nhượng quyền quản trị viên
-														</Typography>
-													)}
-												<Typography
-													className="poper--member--item"
-													onClick={() => navigate(`/profile/${selectedItem.userId}`)}
-												>
-													Xem trang cá nhân
-												</Typography>
-											</div>
-										</Popover>
-									</div>
-								</ListItem>
-							))}
-							<Dialog open={openConfirmation} onClose={handleCloseConfirmation}>
-								<DialogTitle>Xác nhận thay đổi</DialogTitle>
-								<DialogContent>
-									<DialogContentText>
-										{isAdminChange === 'appointDeputy'
-											? `Bạn có chắc chắn muốn chỉ định thành viên ${
-													selectedItem && selectedItem.username
-											  } làm Phó quản trị viên? `
-											: isAdminChange === 'removeDeputy'
-											? `Bạn có chắc chắn muốn hủy quyền phó quản trị viên của ${
-													selectedItem && selectedItem.username
-											  }
+												selectedItem?.userId === currentUser.userId
+													? 'Rời khỏi nhóm'
+													: 'Xóa khỏi nhóm'}
+											</Typography>
+											{selectedItem?.roleName !== 'Admin' && 
+												selectedItem?.userId !== currentUser.userId && (
+													<Typography
+														className="poper--member--item"
+														onClick={() => handleOpenConfirmation('appointAdmin')}
+													>
+														Nhượng quyền quản trị viên
+													</Typography>
+												)}
+											<Typography
+												className="poper--member--item"
+												onClick={() => navigate(`/profile/${selectedItem.userId}`)}
+											>
+												Xem trang cá nhân
+											</Typography>
+										</div>
+									</Popover>
+								</div>
+							</ListItem>
+						))}
+						<Dialog open={openConfirmation} onClose={handleCloseConfirmation}>
+							<DialogTitle>Xác nhận thay đổi</DialogTitle>
+							<DialogContent>
+								<DialogContentText>
+									{isAdminChange === 'appointDeputy'
+										? `Bạn có chắc chắn muốn chỉ định thành viên ${
+												selectedItem && selectedItem.username
+										  } làm Phó quản trị viên? `
+										: isAdminChange === 'removeDeputy'
+										? `Bạn có chắc chắn muốn hủy quyền phó quản trị viên của ${
+												selectedItem && selectedItem.username
+										  }
 											 `
-											: isAdminChange === 'removeMember'
-											? `Bạn có chắc chắn muốn xóa thành viên ${
-													selectedItem && selectedItem.username
-											  } khỏi nhóm? `
-											: isAdminChange === 'appointAdmin'
-											? `Bạn có chắc chắn muốn nhượng quyền quản trị viên cho ${
-													selectedItem && selectedItem.username
-											  } `
-											: `Bạn có chắc chắn muốn xóa thành viên ${
-													selectedItem && selectedItem.username
-											  } khỏi nhóm? `}
-									</DialogContentText>
-								</DialogContent>
-								<DialogActions>
-									<Button onClick={handleCloseConfirmation} color="primary" variant="outlined">
-										Hủy
-									</Button>
-									<Button onClick={handleConfirmAction} color="primary" variant="contained">
-										Xác nhận
-									</Button>
-								</DialogActions>
-							</Dialog>
-						</List>
-					</div>
+										: isAdminChange === 'removeMember'
+										? `Bạn có chắc chắn muốn xóa thành viên ${
+												selectedItem && selectedItem.username
+										  } khỏi nhóm? `
+										: isAdminChange === 'appointAdmin'
+										? `Bạn có chắc chắn muốn nhượng quyền quản trị viên cho ${
+												selectedItem && selectedItem.username
+										  } `
+										: `Bạn có chắc chắn muốn xóa thành viên ${
+												selectedItem && selectedItem.username
+										  } khỏi nhóm? `}
+								</DialogContentText>
+							</DialogContent>
+							<DialogActions>
+								<Button onClick={handleCloseConfirmation} color="primary" variant="outlined">
+									Hủy
+								</Button>
+								<Button onClick={handleConfirmAction} color="primary" variant="contained">
+									Xác nhận
+								</Button>
+							</DialogActions>
+						</Dialog>
+					</List>
 				</div>
 			</div>
 		</>

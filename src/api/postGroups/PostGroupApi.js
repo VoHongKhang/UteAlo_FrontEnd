@@ -592,7 +592,7 @@ const PostGroupApi = {
 				throw new Error(res.data.message);
 			}
 		} catch (error) {
-			throw new Error(error.message);
+			throw new Error(error.response ? error.response.data.message : error.message);
 		}
 	},
 };

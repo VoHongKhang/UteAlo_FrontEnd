@@ -152,6 +152,7 @@ const Feed = ({ inforUser }) => {
 			<InfiniteScroll
 				scrollableTarget="messages-history"
 				className="feed__scroll"
+				style={{ color: theme.foreground, background: theme.background, overflow: 'visible' }}
 				dataLength={postLength}
 				next={loadMore}
 				hasMore={hasMore.posts || hasMore.share}
@@ -171,7 +172,7 @@ const Feed = ({ inforUser }) => {
 						style={{
 							color: theme.foreground,
 							background: theme.background,
-							width: 'fit-content',
+							width: '100%',
 							margin: '50px auto',
 						}}
 						align="center"

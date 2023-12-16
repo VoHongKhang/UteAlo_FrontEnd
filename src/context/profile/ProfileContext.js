@@ -15,6 +15,7 @@ export const ProfileProvider = ({ children }) => {
 
 	// update user req
 	const editUser = async ({ fullName, about, address, phone, gender, dateOfBirth }) => {
+		console.log('dateOfBirth', dateOfBirth);
 		const toastId = toast.loading('Updating profile...');
 		try {
 			dispatch({

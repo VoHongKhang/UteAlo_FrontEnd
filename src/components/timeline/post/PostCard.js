@@ -16,17 +16,21 @@ import useAuth from '../../../context/auth/AuthContext';
 import LikeOrUnlikeApi from '../../../api/timeline/commentPost/likeOrUnlike';
 import GetCommentPostApi from '../../../api/timeline/commentPost/getCommentPost';
 import CommentCard from './CommentCard';
-import { Image, Skeleton, theme, Typography } from 'antd';
+import { Image, Skeleton, theme, Typography, Modal } from 'antd';
 import PostApi from '../../../api/timeline/post/PostApi';
 import { ShareModal } from './ShareModal';
 import classnames from 'classnames';
 import { formatTime } from '../../utils/CommonFuc';
 import PostModal from '../../utils/PostModal';
+<<<<<<< HEAD
 import { Modal } from 'antd';
 
+=======
+import { useWebSocket } from '../../../context/WebSocketContext';
+import UserAvatar from '../../action/UserAvatar';
+>>>>>>> f3df2193a993672a12410d466b4ef38dc99afb7b
 const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 	const navigate = useNavigate();
-
 	const [isModalVisible, setModalVisible] = useState(false);
 	const [currentPost, setCurrentPost] = useState(null);
 	const handleButtonClick = (post) => {
@@ -34,23 +38,13 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 		setModalVisible(true);
 	};
 
+	const { stompClient } = useWebSocket();
 	const handleModalClose = () => {
 		setModalVisible(false);
 	};
 
 	const classPost = ['post'];
 	const classNameUser = [post?.postGroupId && 'hasGroup'];
-	// classPost.push(
-	// 	post.roleName === 'SinhVien'
-	// 		? 'postCardSV'
-	// 		: post.roleName === 'GiangVien'
-	// 		? 'postCardGV'
-	// 		: post.roleName === 'PhuHuynh'
-	// 		? 'postCardPH'
-	// 		: post.roleName === 'NhanVien'
-	// 		? 'postCardNV'
-	// 		: 'postCardADMIN'
-	// );
 
 	//=======Open Handler Button More=======
 
@@ -187,8 +181,11 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 		}
 	};
 
+<<<<<<< HEAD
 	console.log('listUserLikePost', listUserLikePost);
 
+=======
+>>>>>>> f3df2193a993672a12410d466b4ef38dc99afb7b
 	// lấy danh sách bình luận trên bài post
 	useEffect(() => {
 		fetchLikePost();
@@ -200,12 +197,32 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 	const likePostHandler = async () => {
 		try {
 			await LikeOrUnlikeApi.likeOrUnlike(post.postId, currentUser.accessToken, currentUser.userId);
+
+			console.log('post', post);
+			console.log('inforUser', inforUser);
+
+			if (isLiked === false && inforUser.userId !== post.userId) {
+				const data = {
+					postId: post.postId,
+					userId: post.userId,
+					photo: inforUser.avatar,
+					content: inforUser.userName + ' đã thích bài viết của bạn',
+					link: `/post/${post.postId}`,
+					isRead: false,
+					createAt: new Date().toISOString(),
+					updateAt: new Date().toISOString(),
+				};
+
+				stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
+			}
+
 		} catch (err) {
 			console.log(err);
 		}
-
 		setLike(isLiked ? like - 1 : like + 1);
 		setIsLiked(!isLiked);
+		fetchLikePost();
+
 	};
 
 	// Xử lý xem thêm bình luận
@@ -248,6 +265,21 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 					// Thêm mới comment vào object comments
 					setCommentPost({ ...comments, [newComment.commentId]: newComment });
 					setCommentLength(commentlength + 1);
+					if (inforUser.userId !== post.userId) {
+						const data = {
+							postId: post.postId,
+							userId: post.userId,
+							photo: inforUser.avatar,
+							content: inforUser.userName + ' đã bình luận bài viết của bạn',
+							link: `/post/${post.postId}`,
+							isRead: false,
+							createAt: new Date().toISOString(),
+							updateAt: new Date().toISOString(),
+						};
+
+						stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
+					}
+
 					toast.success('Đăng bình luận thành công!', { id: toastId });
 				} else {
 					// Xử lý trường hợp API trả về lỗi
@@ -420,12 +452,7 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 								)}
 
 								<div className="post--header--left--item">
-									<img
-										className="postProfileImg"
-										src={post.avatarUser || sampleProPic}
-										alt="..."
-										onClick={() => navigate(`/profile/${post.userId}`)}
-									/>
+									<UserAvatar user={post} />
 
 									<div className="postNameAndDate">
 										<span
@@ -639,7 +666,9 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 								}}
 							>
 								<a href={post.files} target="_blank" rel="noopener noreferrer">
-									{post.files.substr(post.files.lastIndexOf('/') + 1)}
+									{post.files.substr(post.files.lastIndexOf('/') + 1).length > 20
+										? post.files.substr(post.files.lastIndexOf('/') + 1).substring(0, 20) + '...'
+										: post.files.substr(post.files.lastIndexOf('/') + 1)}
 								</a>
 							</div>
 						)}
@@ -652,7 +681,9 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 								}}
 							>
 								<a href={post.files} target="_blank" rel="noopener noreferrer">
-									{post.files.substr(post.files.lastIndexOf('/') + 1)}
+									{post.files.substr(post.files.lastIndexOf('/') + 1).length > 20
+										? post.files.substr(post.files.lastIndexOf('/') + 1).substring(0, 20) + '...'
+										: post.files.substr(post.files.lastIndexOf('/') + 1)}
 								</a>
 							</div>
 						)}
@@ -665,7 +696,9 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 								}}
 							>
 								<a href={post.files} target="_blank" rel="noopener noreferrer">
-									{post.files.substr(post.files.lastIndexOf('/') + 1)}
+									{post.files.substr(post.files.lastIndexOf('/') + 1).length > 20
+										? post.files.substr(post.files.lastIndexOf('/') + 1).substring(0, 20) + '...'
+										: post.files.substr(post.files.lastIndexOf('/') + 1)}
 								</a>
 							</div>
 						)}
@@ -705,7 +738,18 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 									{listUserLikePost.length > 0 ? (
 										<ul>
 											{listUserLikePost.map((user) => (
+<<<<<<< HEAD
 												<li key={user.userId}>{user.userName}</li>
+=======
+												<li key={user.userId} style={{display:'flex', marginTop: '10px'}}>
+													<img
+														src={user.avatar ? user.avatar : sampleProPic}
+														alt="Avatar"
+														style={{ width: '40px', height: '40px', borderRadius: '50%' }}
+													/>
+													<span style={{display:'flex', alignItems: 'center', marginLeft: '20px'}}>{user.userName}</span>
+												</li>
+>>>>>>> f3df2193a993672a12410d466b4ef38dc99afb7b
 											))}
 										</ul>
 									) : (
@@ -768,6 +812,7 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 					{showAllComments
 						? Object.values(comments).map((comment) => (
 								<CommentCard
+									inforUser={inforUser}
 									comment={comment}
 									fetchCommentPost={fetchCommentPost}
 									post={post}
@@ -781,6 +826,7 @@ const PostCard = ({ inforUser, post, newShare, modalDetail = 0, group }) => {
 								.slice(0, 1)
 								.map((comment) => (
 									<CommentCard
+										inforUser={inforUser}
 										comment={comment}
 										fetchCommentPost={fetchCommentPost}
 										post={post}

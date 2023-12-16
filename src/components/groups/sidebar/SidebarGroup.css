@@ -200,7 +200,7 @@
 .search-dropdown {
 	position: fixed;
 	z-index: 99;
-	width: 24.1%;
+	width: 26%;
 	border-bottom-right-radius: 14px;
 	border-bottom-left-radius: 14px;
 	background: #f0f2f5;
@@ -260,7 +260,6 @@
 
 .search-dropdown ul li:hover {
 	background-color: #E4E6EB;
-	padding: 6px 100px;
 	border-radius: 5px;
 	cursor: pointer;
 }

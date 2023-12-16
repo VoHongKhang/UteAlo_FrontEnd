@@ -3,8 +3,6 @@ import './EditProfile.css';
 import '../profile/Profile.css';
 import noCover from '../../assets/appImages/noCover.jpg';
 import sampleProPic from '../../assets/appImages/user.png';
-import Topbar from '../timeline/topbar/Topbar';
-import { Toaster } from 'react-hot-toast';
 import { Helmet } from 'react-helmet';
 import useTheme from '../../context/ThemeContext';
 import toast from 'react-hot-toast';
@@ -17,14 +15,16 @@ import EditUser from './EditUser';
 import moment from 'moment';
 import ChangePasswordApi from '../../api/auth/ChangePasswordApi';
 import useAuth from '../../context/auth/AuthContext';
-const EditProfile = () => {
+const EditProfile = ({ inforUser, changeUser }) => {
 	const { editUser, updateUserAvatar, updateUserBackground } = useProfile();
 	const { theme } = useTheme();
 	const { user: currentUser } = useAuth();
-	const [profileUser, setProfileUser] = useState([]);
+	const [profileUser, setProfileUser] = useState(inforUser);
 	const [photosUrl, setPhotosUrl] = useState();
 	const [photos, setPhotos] = useState(null);
 	const [targetPhoto, setTargetPhoto] = useState(null);
+
+	console.log('profileUser', profileUser);
 	const hanldeEditPhoto = async () => {
 		if (targetPhoto === 'fileAvatar') {
 			try {
@@ -33,6 +33,8 @@ const EditProfile = () => {
 
 				setProfileUser({ ...profileUser, avatar: photosUrl });
 				setPhotos(null);
+				//reload lại trang
+				//window.location.reload();
 			} catch (err) {
 				console.log(err);
 			}
@@ -63,10 +65,7 @@ const EditProfile = () => {
 			toast.error('Please select an image with png/jpg type');
 		}
 	};
-	const getUserInfor = (data) => {
-		setProfileUser(data);
-		console.log(data);
-	};
+
 	const [visibleModalUpdate, setVisibleModalUpdate] = useState({
 		visible: false,
 		type: '',
@@ -93,20 +92,20 @@ const EditProfile = () => {
 			),
 			children: (
 				<div className="collapse--content">
-					<span>Tên người dùng: {profileUser.userName}</span>
-					<span>Địa chỉ: {profileUser.address || 'Chưa có thông tin'}</span>
+					<span>Tên người dùng: {profileUser?.userName}</span>
+					<span>Địa chỉ: {profileUser?.address || 'Chưa có thông tin'}</span>
 					<span>
 						Giới tính:{' '}
-						{profileUser.gender === 'MALE'
+						{profileUser?.gender === 'MALE'
 							? 'Nam giới'
-							: profileUser.gender === 'FEMALE'
+							: profileUser?.gender === 'FEMALE'
 							? 'Nữ giới'
 							: 'Khác'}
 					</span>
-					<span>Số điện thoại: {profileUser.phone || 'Chưa có thông tin'}</span>
+					<span>Số điện thoại: {profileUser?.phone || 'Chưa có thông tin'}</span>
 					<span>
 						Ngày sinh:
-						{profileUser.dayOfBirth === null ? (
+						{profileUser?.dayOfBirth === null ? (
 							'Chưa có thông tin'
 						) : (
 							<Moment format="DD/MM/YYYY">{profileUser?.dayOfBirth}</Moment>
@@ -133,12 +132,13 @@ const EditProfile = () => {
 			),
 			children: (
 				<div className="collapse--content">
-					<span>Địa chỉ email: {profileUser.email}</span>
+					<span>Địa chỉ email: {profileUser?.email}</span>
 				</div>
 			),
 		},
 	];
 	const updateUser = async (data) => {
+		console.log('data', data);
 		const res = await editUser({
 			fullName: data.userName,
 			address: data.address,
@@ -172,19 +172,17 @@ const EditProfile = () => {
 	return (
 		<>
 			<Helmet title="Edit profile | UTEALO" />
-			<Toaster />
-			<Topbar dataUser={getUserInfor} />
 			{profileUser && (
 				<div style={{ color: theme.foreground, background: theme.background }}>
 					<div className="header--group">
 						<div className="groupCover" style={{ color: theme.foreground, background: theme.background }}>
-							{profileUser.background !== null ? (
+							{profileUser?.background !== null ? (
 								<Image
 									hoverable
 									cover
 									width="100%"
 									className="ManagerGroup--groupCoverImg"
-									src={profileUser.background} // Sử dụng selectedPost.photos thay vì cố định URL như bạn đã đề cập
+									src={profileUser?.background} // Sử dụng selectedPost.photos thay vì cố định URL như bạn đã đề cập
 									alt={'backgroup'}
 									style={{ objectFit: 'cover', background: theme.background }}
 								/>
@@ -192,13 +190,13 @@ const EditProfile = () => {
 								<img className="groupCoverImg" src={noCover} alt="..." />
 							)}
 							<div className="contaner--avatar">
-								{profileUser.avatar !== null ? (
+								{profileUser?.avatar !== null ? (
 									<Image
 										hoverable
 										cover
 										width="100%"
 										className="groupUserImg"
-										src={profileUser.avatar} // Sử dụng selectedPost.photos thay vì cố định URL như bạn đã đề cập
+										src={profileUser?.avatar} // Sử dụng selectedPost.photos thay vì cố định URL như bạn đã đề cập
 										alt={'backgroup'}
 										style={{
 											objectFit: 'cover',
@@ -237,7 +235,7 @@ const EditProfile = () => {
 						</div>
 						<div className="group--contanier--top--edit--profle">
 							<div className="group--detail">
-								<span className="group--name">{profileUser.userName}</span>
+								<span className="group--name">{profileUser?.userName}</span>
 							</div>
 						</div>
 						{photos && (

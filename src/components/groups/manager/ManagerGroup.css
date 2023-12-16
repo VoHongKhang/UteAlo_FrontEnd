@@ -52,6 +52,16 @@
 	position: relative;
 	height: 150px;
 }
+.edit--group--avatar--manager {
+	background: #3a3b3c;
+	position: absolute;
+	bottom: 40%;
+	left: 24%;
+	border-radius: 50%;
+	display: flex;
+	padding: 8px;
+	cursor: pointer;
+}
 .edit--group--avatar {
 	background: #3a3b3c;
 	position: absolute;

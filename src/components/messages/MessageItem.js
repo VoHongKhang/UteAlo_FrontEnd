@@ -1,6 +1,5 @@
-import { Button, Image, List, Space, Spin, Tooltip, Typography } from 'antd';
+import { Button, Image, List, Modal, Space, Spin, Tooltip, Typography } from 'antd';
 import classnames from 'classnames';
-import { HiDownload } from 'react-icons/hi';
 import { HiArrowPath, HiEye } from 'react-icons/hi2';
 import HeartIcon from '../../assets/icons/heart.png';
 import HahaIcon from '../../assets/icons/haha.png';
@@ -15,7 +14,7 @@ import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, P
 import { fileUtil } from './utils/fileUtil';
 import sampleProPic from '../../assets/appImages/user.png';
 import useTheme from '../../context/ThemeContext';
-function MessageItem({ isOwner, message, stompClient, nextCombine, onRetry }) {
+function MessageItem({ isOwner, message, stompClient, currentUser, onRetry }) {
 	const { theme } = useTheme();
 	const classes = ['message'];
 	const classParent = [isOwner ? 'sent--item' : 'received--item'];
@@ -23,10 +22,6 @@ function MessageItem({ isOwner, message, stompClient, nextCombine, onRetry }) {
 	const [iconMessage, setIconMessage] = useState(null);
 	const [media, setMedia] = useState(null);
 	const [isRemove, setIsRemove] = useState(false);
-	const [reactIcon, setReactIcon] = useState({
-		userId: message?.senderId,
-		react: message?.react,
-	});
 	const [anchorEl, setAnchorEl] = useState(null);
 	const [openConfirmation, setOpenConfirmation] = useState(false);
 	const handleCloseConfirmation = () => {
@@ -46,24 +41,37 @@ function MessageItem({ isOwner, message, stompClient, nextCombine, onRetry }) {
 		setAnchorEl(null);
 		setIsRemove(false);
 	};
-	const handleReactIcon = (react) => {
+	const handleReactIcon = (icon) => {
 		handleClose();
-		if (reactIcon.react === react) {
-			setReactIcon({ userId: message?.senderId, react: null });
-		} else setReactIcon({ userId: message?.senderId, react: react });
-		if (message.receiverId) {
-			const data = {
-				react: react,
-				content: message.content,
-				groupId: message.groupId,
-				//xử lý thêm file
-				createAt: message.createAt,
-				senderId: message.senderId,
-				receiverId: message.receiverId,
-			};
-			// gửi lên server
-			stompClient.send('/app/private-message', {}, JSON.stringify(data));
+		const data = {
+			react: icon,
+			messageId: message?.messageId,
+			content: message?.content,
+			groupId: message?.groupId,
+			createdAt: message?.createdAt,
+			senderId: message?.senderId,
+			reactUserName: currentUser?.userName,
+			receiverId: message?.receiverId,
+			reactUser: currentUser?.userId,
+			isReact: true,
+		};
+		if (message.groupId === null || message.groupId === 'null' || message.groupId === undefined) {
+			if (message.react !== undefined && message.react !== null) {
+				const index = message.react.findIndex((item) => item.reactUser === currentUser?.userId);
+				if (index !== -1) {
+					if (message.react[index].react === icon) {
+						message.react.splice(index, 1);
+					} else {
+						message.react[index].react = icon;
+					}
+				} else {
+					message.react.push(data);
+				}
+			} else {
+				message.react = [data];
+			}
 		}
+		stompClient.send('/app/react-message', {}, JSON.stringify(data));
 	};
 	const handleClick = (event, item) => {
 		if (event.currentTarget.className.animVal === 'MuiSvgIcon-root icon--more--message') {
@@ -85,13 +93,21 @@ function MessageItem({ isOwner, message, stompClient, nextCombine, onRetry }) {
 				content: message?.content,
 				senderId: message.senderId,
 				receiverId: message?.receiverId,
+				senderAvatar: message?.avatar,
+				senderName: message?.userName,
 				groupId: message?.groupId,
 				createdAt: message?.createdAt,
 				updatedAt: message?.updatedAt,
 				isDeleted: true,
 			};
 			// gửi lên server
-			stompClient.send('/app/private-message', {}, JSON.stringify(data));
+
+			if (message?.groupId && message?.groupId !== 'null') {
+				stompClient.send('/app/sendMessage/' + data?.groupId, {}, JSON.stringify(data));
+			} else {
+				stompClient.send('/app/private-message', {}, JSON.stringify(data));
+			}
+
 			message.isDeleted = true;
 		}
 		handleClose();
@@ -102,9 +118,18 @@ function MessageItem({ isOwner, message, stompClient, nextCombine, onRetry }) {
 			setMedia(URL.createObjectURL(message.files));
 		}
 	}, [message]);
+
+	//openModal react
+	const [open, setOpen] = useState(false);
 	return (
 		<Space className={classnames(classParent)} align={isOwner ? 'end' : 'start'}>
-			{!isOwner && <img src={message?.senderAvatar || sampleProPic} alt="avatar" className="sender-avatar" />}
+			{!isOwner && (
+				<img
+					src={message?.senderAvatar || message?.avatar || sampleProPic}
+					alt="avatar"
+					className="sender-avatar"
+				/>
+			)}
 			<div className={isOwner ? 'senderMessage' : 'receivedMessage'}>
 				{!isOwner && (
 					<Typography.Text
@@ -119,7 +144,7 @@ function MessageItem({ isOwner, message, stompClient, nextCombine, onRetry }) {
 					style={{ color: theme.foreground, background: theme.background }}
 					className={classnames(classes)}
 				>
-					{message.isDeleted ? (
+					{message?.isDeleted ? (
 						<Typography.Text className="text removeMessage">Tin nhắn đã bị thu hồi</Typography.Text>
 					) : (
 						<>
@@ -168,28 +193,32 @@ function MessageItem({ isOwner, message, stompClient, nextCombine, onRetry }) {
 								title={message.createAt}
 							>
 								{message.content}
-								{reactIcon?.react && (
-									<span className="react--icon">
-										<img
-											src={
-												reactIcon.react === 'HeartIcon'
-													? HeartIcon
-													: reactIcon.react === 'LikeIcon'
-													? LikeIcon
-													: reactIcon.react === 'WowIcon'
-													? WowIcon
-													: reactIcon.react === 'SadIcon'
-													? SadIcon
-													: reactIcon.react === 'AngryIcon'
-													? AngryIcon
-													: reactIcon.react === 'HahaIcon'
-													? HahaIcon
-													: ''
-											}
-											alt="Heart Icon"
-											className="icon--react--message"
-										/>
-									</span>
+								{message.react !== undefined && message.react !== null && (
+									<div className="react--icon" onClick={() => setOpen(true)}>
+										{message.react.slice(0, 5).map((item) => (
+											<span>
+												<img
+													className="icon--react--message"
+													src={
+														item.react === 'Heart'
+															? HeartIcon
+															: item.react === 'Like'
+															? LikeIcon
+															: item.react === 'Wow'
+															? WowIcon
+															: item.react === 'Sad'
+															? SadIcon
+															: item.react === 'Angry'
+															? AngryIcon
+															: item.react === 'Haha'
+															? HahaIcon
+															: ''
+													}
+													alt="Heart Icon"
+												/>
+											</span>
+										))}
+									</div>
 								)}
 							</Typography.Text>
 						</>
@@ -237,37 +266,37 @@ function MessageItem({ isOwner, message, stompClient, nextCombine, onRetry }) {
 								src={HeartIcon}
 								alt="Heart Icon"
 								className="icon--emoticon"
-								onClick={() => handleReactIcon('HeartIcon')}
+								onClick={() => handleReactIcon('Heart')}
 							/>
 							<img
 								src={HahaIcon}
 								alt="Haha Icon"
 								className="icon--emoticon"
-								onClick={() => handleReactIcon('HahaIcon')}
+								onClick={() => handleReactIcon('Haha')}
 							/>
 							<img
 								src={LikeIcon}
 								alt="Like Icon"
 								className="icon--emoticon"
-								onClick={() => handleReactIcon('LikeIcon')}
+								onClick={() => handleReactIcon('Like')}
 							/>
 							<img
 								src={SadIcon}
 								alt="Sad Icon"
 								className="icon--emoticon"
-								onClick={() => handleReactIcon('SadIcon')}
+								onClick={() => handleReactIcon('Sad')}
 							/>
 							<img
 								src={WowIcon}
 								alt="Wow Icon"
 								className="icon--emoticon"
-								onClick={() => handleReactIcon('WowIcon')}
+								onClick={() => handleReactIcon('Wow')}
 							/>
 							<img
 								src={AngryIcon}
 								alt="Angry Icon"
 								className="icon--emoticon"
-								onClick={() => handleReactIcon('AngryIcon')}
+								onClick={() => handleReactIcon('Angry')}
 							/>
 						</div>
 					)}
@@ -292,6 +321,44 @@ function MessageItem({ isOwner, message, stompClient, nextCombine, onRetry }) {
 					</Button>
 				</DialogActions>
 			</Dialog>
+			{open && (
+				<Modal
+					title="Danh sách người đã tương tác "
+					open={open}
+					onCancel={() => setOpen(false)}
+					footer={null}
+					width={300}
+				>
+					{message.react !== undefined && message.react !== null ? (
+						message.react.map((item) => (
+							<div className="react--item">
+								<img
+									className="icon--react--message"
+									src={
+										item.react === 'Heart'
+											? HeartIcon
+											: item.react === 'Like'
+											? LikeIcon
+											: item.react === 'Wow'
+											? WowIcon
+											: item.react === 'Sad'
+											? SadIcon
+											: item.react === 'Angry'
+											? AngryIcon
+											: item.react === 'Haha'
+											? HahaIcon
+											: ''
+									}
+									alt="Heart Icon"
+								/>
+								<Typography.Text className="react--name"> {item.reactUserName}</Typography.Text>
+							</div>
+						))
+					) : (
+						<Typography.Text>Chưa có tương tác nào</Typography.Text>
+					)}
+				</Modal>
+			)}
 		</Space>
 	);
 }

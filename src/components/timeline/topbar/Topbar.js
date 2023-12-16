@@ -1,17 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Topbar.css';
 import axios from 'axios';
-import { NightsStay, Search, WbSunny, Home, Group, GroupAdd, Notifications } from '@material-ui/icons';
+import { NightsStay, Search, WbSunny, Home, Group, GroupAdd, Notifications, MoreHoriz } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 import useAuth from '../../../context/auth/AuthContext';
 import useTheme, { themes } from '../../../context/ThemeContext';
-import { CloseOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { CloseOutlined } from '@ant-design/icons';
 import noAvatar from '../../../assets/appImages/user.png';
 import { BASE_URL } from '../../../context/apiCall';
 import { useNavigate } from 'react-router-dom';
 import adver4 from '../../../assets/appImages/adver4.jpg';
 import { HiChatBubbleOvalLeft } from 'react-icons/hi2';
-
+import { Badge, Button, List, Typography } from 'antd';
+import { useWebSocket } from '../../../context/WebSocketContext';
+import NotificationApi from '../../../api/notification/NotificationApi';
+import { Popover } from '@material-ui/core';
+import toast, { Toaster } from 'react-hot-toast';
+import classnames from 'classnames';
+import moment from 'moment';
 const Topbar = ({ dataUser }) => {
 	const [user, setUser] = useState();
 	const { user: currentUser } = useAuth();
@@ -23,6 +29,40 @@ const Topbar = ({ dataUser }) => {
 	const [showDropdown, setShowDropdown] = useState(false);
 	const [searchFriends, setSearchFriends] = useState([]);
 	const inputRef = useRef(null);
+	const [listNotification, setListNotification] = useState([]);
+	const [page, setPage] = useState(0);
+	const { notification } = useWebSocket();
+	const [loading, setLoading] = useState(false);
+	const [hasMore, setHasMore] = useState(true);
+	useEffect(() => {
+		console.log('notification', notification);
+		if (notification) {
+			// unshift thêm vào đầu mảng
+			setListNotification([notification, ...listNotification]);
+		}
+	}, [notification]);
+
+	useEffect(() => {
+		const fetchNotifications = async () => {
+			setLoading(true);
+			const res = await NotificationApi.getNotifications({ user: currentUser, page: page, size: 10 });
+			console.log('res', res);
+			if (res.success) {
+				console.log(res.data);
+				// thêm vào cuối mảng
+				setListNotification([...listNotification, ...res.result]);
+				if (res.result.length < 10) {
+					setHasMore(false);
+				} else {
+					setHasMore(true);
+				}
+			} else {
+				throw new Error(res.message);
+			}
+			setLoading(false);
+		};
+		fetchNotifications();
+	}, [currentUser, page]);
 
 	// Toggle theme switch
 	const themeModeHandler = () => {
@@ -30,10 +70,7 @@ const Topbar = ({ dataUser }) => {
 		localStorage.setItem('userTheme', theme === themes.light ? 'dark' : 'light');
 	};
 	const handderMessageClick = () => {
-		navigate(`/message/${currentUser.userId}}`);
-	};
-	const handderNotificationClick = () => {
-		navigate(`notification/${currentUser.userId}`);
+		navigate(`/messages`);
 	};
 	// get user details
 	useEffect(() => {
@@ -51,15 +88,6 @@ const Topbar = ({ dataUser }) => {
 	}, [currentUser]);
 
 	const buttonCenterHandler = (e, link) => {
-		// if (e.tagName === 'svg') e = e.parentNode;
-		// if (e.tagName === 'path') e = e.parentNode.parentNode;
-
-		// const buttons = document.querySelectorAll('.button-center');
-		// buttons.forEach((button) => {
-		// 	button.classList.remove('button-active');
-		// });
-		// e.classList.add('button-active');
-		// Chuyển trang theo link sử dụng
 		navigate(link);
 	};
 
@@ -83,6 +111,7 @@ const Topbar = ({ dataUser }) => {
 		// Lắng nghe sự kiện click trên toàn bộ trang
 		const handleClickOutside = (e) => {
 			if (inputRef.current && !inputRef.current.contains(e.target)) {
+				document.querySelector('.hide--on-click').classList.remove('hide');
 				setShowDropdown(false);
 			}
 		};
@@ -118,11 +147,13 @@ const Topbar = ({ dataUser }) => {
 		}
 	}, []);
 
-	const handleRemoveSearchItem = (itemToRemove) => {
+	const handleRemoveSearchItem = (e, itemToRemove) => {
+		// ngăn chặn sự kiện click lan ra ngoài
+		e.stopPropagation();
 		// Xóa mục khỏi searchHistory trong trạng thái của component
 		const updatedSearchHistory = searchHistory.filter((item) => item !== itemToRemove);
 		setSearchHistory(updatedSearchHistory);
-
+		setSearchKey('');
 		// Cập nhật Local Storage với mảng mới sau khi xóa
 		localStorage.setItem('searchHistory', JSON.stringify(updatedSearchHistory));
 	};
@@ -144,6 +175,7 @@ const Topbar = ({ dataUser }) => {
 		localStorage.setItem('searchHistory', JSON.stringify(updatedSearchHistory));
 
 		// Đóng dropdown
+		document.querySelector('.hide--on-click').classList.remove('hide');
 		setShowDropdown(false);
 		navigate('/groups/searchResult', { state: { searchData: searchFriends } });
 	};
@@ -171,8 +203,70 @@ const Topbar = ({ dataUser }) => {
 			link: '/friends',
 		},
 	];
+	const [anchorEl, setAnchorEl] = useState(null);
+	const handleClose = () => {
+		setAnchorEl(null);
+	};
+	const handleClick = (e) => {
+		setAnchorEl(e.currentTarget);
+	};
+	const handleReadNotification = async (item) => {
+		const toastId = toast.loading('Đang xử lý...');
+		const res = await NotificationApi.readNotification({ user: currentUser, notificationId: item.notificationId });
+		toast.dismiss(toastId);
+		if (res.success) {
+			console.log(res.data);
+			setAnchorEl(null);
+
+			navigate(`${item.link}`);
+		} else {
+			toast.error('Nội dung thông báo không còn tồn tại!!!');
+		}
+		//Chỉnh thông báo đó là đã đọc
+		const newListNotification = listNotification.map((notification) => {
+			if (notification.notificationId === item.notificationId) {
+				return { ...notification, isRead: true };
+			}
+			return notification;
+		});
+		setListNotification(newListNotification);
+	};
+	const unReadAllNotification = async () => {
+		const res = await NotificationApi.unReadAllNotification({ user: currentUser });
+		if (res.success) {
+			//chỉnh tất cả thông báo là đã đọc
+			const newListNotification = listNotification.map((notification) => {
+				return { ...notification, isRead: true };
+			});
+			setListNotification(newListNotification);
+		} else {
+			toast.error('Đã có lỗi xảy ra!!!');
+		}
+	};
+	const clickSearchHistory = async (e) => {
+		const item = e.target.innerText;
+		setSearchKey(item);
+		try {
+			const config = {
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Bearer ${currentUser.accessToken}`,
+				},
+			};
+			const res = await axios.get(`${BASE_URL}/v1/user/search/key?search=${item}`, config);
+
+			navigate('/groups/searchResult', {
+				state: { searchData: res.data.result },
+			});
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	const classParent = ['notification--item'];
 	return (
 		<>
+			<Toaster />
 			<div
 				className="topbarContainer"
 				style={{
@@ -185,80 +279,72 @@ const Topbar = ({ dataUser }) => {
 						<span className="topbarLogo">UTEALO</span>
 					</Link>
 					<div className="topbarLeft__search">
-						<div className="group--infor-introduce">
-							<Search className="icon__search" />
-							{showDropdown && (
-								<div className="search-dropdown">
-									<div className="search-dropdown-title">
-										<span className="span-1">Gần đây</span>
-										<span className="span-2">Chỉnh sửa</span>
-									</div>
-									<div className="search-dropdown-history">
-										<ul>
-											{/* Lịch sử tìm kiếm */}
-											{searchHistory.map((item, index) => (
-												<li key={index} onClick={() => setSearchKey(item)}>
-													<ClockCircleOutlined className="icon--clock" />
-													<span>{item}</span>
-													<CloseOutlined
-														className="icon--remove"
-														onClick={() => handleRemoveSearchItem(item)}
-													/>
-												</li>
-											))}
-											{/* Tiên đoán */}
-											{/* {suggestedValues.map((item, index) => (
-											<li key={index} onClick={() => setSearchKey(item)}>
-												{item}
-											</li>
-										))} */}
-											{/* Kết quả tìm kiếm */}
-											{Object.values(searchFriends).map((item, index) => (
-												<li
-													key={index}
-													onClick={() =>
-														setSearchKey(
-															item.postGroupName ? item.postGroupName : item.userName
-														)
-													}
-												>
-													<img
-														className="search--avatarGroup"
-														src={item.avatarGroup || item.avatar || adver4}
-														alt="avatarGroup"
-													></img>
-													<span
-														className="item--postGroupName"
-														onClick={() => {
-															navigate(
-																item.postGroupName
-																	? `/groups/${item.postGroupId}`
-																	: `/profile/${item.userId}`
-															);
-														}}
-													>
-														{item.postGroupName ? item.postGroupName : item.userName}
-													</span>
-												</li>
-											))}
-										</ul>
-									</div>
-								</div>
-							)}
-						</div>
-						<form onSubmit={handleSearchSubmit}>
-							<div ref={inputRef}>
-								<input
-									type="text"
-									placeholder="Tìm kiếm trên UteAlo"
-									className="input__search__utealo"
-									style={{ fontSize: '14px' }}
-									value={searchKey}
-									onChange={handleSearchInputChange}
-									onClick={handleInputClick}
-								/>
+						<div className="topbarLeft--search">
+							<div className="group--infor-introduce">
+								<Search className="icon__search" />
 							</div>
-						</form>
+							<form onSubmit={handleSearchSubmit} style={{ flex: 1 }}>
+								<div ref={inputRef}>
+									<input
+										type="text"
+										placeholder="Tìm kiếm trên UteAlo"
+										className="input__search__utealo"
+										style={{ fontSize: '14px' }}
+										value={searchKey}
+										onChange={handleSearchInputChange}
+										onClick={handleInputClick}
+									/>
+								</div>
+							</form>
+						</div>
+						{showDropdown && (
+							<div className="search-dropdown">
+								<div className="search-dropdown-title" style={{ color: '#000' }}>
+									<span className="span-1">Gần đây</span>
+								</div>
+								<div className="search-dropdown-history">
+									<ul className="search-dropdown-history-ul" style={{ color: '#000' }}>
+										{/* Lịch sử tìm kiếm */}
+
+										{[...new Set(searchHistory)].map((item, index) => (
+											<li key={index} onClick={clickSearchHistory}>
+												{item}
+												<CloseOutlined
+													className="search-dropdown-history-close"
+													onClick={(e) => handleRemoveSearchItem(e, item)}
+												/>
+											</li>
+										))}
+
+										{/* Kết quả tìm kiếm */}
+										{Object.values(searchFriends).map((item, index) => (
+											<li
+												key={index}
+												onClick={() => {
+													setSearchKey(
+														item.postGroupName ? item.postGroupName : item.userName
+													);
+													navigate(
+														item.postGroupName
+															? `/groups/${item.postGroupId}`
+															: `/profile/${item.userId}`
+													);
+												}}
+											>
+												<img
+													className="search--avatarGroup"
+													src={item.avatarGroup || item.avatar || adver4}
+													alt="avatarGroup"
+												></img>
+												<span className="item--postGroupName">
+													{item.postGroupName ? item.postGroupName : item.userName}
+												</span>
+											</li>
+										))}
+									</ul>
+								</div>
+							</div>
+						)}
 					</div>
 				</div>
 				<div className="topbarCenter">
@@ -278,24 +364,127 @@ const Topbar = ({ dataUser }) => {
 						) : (
 							<WbSunny className="button-center-theme" titleAccess="Chế độ sáng" />
 						)}
-						<span className="button-center-title">Theme</span>
+						<span className="button-center-title">Chủ đề</span>
 					</div>
 				</div>
 
 				<div className="topbarRight">
 					<div className="button-right">
-						<HiChatBubbleOvalLeft
-							className="button-right-message"
-							titleAccess="Tin nhắn"
-							onClick={handderMessageClick}
-						/>
+						<Badge count={0}>
+							<HiChatBubbleOvalLeft
+								className="button-right-message"
+								titleAccess="Tin nhắn"
+								onClick={handderMessageClick}
+							/>
+						</Badge>
 					</div>
 					<div className="button-right">
-						<Notifications
-							className="button-right-notifications"
-							titleAccess="Thông báo"
-							onClick={handderNotificationClick}
-						/>
+						<Badge
+							// chỉ tính những thông báo chưa đọc
+							count={listNotification.filter((item) => item.isRead === false).length}
+							aria-describedby="simple-popover"
+							onClick={(e) => handleClick(e)}
+						>
+							<Notifications className="button-right-notifications" titleAccess="Thông báo" />
+						</Badge>
+						<Popover
+							id="simple-popover"
+							open={Boolean(anchorEl)}
+							className="popper--member"
+							anchorEl={anchorEl}
+							onClose={handleClose}
+							anchorOrigin={{
+								vertical: 'bottom',
+								horizontal: 'right',
+							}}
+							transformOrigin={{
+								vertical: 'top',
+								horizontal: 'right',
+							}}
+						>
+							<div className="notification--container">
+								<div className="notification--header">
+									<Typography.Text strong>Thông báo</Typography.Text>
+
+									<Typography.Text
+										style={{ color: '#1e90ff', cursor: 'pointer' }}
+										onClick={unReadAllNotification}
+									>
+										Đánh dấu tất cả đã đọc
+									</Typography.Text>
+								</div>
+								<div className="notification--body">
+									{listNotification.length > 0 ? (
+										<List
+											itemLayout="horizontal"
+											dataSource={listNotification}
+											loadMore={
+												<div
+													style={{
+														textAlign: 'center',
+														marginTop: 12,
+														height: 32,
+														lineHeight: '32px',
+														marginBottom: 12,
+													}}
+												>
+													<Button
+														disabled={!hasMore}
+														type="primary"
+														onClick={() => setPage((pre) => pre + 1)}
+														loading={loading}
+													>
+														Xem thêm
+													</Button>
+												</div>
+											}
+											renderItem={(item) => (
+												<List.Item
+													className={classnames(item.isRead ? 'read' : 'unread', classParent)}
+													onClick={() => handleReadNotification(item)}
+												>
+													<List.Item.Meta
+														avatar={
+															<img
+																src={item.photo || adver4}
+																alt="avatarGroup"
+																className="notification--item-avatar"
+															></img>
+														}
+														description={
+															<div style={{ display: 'flex', flexDirection: 'column' }}>
+																<span className="notification--item-content">
+																	{item.content}
+																</span>
+																<span className="notification--item-time">
+																	Thời gian:{' '}
+																	{moment(item.createdAt).format('DD/MM/YYYY')}
+																</span>
+															</div>
+														}
+													/>
+												</List.Item>
+											)}
+										/>
+									) : (
+										<div className="notification--item">
+											<img
+												src={adver4}
+												alt="avatarGroup"
+												className="notification--item-avatar"
+											></img>
+											<div className="notification--item-content">
+												<Typography.Text>
+													<span className="notification--item-content-content">
+														Bạn không có thông báo nào
+													</span>
+												</Typography.Text>
+											</div>
+										</div>
+									)}
+								</div>
+							</div>
+						</Popover>
 					</div>
 
 					<Link to={`/profile/${currentUser.userId}`}>

@@ -135,6 +135,7 @@ const NewFeedGroup = ({ inforUser, currentUser }) => {
 				<InfiniteScroll
 					scrollableTarget="feed"
 					dataLength={postLength}
+					style={{ color: theme.foreground, background: theme.background, overflow: 'visible' }}
 					className="feed__scroll"
 					next={loadMore}
 					hasMore={hasMore.posts || hasMore.share}

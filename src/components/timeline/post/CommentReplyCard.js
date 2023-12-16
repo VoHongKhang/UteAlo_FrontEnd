@@ -14,8 +14,18 @@ import { Image, Modal } from 'antd';
 import { PermMedia, Cancel } from '@material-ui/icons';
 import { Send } from '@material-ui/icons';
 import InputEmoji from 'react-input-emoji';
+import { useWebSocket } from '../../../context/WebSocketContext';
 
-const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete, onCreate, commentReplyLength }) => {
+const CommentCard = ({
+	inforUser,
+	commentReply,
+	fetchCommentReply,
+	comment,
+	post,
+	onDelete,
+	onCreate,
+	commentReplyLength,
+}) => {
 	const { user: currentUser } = useAuth();
 	console.log('commentReplyLength', commentReplyLength);
 	// Hàm kiểm tra xem người dùng đã like bài comment chưa
@@ -39,6 +49,7 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete,
 		}
 	}, [currentUser.accessToken, commentReply.commentId]);
 
+	const { stompClient } = useWebSocket();
 	const [isLikedComment, setIsLikedComment] = useState(false);
 	const [likeComment, setLikeComment] = useState(comment.likes?.length || 0);
 	const [isModalVisible, setIsModalVisible] = useState(false);
@@ -58,6 +69,18 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete,
 	const [photosCommetUrl, setPhotosCommetUrl] = useState('');
 	const [content, setContent] = useState('');
 	const [comments, setCommentPost] = useState({});
+
+	// Danh sách người dùng thích bình luận
+	const [listUserLikeComment, setListUserLikeComment] = useState([]);
+	const [showModalLikeComment, setShowModalLikeComment] = useState(false);
+
+	const handleLikeCounterClick = () => {
+		setShowModalLikeComment(true);
+	};
+
+	const handleCloseModal = () => {
+		setShowModalLikeComment(false);
+	};
 
 	// Model xuất hiện khi nhấn chỉnh sửa bình luận
 	const showDeleteConfirm = (commentReply) => {
@@ -85,7 +108,18 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete,
 		};
 
 		fetchData();
+		fetchLikeComment();
 	}, [checkUserLikeComment]);
+
+	// Lấy danh sách người dùng thích bình luận
+	const fetchLikeComment = async () => {
+		try {
+			const res = await axios.get(`${BASE_URL}/v1/comment/like/listUser/${comment.commentId}`);
+			setListUserLikeComment(res.data.result);
+		} catch (error) {
+			console.error(error);
+		}
+	};
 
 	// yêu thích và bỏ yêu thích bình luận
 	const likeCommentHandler = async (commentId) => {
@@ -97,6 +131,7 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete,
 
 		setLikeComment(isLikedComment ? isLikedComment - 1 : isLikedComment + 1);
 		setIsLikedComment(!isLikedComment);
+		fetchLikeComment();
 	};
 
 	// xóa bình luận trên bài post
@@ -155,6 +190,40 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete,
 					setCommentPost({ ...comments, [newComment.commentId]: newComment });
 					onCreate(commentReplyLength + 1);
 					//setCommentLength(commentlength + 1);
+
+					const dataComment = {
+						commentId: comment.commentId,
+						userId: comment.userId,
+						photo: inforUser.avatar,
+						content: inforUser.userName + ' đã phản hồi bình luận của bạn',
+						link: `/post/${post.postId}`,
+						isRead: false,
+						createAt: new Date().toISOString(),
+						updateAt: new Date().toISOString(),
+					};
+					const dataPost = {
+						postId: post.postId,
+						userId: post.userId,
+						photo: inforUser.avatar,
+						content: inforUser.userName + ' đã bình luận bài viết của bạn',
+						link: `/post/${post.postId}`,
+						isRead: false,
+						createAt: new Date().toISOString(),
+						updateAt: new Date().toISOString(),
+					};
+					if (comment.userId === post.userId) {
+						if (comment.userId !== currentUser.userId) {
+							stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(dataComment));
+						}
+					} else {
+						if (comment.userId !== currentUser.userId) {
+							stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(dataComment));
+						}
+						if (post.userId !== currentUser.userId) {
+							stompClient.send('/app/userNotify/' + post.userId, {}, JSON.stringify(dataPost));
+						}
+					}
+
 					toast.success('Đăng bình luận thành công!', { id: toastId });
 				} else {
 					// Xử lý trường hợp API trả về lỗi
@@ -185,6 +254,40 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete,
 					setCommentPost({ ...comments, [newComment.commentId]: newComment });
 					onCreate(commentReplyLength + 1);
 					//setCommentLength(commentlength + 1);
+
+					const dataComment = {
+						commentId: comment.commentId,
+						userId: comment.userId,
+						photo: inforUser.avatar,
+						content: inforUser.userName + ' đã phản hồi bình luận của bạn',
+						link: `/share/${post.shareId}`,
+						isRead: false,
+						createAt: new Date().toISOString(),
+						updateAt: new Date().toISOString(),
+					};
+					const dataPost = {
+						shareId: post.shareId,
+						userId: post.userId,
+						photo: inforUser.avatar,
+						content: inforUser.userName + ' đã bình luận bài chia sẻ của bạn',
+						link: `/share/${post.postId}`,
+						isRead: false,
+						createAt: new Date().toISOString(),
+						updateAt: new Date().toISOString(),
+					};
+					if (comment.userId === post.userId) {
+						if (comment.userId !== currentUser.userId) {
+							stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(dataComment));
+						}
+					} else {
+						if (comment.userId !== currentUser.userId) {
+							stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(dataComment));
+						}
+						if (post.userId !== currentUser.userId) {
+							stompClient.send('/app/userNotify/' + post.userId, {}, JSON.stringify(dataPost));
+						}
+					}
+
 					toast.success('Đăng bình luận thành công!', { id: toastId });
 				} else {
 					// Xử lý trường hợp API trả về lỗi
@@ -383,7 +486,7 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete,
 
 							{isReplyCommentVisible && (
 								<div className="postCommentContReply">
-									<div className="postCommentCont-1">
+									<div className="postCommentCont-1" style={{ width: '300px' }}>
 										<InputEmoji
 											value={content}
 											onChange={setContent}
@@ -479,7 +582,44 @@ const CommentCard = ({ commentReply, fetchCommentReply, comment, post, onDelete,
 							</Modal>
 						</div>
 					</div>
-					<div className="postLikeCommentCounter">{likeComment}</div>
+					<div className="postLikeCommentCounter">
+						<span onClick={handleLikeCounterClick} className="countCommentPostLike">
+							{likeComment}
+						</span>
+						<Modal
+							title="Danh sách người đã thích"
+							open={showModalLikeComment}
+							onCancel={handleCloseModal}
+							footer={null}
+						>
+							<ul>
+								{listUserLikeComment.length > 0 ? (
+									<ul>
+										{listUserLikeComment.map((user) => (
+											<li key={user.userId} style={{ display: 'flex', marginTop: '10px' }}>
+												<img
+													src={user.avatar ? user.avatar : sampleProPic}
+													alt="Avatar"
+													style={{ width: '40px', height: '40px', borderRadius: '50%' }}
+												/>
+												<span
+													style={{
+														display: 'flex',
+														alignItems: 'center',
+														marginLeft: '20px',
+													}}
+												>
+													{user.userName}
+												</span>
+											</li>
+										))}
+									</ul>
+								) : (
+									<p>Chưa có ai thích</p>
+								)}
+							</ul>
+						</Modal>
+					</div>
 				</div>
 
 				<div className="comment">

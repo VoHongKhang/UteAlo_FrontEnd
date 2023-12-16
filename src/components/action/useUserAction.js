@@ -7,10 +7,14 @@ const userAction = ({ currentUser, user, action }) => {
 		const toastId = toast.loading('Đang gửi lời mời kết bạn...');
 
 		try {
-			await GetFriendApi.sendFriendRequest({ token: currentUser.accessToken, userId: user.userId });
+			const res = await GetFriendApi.sendFriendRequest({ token: currentUser.accessToken, userId: user.userId });
+			console.log('res', res);
+
 			toast.success('Gửi lời mời kết bạn thành công!', { id: toastId });
+			return res;
 		} catch (error) {
 			toast.error(error.message || error.toString(), { id: toastId });
+			return null;
 		}
 	};
 
@@ -25,26 +29,13 @@ const userAction = ({ currentUser, user, action }) => {
 		}
 	};
 
-	const handleChat = async ({ currentUser, user }) => {
-		console.log('handleChat', user);
-		const toastId = toast.loading('Đang chuyển hướng đến trang nhắn tin...');
-
-		try {
-			//const created = await createConversationApi({ members: [{ user: user._id }] });
-			//await router.push(`/messages?id=${created._id}`);
-
-			toast.dismiss(toastId);
-		} catch (error) {
-			toast('Có lỗi xảy ra, vui lòng thử lại sau', { id: toastId });
-		}
-	};
-
 	const handleAcceptFriend = async ({ currentUser, user }) => {
 		const toastId = toast.loading('Đang xác nhận lời mời kết bạn...');
 
 		try {
-			await GetFriendApi.acceptFriendRequest({ token: currentUser.accessToken, userId: user.userId });
+			const res = await GetFriendApi.acceptFriendRequest({ token: currentUser.accessToken, userId: user.userId });
 			toast.success('Xác nhận lời mời kết bạn thành công! Bạn bè với nhau rồi đó!', { id: toastId });
+			return res;
 		} catch (error) {
 			toast.error(error.message || error.toString(), { id: toastId });
 		}

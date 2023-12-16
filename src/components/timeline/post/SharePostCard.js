@@ -21,6 +21,7 @@ import classnames from 'classnames';
 import { useNavigate } from 'react-router-dom';
 import PostModal from '../../utils/PostModal';
 import { ModalShare } from '../sharePost/ModalShare';
+import { useWebSocket } from '../../../context/WebSocketContext';
 const SharePostCard = ({ inforUser, share, newSharePosts }) => {
 	const [isModalVisible, setModalVisible] = useState(false);
 	const [currentPost, setCurrentPost] = useState(null);
@@ -119,6 +120,19 @@ const SharePostCard = ({ inforUser, share, newSharePosts }) => {
 	const [photosCommetUrl, setPhotosCommetUrl] = useState('');
 	const [content, setContent] = useState('');
 
+	// Danh sách người dùng thích bài share post
+	const [listUserLikePost, setListUserLikePost] = useState([]);
+
+	const [showModalLikePost, setShowModalLikePost] = useState(false);
+
+	const handleLikeCounterClick = () => {
+		setShowModalLikePost(true);
+	};
+
+	const handleCloseModal = () => {
+		setShowModalLikePost(false);
+	};
+
 	// Chức năng xem chi tiết chia sẻ bài viết
 	const [showSharePostDetailModal, setShowSharePostDetailModal] = useState(false);
 	const [selectedSharePost, setSelectedSharePost] = useState(null);
@@ -167,22 +181,50 @@ const SharePostCard = ({ inforUser, share, newSharePosts }) => {
 		}
 	};
 
-	// lấy danh sách bình luận trên bài post
+	// Lấy danh sách người dùng thích bài post
+	const fetchLikeSharePost = async () => {
+		try {
+			const res = await axios.get(`${BASE_URL}/v1/share/like/listUser/${share.shareId}`);
+			setListUserLikePost(res.data.result);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
+	// lấy danh sách bình luận trên bài share post
 	useEffect(() => {
+		fetchLikeSharePost();
 		fetchCommentSharePost();
 		//eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [currentUser.userId, currentUser.accessToken]);
 
+	const { stompClient } = useWebSocket();
 	// yêu thích và bỏ yêu thích bài post
 	const likePostHandler = async () => {
 		try {
 			await LikeOrUnlikeApi.likeOrUnlike(share.shareId, currentUser.accessToken, currentUser.userId);
+			console.log('share', share);
+			console.log('inforUser', inforUser);
+			if (isLiked === false && inforUser.userId !== share.userId) {
+				const data = {
+					shareId: share.shareId,
+					userId: share.userId,
+					photo: inforUser.avatar,
+					content: inforUser.userName + ' đã thích bài chia sẻ của bạn',
+					link: `/share/${share.shareId}`,
+					isRead: false,
+					createAt: new Date().toISOString(),
+					updateAt: new Date().toISOString(),
+				};
+
+				stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
+			}
 		} catch (err) {
 			console.log(err);
 		}
-
 		setLike(isLiked ? like - 1 : like + 1);
 		setIsLiked(!isLiked);
+		fetchLikeSharePost();
 	};
 
 	const toggleShowAllComments = () => {
@@ -220,6 +262,20 @@ const SharePostCard = ({ inforUser, share, newSharePosts }) => {
 					// Thêm mới comment vào object comments
 					setCommentPost({ ...comments, [newComment.commentId]: newComment });
 					setCommentLength(commentlength + 1);
+					if (inforUser.userId !== share.userId) {
+						const data = {
+							shareId: share.shareId,
+							userId: share.userId,
+							photo: inforUser.avatar,
+							content: inforUser.userName + ' đã bình luận bài chia sẻ của bạn',
+							link: `/share/${share.shareId}`,
+							isRead: false,
+							createAt: new Date().toISOString(),
+							updateAt: new Date().toISOString(),
+						};
+
+						stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
+					}
 					toast.success('Đăng bình luận thành công!', { id: toastId });
 				} else {
 					// Xử lý trường hợp API trả về lỗi
@@ -590,7 +646,42 @@ const SharePostCard = ({ inforUser, share, newSharePosts }) => {
 							src={isLiked ? heart : heartEmpty}
 							alt="heart"
 						/>
-						<span className="postLikeCounter">{like} người đã thích</span>
+						<span className="postLikeCounter" onClick={handleLikeCounterClick}>
+							{like} người đã thích
+						</span>
+						<Modal
+							title="Danh sách người đã thích"
+							open={showModalLikePost}
+							onCancel={handleCloseModal}
+							footer={null}
+						>
+							<ul>
+								{listUserLikePost.length > 0 ? (
+									<ul>
+										{listUserLikePost.map((user) => (
+											<li key={user.userId} style={{ display: 'flex', marginTop: '10px' }}>
+												<img
+													src={user.avatar ? user.avatar : sampleProPic}
+													alt="Avatar"
+													style={{ width: '40px', height: '40px', borderRadius: '50%' }}
+												/>
+												<span
+													style={{
+														display: 'flex',
+														alignItems: 'center',
+														marginLeft: '20px',
+													}}
+												>
+													{user.userName}
+												</span>
+											</li>
+										))}
+									</ul>
+								) : (
+									<p>Chưa có ai thích</p>
+								)}
+							</ul>
+						</Modal>
 					</div>
 					<div className="postBottomRight">
 						<span className="postCommentText" onClick={toggleShowAllComments}>
@@ -639,6 +730,7 @@ const SharePostCard = ({ inforUser, share, newSharePosts }) => {
 				{showAllComments
 					? Object.values(comments).map((comment) => (
 							<CommentCard
+								inforUser={inforUser}
 								comment={comment}
 								fetchCommentPost={fetchCommentSharePost}
 								post={share}
@@ -651,6 +743,7 @@ const SharePostCard = ({ inforUser, share, newSharePosts }) => {
 							.slice(0, 1)
 							.map((comment) => (
 								<CommentCard
+									inforUser={inforUser}
 									comment={comment}
 									fetchCommentPost={fetchCommentSharePost}
 									post={share}

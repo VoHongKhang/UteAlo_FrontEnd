@@ -16,9 +16,11 @@ import InputEmoji from 'react-input-emoji';
 import GetCommentReplyApi from '../../../api/timeline/commentPost/getCommentReply';
 import GetCommentReplyShareApi from '../../../api/timeline/commentSharePost/getCommentReplyShare';
 import CommentReplyCard from './CommentReplyCard';
+import { useWebSocket } from '../../../context/WebSocketContext';
 
-const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, commentLength }) => {
+const CommentCard = ({ inforUser, comment, fetchCommentPost, post, onDelete, onCreate, commentLength }) => {
 	const isMounted = useRef(true);
+	const { stompClient } = useWebSocket();
 	useEffect(() => {
 		return () => {
 			// Cleanup: Set isMounted to false when the component unmounts
@@ -69,6 +71,18 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 	const [commentReplies, setCommentReplies] = useState({});
 	const [showAllComments, setShowAllComments] = useState(false);
 
+	// Danh sách người dùng thích bình luận
+	const [listUserLikeComment, setListUserLikeComment] = useState([]);
+	const [showModalLikeComment, setShowModalLikeComment] = useState(false);
+
+	const handleLikeCounterClick = () => {
+		setShowModalLikeComment(true);
+	};
+
+	const handleCloseModal = () => {
+		setShowModalLikeComment(false);
+	};
+
 	// Xử lý xem thêm bình luận
 	const toggleShowAllComments = () => {
 		setShowAllComments(!showAllComments);
@@ -112,6 +126,7 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 
 		setLikeComment(isLikedComment ? isLikedComment - 1 : isLikedComment + 1);
 		setIsLikedComment(!isLikedComment);
+		fetchLikeComment();
 	};
 
 	// xóa bình luận trên bài post
@@ -169,6 +184,40 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 					// Thêm mới comment vào object comments
 					setCommentReplies({ ...commentReplies, [newComment.commentId]: newComment });
 					onCreate(commentLength + 1);
+
+					const dataComment = {
+						commentId: comment.commentId,
+						userId: comment.userId,
+						photo: inforUser.avatar,
+						content: inforUser.userName + ' đã phản hồi bình luận của bạn',
+						link: `/post/${post.postId}`,
+						isRead: false,
+						createAt: new Date().toISOString(),
+						updateAt: new Date().toISOString(),
+					};
+					const dataPost = {
+						postId: post.postId,
+						userId: post.userId,
+						photo: inforUser.avatar,
+						content: inforUser.userName + ' đã bình luận bài viết của bạn',
+						link: `/post/${post.postId}`,
+						isRead: false,
+						createAt: new Date().toISOString(),
+						updateAt: new Date().toISOString(),
+					};
+					if (comment.userId === post.userId) {
+						if (comment.userId !== currentUser.userId) {
+							stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(dataComment));
+						}
+					} else {
+						if (comment.userId !== currentUser.userId) {
+							stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(dataComment));
+						}
+						if (post.userId !== currentUser.userId) {
+							stompClient.send('/app/userNotify/' + post.userId, {}, JSON.stringify(dataPost));
+						}
+					}
+
 					toast.success('Đăng bình luận thành công!', { id: toastId });
 				} else {
 					// Xử lý trường hợp API trả về lỗi
@@ -198,6 +247,39 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 					// Thêm mới comment vào object comments
 					setCommentReplies({ ...commentReplies, [newComment.commentId]: newComment });
 					onCreate(commentLength + 1);
+					const dataComment = {
+						commentId: comment.commentId,
+						userId: comment.userId,
+						photo: inforUser.avatar,
+						content: inforUser.userName + ' đã phản hồi bình luận của bạn',
+						link: `/share/${post.shareId}`,
+						isRead: false,
+						createAt: new Date().toISOString(),
+						updateAt: new Date().toISOString(),
+					};
+					const dataPost = {
+						shareId: post.shareId,
+						userId: post.userId,
+						photo: inforUser.avatar,
+						content: inforUser.userName + ' đã bình luận bài chia sẻ của bạn',
+						link: `/share/${post.shareId}`,
+						isRead: false,
+						createAt: new Date().toISOString(),
+						updateAt: new Date().toISOString(),
+					};
+					if (comment.userId === post.userId) {
+						if (comment.userId !== currentUser.userId) {
+							stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(dataComment));
+						}
+					} else {
+						if (comment.userId !== currentUser.userId) {
+							stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(dataComment));
+						}
+						if (post.userId !== currentUser.userId) {
+							stompClient.send('/app/userNotify/' + post.userId, {}, JSON.stringify(dataPost));
+						}
+					}
+
 					toast.success('Đăng bình luận thành công!', { id: toastId });
 				} else {
 					// Xử lý trường hợp API trả về lỗi
@@ -351,8 +433,19 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 		}
 	};
 
+	// Lấy danh sách người dùng thích bình luận
+	const fetchLikeComment = async () => {
+		try {
+			const res = await axios.get(`${BASE_URL}/v1/comment/like/listUser/${comment.commentId}`);
+			setListUserLikeComment(res.data.result);
+		} catch (error) {
+			console.error(error);
+		}
+	};
+
 	// lấy danh sách bình luận trên bài post
 	useEffect(() => {
+		fetchLikeComment();
 		fetchCommentReply();
 		//eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [currentUser.userId, currentUser.accessToken]);
@@ -419,7 +512,7 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 
 							{isReplyCommentVisible && (
 								<div className="postCommentContReply">
-									<div className="postCommentCont-1">
+									<div className="postCommentCont-1" style={{ width: '300px' }}>
 										<InputEmoji
 											value={content}
 											onChange={setContent}
@@ -515,7 +608,44 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 							</Modal>
 						</div>
 					</div>
-					<div className="postLikeCommentCounter">{likeComment}</div>
+					<div className="postLikeCommentCounter">
+						<span onClick={handleLikeCounterClick} className="countCommentPostLike">
+							{likeComment}
+						</span>
+						<Modal
+							title="Danh sách người đã thích"
+							open={showModalLikeComment}
+							onCancel={handleCloseModal}
+							footer={null}
+						>
+							<ul>
+								{listUserLikeComment.length > 0 ? (
+									<ul>
+										{listUserLikeComment.map((user) => (
+											<li key={user.userId} style={{ display: 'flex', marginTop: '10px' }}>
+												<img
+													src={user.avatar ? user.avatar : sampleProPic}
+													alt="Avatar"
+													style={{ width: '40px', height: '40px', borderRadius: '50%' }}
+												/>
+												<span
+													style={{
+														display: 'flex',
+														alignItems: 'center',
+														marginLeft: '20px',
+													}}
+												>
+													{user.userName}
+												</span>
+											</li>
+										))}
+									</ul>
+								) : (
+									<p>Chưa có ai thích</p>
+								)}
+							</ul>
+						</Modal>
+					</div>
 				</div>
 
 				<div className="comment">
@@ -545,6 +675,7 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 				{showAllComments
 					? Object.values(commentReplies).map((commentReply) => (
 							<CommentReplyCard
+								inforUser={inforUser}
 								commentReply={commentReply}
 								fetchCommentReply={fetchCommentReply}
 								comment={commentReply}
@@ -559,6 +690,7 @@ const CommentCard = ({ comment, fetchCommentPost, post, onDelete, onCreate, comm
 							.slice(0, 1)
 							.map((commentReply) => (
 								<CommentReplyCard
+									inforUser={inforUser}
 									commentReply={commentReply}
 									fetchCommentReply={fetchCommentReply}
 									comment={commentReply}

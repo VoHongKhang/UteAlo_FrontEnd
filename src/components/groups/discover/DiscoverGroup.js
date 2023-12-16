@@ -1,13 +1,9 @@
 import { useState } from 'react';
-import { Helmet } from 'react-helmet';
 import { Card, Menu } from 'antd';
 import ListDiscover from '../discover/ListDiscover';
-import Topbar from '../../timeline/topbar/Topbar';
 import '../../friend/friendRequest/friendRequest.css';
 import useAuth from '../../../context/auth/AuthContext';
-import SidebarGroup from '../sidebar/SidebarGroup';
 import './GroupCard.css';
-import { Toaster } from 'react-hot-toast';
 const DiscoverGroup = () => {
 	const { user: currentUser } = useAuth();
 	const [type, setType] = useState('friend');
@@ -45,31 +41,24 @@ const DiscoverGroup = () => {
 	];
 	return (
 		<>
-			<Helmet title={`${title}`} />
-			<Toaster />
-			<Topbar />
-			<div className="homeContainer">
-				<SidebarGroup user={currentUser} />
+			<div className="centerbar">
+				<ListDiscover currentUser={currentUser} title={title} type={type} />
+			</div>
 
-				<div className="centerbar">
-					<ListDiscover currentUser={currentUser} title={title} type={type} />
-				</div>
-
-				<div className="leftbar leftbar--discover">
-					<Card title="Danh sách" headStyle={{ padding: '0 16px' }} bodyStyle={{ padding: 8 }}>
-						<Menu
-							mode="vertical"
-							style={{ width: '100%', border: 'none' }}
-							items={friendTypeList.map((item) => ({
-								key: item.type,
-								icon: <item.Icon size={20} />,
-								label: item.title,
-							}))}
-							selectedKeys={[type]}
-							onClick={({ key }) => changeType(key)}
-						/>
-					</Card>
-				</div>
+			<div className="leftbar leftbar--discover">
+				<Card title="Danh sách" headStyle={{ padding: '0 16px' }} bodyStyle={{ padding: 8 }}>
+					<Menu
+						mode="vertical"
+						style={{ width: '100%', border: 'none' }}
+						items={friendTypeList.map((item) => ({
+							key: item.type,
+							icon: <item.Icon size={20} />,
+							label: item.title,
+						}))}
+						selectedKeys={[type]}
+						onClick={({ key }) => changeType(key)}
+					/>
+				</Card>
 			</div>
 		</>
 	);

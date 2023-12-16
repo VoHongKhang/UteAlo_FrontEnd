@@ -6,7 +6,9 @@ import '../discover/GroupCard.css';
 import { HiArrowDownOnSquareStack, HiExclamationTriangle, HiUserMinus, HiXMark } from 'react-icons/hi2';
 import UserAvatar from '../../action/UserAvatar';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 const GroupCard = ({ user, type }) => {
+	const navigate = useNavigate();
 	const { user: currentUser } = useAuth();
 	const [userState, setUserState] = useState(user);
 	const [loading, setLoading] = useState({});
@@ -165,7 +167,13 @@ const GroupCard = ({ user, type }) => {
 
 						<div className="card--description">
 							<Typography.Text className="card--description-text">
-								{type === 'sent' ? 'Gửi đến' : type === 'request' ? 'Người mời' : ''}: {user.userName}
+								{type === 'sent' ? 'Gửi đến' : type === 'request' ? 'Người mời' : ''}:{' '}
+								<span
+									style={{ cursor: 'pointer' }}
+									onClick={() => navigate(`/profile/${user?.userId}`)}
+								>
+									{user.userName}
+								</span>
 							</Typography.Text>
 						</div>
 					</div>

@@ -1,82 +1,73 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { publicRoutes, privateRoutes, notFoundRoute } from './routes/Routers';
 import useAuth from './context/auth/AuthContext';
-import { over } from 'stompjs';
-import SockJS from 'sockjs-client';
-export default function App() {
+import { useWebSocket } from './context/WebSocketContext';
+import DefaultLayout from './layouts/DefaultLayout';
+import { Toaster } from 'react-hot-toast';
+import { Helmet } from 'react-helmet';
+export default function Application() {
 	const { user: currentUser } = useAuth();
 	const Page404 = notFoundRoute.component;
+	const { connectWebSocket, disconnectWebSocket, notification } = useWebSocket();
+	const isComponentUnmounted = useRef(false);
+	window.addEventListener('beforeunload', async function (event) {
+		// Hủy bỏ sự kiện ngăn chặn đóng trang
+		event.preventDefault();
 
-	const onError = (err) => {
-		console.log(err);
-	};
+		// Gọi hàm disconnectWebSocket(currentUser) và đợi nó hoàn thành
+		await disconnectWebSocket(currentUser);
+
+		// Thực hiện đóng trang
+		const confirmationMessage = 'Bạn có chắc muốn rời khỏi trang?';
+		event.returnValue = confirmationMessage;
+
+		return confirmationMessage;
+	});
+
 	useEffect(() => {
-		var stompClient = null;
-		// Kết nối với web socketJS và STOMPJS
-		const onConnected = () => {
-			//Đăng ký vào kênh chat nhận thông báo
-			stompClient.subscribe('/notification/' + currentUser.userId + '/notify', (data) => {
-				var payloadData = JSON.parse(data.body);
-				console.log('payloadData', payloadData);
-			});
-
-		};
-		if (currentUser) {
-			let Sock = new SockJS('http://localhost:8089/ws');
-			stompClient = over(Sock);
-			stompClient.connect({}, onConnected, onError);
-
-			const chatMessage = {
-				senderId: "424e1709-68b4-4401-a0a6-fc0963e17805",
-				avatar: 'https://i.pravatar.cc/150?img=3',
-				content: 'Hello',
-				link: 'http://localhost:3000',
-				createAt: new Date(),
-				status: 'UNREAD',
-			};
-
-			setTimeout(() => {
-				stompClient.send('/app/private-notification', {}, JSON.stringify(chatMessage));
-				console.log('send');
-			}, 5000);
-		}
+		// Thực hiện kết nối khi component được mount
+		connectWebSocket(currentUser);
 		return () => {
-			if (stompClient) {
-				stompClient.disconnect();
+			// Kiểm tra xem component đã unmount chưa trước khi thực hiện disconnect
+			if (!isComponentUnmounted.current) {
+				disconnectWebSocket(currentUser);
 			}
 		};
 	}, [currentUser]);
-
+	const [inforUser, setInforUser] = useState();
 	return (
 		<BrowserRouter>
 			<Routes>
-				{publicRoutes.map((route, index) => {
-					const Page = route.component;
-					return <Route key={index} path={route.path} element={<Page />} />;
-				})}
-				,
-				{privateRoutes.map((route, index) => {
-					const Page = route.component;
-					return (
-						<Route
-							key={index}
-							path={route.path}
-							element={
-								currentUser ? (
-									// <DefaultLayout Topbar={topbar} SideBar={sidebar} RightBar={rightbar}>
-									// 	<Page />
-									// </DefaultLayout>
-									<Page />
-								) : (
-									<Navigate to="/login" replace />
-								)
-							}
-						/>
-					);
-				})}
-				,
-				<Route key={notFoundRoute.path} path={notFoundRoute.path} element={<Page404 />} />,
+				<>
+					{publicRoutes.map((route, index) => {
+						const Page = route.component;
+						return <Route key={index} path={route.path} element={<Page />} />;
+					})}
+					,
+					{privateRoutes.map((route, index) => {
+						return (
+							<Route
+								key={index}
+								path={route.path}
+								element={
+									currentUser ? (
+										<DefaultLayout
+											Topbar={route.topbar}
+											Page={route.component}
+											SideBar={route.sidebar}
+											RightBar={route.rightbar}
+										/>
+									) : (
+										<Navigate to="/login" replace />
+									)
+								}
+							/>
+						);
+					})}
+					,
+					<Route key={notFoundRoute.path} path={notFoundRoute.path} element={<Page404 />} />,
+				</>
 			</Routes>
 		</BrowserRouter>
 	);

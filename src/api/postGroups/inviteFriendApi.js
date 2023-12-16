@@ -21,10 +21,15 @@ const InviteFriendApi = {
 
 			if (response.data.success) {
 				if (response.data.result.length > 0) {
-					toast.success(`Người dùng ${response.data.result} không thể gửi lời mời!!!`, { id: toastId });
+					// laasy ra teen cua nguoi dung
+					let name = '';
+					response.data.result.forEach((element) => {
+						name += element.userName + ', ';
+					});
+					toast.success(`Người dùng ${name} không thể gửi lời mời!!!`, { id: toastId });
 					return response.data;
 				} else {
-					toast.success('Gửi lời mời thành công', { id: toastId });
+					toast.success('Gửi lời mời thành công!!!', { id: toastId });
 					return response.data;
 				}
 			} else {

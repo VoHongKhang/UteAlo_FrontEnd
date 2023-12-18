@@ -45,8 +45,57 @@ export const PostProvider = ({ children }) => {
 				type: 'CREATE_POST_SUCCESS',
 				payload: data,
 			});
+			if (privacyLevel === 'CONTRIBUTE' || privacyLevel === 'BUG') {
+				toast.success('Gửi đóng góp thành công', { id: toastId });
+			} else {
+				toast.success('Đăng bài thành công', { id: toastId });
+			}
+			return data;
+		} catch (error) {
+			dispatch({
+				type: 'CREATE_POST_FAIL',
+				payload: error.response ? error.response.data.message : error.message,
+			});
+			toast.error('Có lỗi trong quá trình thực hiện.Vui lòng thử lại', { id: toastId });
+		}
+	};
 
-			toast.success('Đăng bài thành công', { id: toastId });
+	const createReport = async (location, content, photos, files, privacyLevel, postGroupId) => {
+		const toastId = toast.loading('Đang gửi yêu cầu...');
+		try {
+			dispatch({
+				type: 'CREATE_POST_REQUEST',
+			});
+
+			const formData = new FormData();
+			formData.append('location', location || '');
+			formData.append('content', content || '');
+			formData.append('postGroupId', postGroupId || 0);
+			formData.append('privacyLevel', privacyLevel || 'PUBLIC');
+			if (files) {
+				formData.append('files', files);
+			}
+			if (photos) {
+				formData.append('photos', photos);
+			}
+			const config = {
+				headers: {
+					Authorization: `Bearer ${user.accessToken}`,
+					'Content-Type': 'multipart/form-data',
+				},
+			};
+
+			const { data } = await axios.post(`${BASE_URL}/v1/report/create`, formData, config);
+
+			dispatch({
+				type: 'CREATE_POST_SUCCESS',
+				payload: data,
+			});
+			if (privacyLevel === 'CONTRIBUTE' || privacyLevel === 'BUG') {
+				toast.success('Gửi đóng góp thành công', { id: toastId });
+			} else {
+				toast.success('Đăng bài thành công', { id: toastId });
+			}
 			return data;
 		} catch (error) {
 			dispatch({
@@ -118,6 +167,7 @@ export const PostProvider = ({ children }) => {
 		error: state.error,
 		createPost,
 		sharePost,
+		createReport,
 		getTimelinePosts,
 	};
 

@@ -2,6 +2,7 @@
 	display: flex;
 	width: 100%;
 }
+
 .sidebar {
 	flex: 2;
 	height: calc(100vh - 50px);
@@ -10,6 +11,7 @@
 	top: 50px;
 	overflow-x: hidden;
 }
+
 .topbarImg {
 	width: 40px;
 	height: 40px;
@@ -17,6 +19,7 @@
 	object-fit: cover;
 	cursor: pointer;
 }
+
 ::-webkit-scrollbar {
 	width: 5px;
 }
@@ -48,12 +51,14 @@
 .sidebarIcon {
 	margin-right: 15px;
 }
+
 .slider--bar--item {
 	display: flex;
 	justify-content: flex-start;
 	align-items: flex-start;
 	margin-left: 30px;
 }
+
 .sidebarButton {
 	width: 150px;
 	border: none;
@@ -75,6 +80,229 @@
 	padding: 0;
 	margin: 0;
 	list-style: none;
+}
+
+.contribute-modal {
+	width: 550px;
+	height: 235px;
+}
+
+.help-modal .ant-modal-content {
+	width: 500px;
+	margin: auto;
+}
+
+.contribute-modal .ant-modal-header .ant-modal-title {
+	font-size: 22px;
+	text-align: center;
+}
+
+.contribute-modal .ant-modal-close {
+	background: #e4e6eb;
+	width: 36px;
+	height: 36px;
+	border-radius: 50%;
+}
+
+.contribute-modal .ant-modal-close svg {
+	font-size: 20px;
+	color: #606770;
+}
+
+.contribute-line--top {
+	height: 1px;
+	background: #ddd0d0;
+	width: 107%;
+	margin-bottom: 16px;
+	margin-top: 16px;
+	margin-left: -21.5px;
+}
+
+.contribute-option {
+	display: flex;
+	padding: 4px 2px;
+}
+
+.contribute-option:hover {
+	background: #f1f1f1;
+	cursor: pointer;
+	border-radius: 12px;
+}
+
+.contribute-option-icon {
+	width: 54px;
+	height: 54px;
+	background: #e4e6eb;
+	border-radius: 50%;
+	display: flex;
+	margin-left: 10px;
+}
+
+.contribute-option-icon svg {
+	margin: auto;
+	height: 24px;
+	width: 24px;
+}
+
+.help-icon svg{
+	width: 30px;
+	height: 30px;
+}
+
+.contribute-option-text {
+	margin-left: 20px;
+	font-size: 16px;
+}
+
+.contribute-option-text-1 {
+	display: block;
+	font-weight: 600;
+	margin-top: 4px;
+}
+
+.contribute-option-text-2 {
+	color: #818388;
+}
+
+.contribute-modal-second .ant-modal-header .ant-modal-title {
+	font-size: 22px;
+	text-align: center;
+}
+
+.contribute-modal-second .ant-modal-close {
+	background: #e4e6eb;
+	width: 36px;
+	height: 36px;
+	border-radius: 50%;
+}
+
+.contribute-modal-second .ant-modal-close svg {
+	font-size: 20px;
+	color: #606770;
+}
+
+.contribute-line--top {
+	height: 1px;
+	background: #ddd0d0;
+	width: 107%;
+	margin-bottom: 16px;
+	margin-top: 16px;
+	margin-left: -21.5px;
+}
+
+.contribute-content-second {
+	margin: 4px 4px;
+}
+
+.contribute-content-span-1 {
+	display: block;
+	font-size: 16px;
+	font-weight: 600;
+}
+
+.privacy-content-span-2 {
+	font-size: 15px;
+}
+
+.privacy-content-span-1 {
+	display: block;
+	font-size: 16px;
+	font-weight: 600;
+}
+
+.contribute-content-span-2 {
+	font-size: 15px;
+}
+
+.privacy-option-top {
+	display: flex;
+}
+
+.privacy-option-bottom {
+	display: flex;
+	margin-top: 20px;
+}
+
+.privacy-option-one {
+	width: 205px;
+	margin-right: 10px;
+	border-radius: 10px;
+    box-shadow: 2px 3px 17px -8px rgb(0 0 0 / 67%);
+}
+
+.privacy-option-two {
+	width: 205px;
+	border-radius: 10px;
+    box-shadow: 2px 3px 17px -8px rgb(0 0 0 / 67%);
+}
+
+.privacy-option-three {
+	width: 205px;
+	margin-right: 10px;
+	border-radius: 10px;
+    box-shadow: 2px 3px 17px -8px rgb(0 0 0 / 67%);
+}
+
+.privacy-option-four {
+	width: 205px;
+	margin-right: 10px;
+	border-radius: 10px;
+    box-shadow: 2px 3px 17px -8px rgb(0 0 0 / 67%);
+}
+
+.privacy-option-five {
+	width: 205px;
+	border-radius: 10px;
+    box-shadow: 2px 3px 17px -8px rgb(0 0 0 / 67%);
+}
+
+.privacy-option-one img {
+	width: 205px;
+	height: 102px;
+	border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+}
+
+.privacy-option-two img {
+	width: 205px;
+	height: 102px;
+	border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+}
+
+.privacy-option-three img {
+	width: 205px;
+	height: 102px;
+	border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+}
+
+.privacy-option-four img {
+	width: 205px;
+	height: 102px;
+	border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+}
+
+.privacy-option-five img {
+	width: 205px;
+	height: 102px;
+	border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+}
+
+.privacy-option-text {
+	width: 90%;
+    display: flex;
+    margin: auto;
+}
+
+.privacy-option-text span {
+	font-weight: 600;
+}
+
+.contribute-content-span-2 p {
+	font-weight: 600;
 }
 
 @media screen and (max-width: 820px) {

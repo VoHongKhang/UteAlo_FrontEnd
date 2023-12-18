@@ -4,9 +4,12 @@ import PostCard from '../../timeline/post/PostCard';
 import SharePostCard from '../../timeline/post/SharePostCard';
 import Share from '../../timeline/sharePost/Share';
 import { Lock, Public, Room, Visibility } from '@material-ui/icons';
-import sampleProPic from '../../../assets/appImages/user.png';
 import noCover from '../../../assets/appImages/noCover.jpg';
 import useTheme from '../../../context/ThemeContext';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { BASE_URL } from '../../../context/apiCall';
+
 export default function Discuss({
 	postGroup,
 	inforUser,
@@ -17,8 +20,28 @@ export default function Discuss({
 	getNewPost,
 	getPostUpdate,
 	getNewSharePost,
+	onViewAllFilesClick,
 }) {
-	const listImage = [noCover, noCover, noCover, noCover];
+	const [listPhoto, setListPhoto] = useState([]);
+	const handleViewAllFilesClick = () => {
+		if (onViewAllFilesClick) {
+			onViewAllFilesClick();
+		}
+	};
+	useEffect(() => {
+		const fetch = async () => {
+			try {
+				const res = await axios.get(`${BASE_URL}/v1/groupPost/photos/${postGroup.postGroupId}`);
+				const data = res.data.content;
+				const photoUrls = data.map((item) => item.photos);
+				setListPhoto(photoUrls);
+			} catch (error) {
+				return error.response ? error.response.data.message : error.message;
+			}
+		};
+		fetch();
+	}, [postGroup.postGroupId]);
+	console.log('listPhoto', listPhoto);
 	// Hàm border-radius 4 gốc cho 4 ảnh
 	function getImageStyles(index) {
 		let borderStyles = '';
@@ -64,7 +87,7 @@ export default function Discuss({
 							scrollableTarget="feed--group--scroll"
 							className="feed__scroll"
 							dataLength={postLength}
-							style={{ color: theme.foreground, background: theme.background, overflow:"visible" }}
+							style={{ color: theme.foreground, background: theme.background, overflow: 'visible' }}
 							next={loadMore}
 							hasMore={hasMore.posts || hasMore.share}
 							loader={
@@ -162,13 +185,21 @@ export default function Discuss({
 								style={{ color: theme.foreground, background: theme.background }}
 							>
 								<div className="group--file-text-title">File phương tiện</div>
-								<div className="group--file-text-more">Xem tất cả file</div>
+								<div
+									className="group--file-text-more"
+									onClick={handleViewAllFilesClick}
+									style={{
+										cursor: 'pointer',
+									}}
+								>
+									Xem tất cả file
+								</div>
 							</div>
 
 							<div className="file--photos">
 								{Array.from({ length: 4 }).map((_, index) => (
 									<div key={index} className="filePhotoItem" style={getImageStyles(index)}>
-										<img src={listImage[index] || sampleProPic} alt="" />
+										<img src={listPhoto[index] || noCover} alt="" />
 									</div>
 								))}
 							</div>

@@ -27,6 +27,7 @@ import SidebarGroup from '../components/groups/sidebar/SidebarGroup';
 import NewFeedGroup from '../components/groups/NewFeedGroup';
 import SidebarManagerGroup from '../components/groups/manager/sidebarManagerGroup/SidebarManagerGroup';
 import ShareDetail from '../components/timeline/sharePost/ShareDetail';
+import FileMedia from '../components/groups/detail/FileMedia';
 
 const privateRoutes = [
 	{ path: '/groups/manager/:postGroupId', component: ManagerGroup, topbar: Topbar, sidebar: SidebarManagerGroup },
@@ -70,6 +71,7 @@ const privateRoutes = [
 	},
 	{ path: '/message/:userId', component: Meessage, topbar: Topbar },
 	{ path: '/messages', component: Meessage, topbar: Topbar },
+	{ path: '/groups/:postGroupId/file-media', component: FileMedia },
 ];
 
 const publicRoutes = [

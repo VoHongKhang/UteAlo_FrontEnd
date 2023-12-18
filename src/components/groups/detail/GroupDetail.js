@@ -4,15 +4,13 @@ import sampleProPic from '../../../assets/appImages/user.png';
 import noCover from '../../../assets/appImages/noCover.jpg';
 import { Search, Public, People, MoreHoriz, Lock } from '@material-ui/icons';
 import { useParams } from 'react-router-dom';
-import Topbar from '../../timeline/topbar/Topbar';
-import SidebarGroup from '../sidebar/SidebarGroup';
 import { Helmet } from 'react-helmet';
 import toast, { Toaster } from 'react-hot-toast';
 import PostGroupApi from '../../../api/postGroups/PostGroupApi';
 import './GroupDetail.css';
 import { useNavigate } from 'react-router-dom';
 import { Image, Tabs, Typography } from 'antd';
-import { Modal, Select, Checkbox } from 'antd';
+import { Modal, Select } from 'antd';
 import qrCode from '../../../assets/icons/qr-code/qr-code.png';
 import home from '../../../assets/icons/qr-code/home.png';
 import building from '../../../assets/icons/qr-code/building.png';
@@ -498,6 +496,11 @@ const GroupDetail = ({ inforUser }) => {
 		}
 	};
 
+	const [activeKey, setActiveKey] = useState('1');
+
+	const handleFileMediaTab = () => {
+		setActiveKey('5');
+	};
 	const items = [
 		{
 			key: '1',
@@ -513,6 +516,7 @@ const GroupDetail = ({ inforUser }) => {
 					getNewPost={getNewPost}
 					getPostUpdate={getPostUpdate}
 					getNewSharePost={getNewSharePost}
+					onViewAllFilesClick={handleFileMediaTab}
 				/>
 			),
 		},
@@ -813,11 +817,12 @@ const GroupDetail = ({ inforUser }) => {
 						<hr />
 						<div className="list--feature--group">
 							<Tabs
-								defaultActiveKey="1"
+								defaultActiveKey={activeKey}
 								style={{ color: theme.foreground, background: theme.background, width: '99%' }}
 								items={items}
 								onChange={onChange}
 								tabBarExtraContent={operations}
+								handleFileMediaTab={handleFileMediaTab}
 							/>
 						</div>
 					</div>

@@ -4,12 +4,10 @@ import { publicRoutes, privateRoutes, notFoundRoute } from './routes/Routers';
 import useAuth from './context/auth/AuthContext';
 import { useWebSocket } from './context/WebSocketContext';
 import DefaultLayout from './layouts/DefaultLayout';
-import { Toaster } from 'react-hot-toast';
-import { Helmet } from 'react-helmet';
 export default function Application() {
 	const { user: currentUser } = useAuth();
 	const Page404 = notFoundRoute.component;
-	const { connectWebSocket, disconnectWebSocket, notification } = useWebSocket();
+	const { connectWebSocket, disconnectWebSocket } = useWebSocket();
 	const isComponentUnmounted = useRef(false);
 	window.addEventListener('beforeunload', async function (event) {
 		// Hủy bỏ sự kiện ngăn chặn đóng trang
@@ -35,7 +33,7 @@ export default function Application() {
 			}
 		};
 	}, [currentUser]);
-	const [inforUser, setInforUser] = useState();
+
 	return (
 		<BrowserRouter>
 			<Routes>

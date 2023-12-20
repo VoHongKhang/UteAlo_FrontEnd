@@ -1,6 +1,5 @@
 const { Builder, By } = require('selenium-webdriver');
 const { beforeAll, afterAll, test } = require('@jest/globals');
-const { until } = require('selenium-webdriver');
 jest.setTimeout(100000); // timeout toàn cục
 
 let driver;

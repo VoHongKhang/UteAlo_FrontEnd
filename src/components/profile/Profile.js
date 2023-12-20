@@ -26,6 +26,7 @@ const Profile = ({ inforUser, currentUser }) => {
 	const navigate = useNavigate();
 	const { stompClient } = useWebSocket();
 	const params = useParams();
+	const [isActive, setIsActive] = useState(false);
 
 	const { theme } = useTheme();
 
@@ -405,127 +406,137 @@ const Profile = ({ inforUser, currentUser }) => {
 							</Space>
 						)}
 					</div>
-					<div className="profileRightBottom">
-						<div className="profileILeft">
-							<div className="profileInfor">
-								<div className="textGioiThieu">Giới thiệu</div>
-								{params?.userId === currentUser.userId && (
-									<div className="textTieuSu" onClick={handleBio}>
-										Thêm tiểu sử
-									</div>
-								)}
-								{useInParams?.address && (
-									<div className="textDenTu">
-										<img src={userFrom} alt="Icon" className="icon" />
-										Đến từ {useInParams?.address}
-									</div>
-								)}
-								{useInParams?.phone && (
-									<div className="textDenTu">
-										<Phone /> {` ${useInParams?.phone}`}
-									</div>
-								)}
-								{useInParams?.email && (
-									<div className="textDenTu">
-										<Email />
-										{useInParams?.email}
-									</div>
-								)}
-								{useInParams?.dayOfBirth && (
-									<div className="textDenTu">
-										<Cake /> Ngày sinh:{' '}
-										<Moment format="DD/MM/YYYY">{useInParams?.dayOfBirth}</Moment>
-									</div>
-								)}
+					{isActive ? (
+						<div className="profileRightBottom">
+							<div className="profileILeft">
+								<div className="profileInfor">
+									<div className="textGioiThieu">Giới thiệu</div>
+									{params?.userId === currentUser.userId && (
+										<div className="textTieuSu" onClick={handleBio}>
+											Thêm tiểu sử
+										</div>
+									)}
+									{useInParams?.address && (
+										<div className="textDenTu">
+											<img src={userFrom} alt="Icon" className="icon" />
+											Đến từ {useInParams?.address}
+										</div>
+									)}
+									{useInParams?.phone && (
+										<div className="textDenTu">
+											<Phone /> {` ${useInParams?.phone}`}
+										</div>
+									)}
+									{useInParams?.email && (
+										<div className="textDenTu">
+											<Email />
+											{useInParams?.email}
+										</div>
+									)}
+									{useInParams?.dayOfBirth && (
+										<div className="textDenTu">
+											<Cake /> Ngày sinh:{' '}
+											<Moment format="DD/MM/YYYY">{useInParams?.dayOfBirth}</Moment>
+										</div>
+									)}
 
-								<div className="textDenTu">
-									<img src={userFollow} alt="Icon" className="icon" />
-									Có {useInParams?.friends?.length} bạn bè
+									<div className="textDenTu">
+										<img src={userFollow} alt="Icon" className="icon" />
+										Có {useInParams?.friends?.length} bạn bè
+									</div>
+									<div className="textDenTu">
+										<small className="profileInfoDesc">
+											Ngày đăng nhập:
+											{(
+												<em>
+													<Moment format="YYYY/MM/DD">{useInParams?.createdAt}</Moment>
+												</em>
+											) || '----'}
+										</small>
+									</div>
+									{params?.userId === currentUser.userId && (
+										<div
+											className="textChinhSua"
+											onClick={() => {
+												navigate(`/update/${useInParams?.userId}`);
+											}}
+										>
+											Chỉnh sửa chi tiết
+										</div>
+									)}
 								</div>
-								<div className="textDenTu">
-									<small className="profileInfoDesc">
-										Ngày đăng nhập:
-										{(
-											<em>
-												<Moment format="YYYY/MM/DD">{useInParams?.createdAt}</Moment>
-											</em>
-										) || '----'}
-									</small>
+
+								<div className="profileImage">
+									<div className="textprofileImage">
+										<div className="textGioiThieu">Ảnh</div>
+										<div className="showMorePhoto" onClick={openModalPhoto}>
+											Xem tất cả ảnh
+										</div>
+									</div>
+
+									<div className="userPhotos">
+										{listImage.map((item, index) => (
+											<div key={index} className="photoItem">
+												<img
+													src={item.photos || sampleProPic}
+													alt="photos"
+													onClick={() => navigate(`/post/${item.postId}`)}
+												/>
+											</div>
+										))}
+									</div>
 								</div>
-								{params?.userId === currentUser.userId && (
-									<div
-										className="textChinhSua"
-										onClick={() => {
-											navigate(`/update/${useInParams?.userId}`);
-										}}
+								{modalPhotoVisible && useInParams && (
+									<Modal
+										title="Ảnh"
+										open={modalPhotoVisible}
+										onCancel={() => setModalPhotoVisible(false)}
+										footer={null}
 									>
-										Chỉnh sửa chi tiết
-									</div>
+										<ListPhoto currentUser={currentUser} params={params} />
+									</Modal>
 								)}
-							</div>
-
-							<div className="profileImage">
-								<div className="textprofileImage">
-									<div className="textGioiThieu">Ảnh</div>
-									<div className="showMorePhoto" onClick={openModalPhoto}>
-										Xem tất cả ảnh
-									</div>
-								</div>
-
-								<div className="userPhotos">
-									{listImage.map((item, index) => (
-										<div key={index} className="photoItem">
-											<img
-												src={item.photos || sampleProPic}
-												alt="photos"
-												onClick={() => navigate(`/post/${item.postId}`)}
-											/>
-										</div>
-									))}
-								</div>
-							</div>
-							{modalPhotoVisible && useInParams && (
 								<Modal
-									title="Ảnh"
-									open={modalPhotoVisible}
-									onCancel={() => setModalPhotoVisible(false)}
-									footer={null}
+									title="Xác nhận"
+									open={modalVisible.modalVisible}
+									onCancel={() => {
+										setModalVisible({ modalVisible: false, handle: '' });
+									}}
+									onOk={() => {
+										setModalVisible({ modalVisible: false, handle: modalVisible.handle });
+										handleModalConfirm(modalVisible.handle);
+									}}
 								>
-									<ListPhoto currentUser={currentUser} params={params} />
+									<p>Bạn có chắc chắn muốn tiếp tục?</p>
 								</Modal>
-							)}
-							<Modal
-								title="Xác nhận"
-								open={modalVisible.modalVisible}
-								onCancel={() => {
-									setModalVisible({ modalVisible: false, handle: '' });
-								}}
-								onOk={() => {
-									setModalVisible({ modalVisible: false, handle: modalVisible.handle });
-									handleModalConfirm(modalVisible.handle);
-								}}
-							>
-								<p>Bạn có chắc chắn muốn tiếp tục?</p>
-							</Modal>
-							<div className="profileFriend">
-								<div className="textprofileImage">
-									<div className="textGioiThieu">Bạn bè</div>
-									<div className="showMoreFriend" onClick={() => navigate('/friends')}>
-										Xem tất cả bạn bè
+								<div className="profileFriend">
+									<div className="textprofileImage">
+										<div className="textGioiThieu">Bạn bè</div>
+										<div className="showMoreFriend" onClick={() => navigate('/friends')}>
+											Xem tất cả bạn bè
+										</div>
+									</div>
+									<div className="textCountFriend">{inforUser?.friends?.length} bạn bè</div>
+									<div className="userPhotos">
+										{listImageFriend.map((item, index) => (
+											<div key={index} className="photoItem">
+												<img src={item || sampleProPic} alt="" />
+											</div>
+										))}
 									</div>
 								</div>
-								<div className="textCountFriend">{inforUser?.friends?.length} bạn bè</div>
-								<div className="userPhotos">
-									{listImageFriend.map((item, index) => (
-										<div key={index} className="photoItem">
-											<img src={item || sampleProPic} alt="" />
-										</div>
-									))}
-								</div>
 							</div>
+							{params?.userId && <FeedOfUser inforUser={inforUser} userProfile={params?.userId} />}
 						</div>
-						{params?.userId && <FeedOfUser inforUser={inforUser} userProfile={params?.userId} />}
-					</div>
+					) : (
+						<div>
+							{params?.userId === inforUser?.userId  ? (
+								<div>Bạn đang khóa tài khoản của mình</div>
+							) : (
+								<div>Chủ tài khoản hiện đang khóa tài khoản của họ</div>
+							)}
+						</div>
+					)}
 				</div>
 			</div>
 		</>

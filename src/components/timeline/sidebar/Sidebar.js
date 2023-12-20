@@ -29,8 +29,8 @@ import PrivacyOptionFive from '../../../assets/appImages/privacy-option-five.jpg
 import { IoHelpCircleSharp } from 'react-icons/io5';
 import { IoIosMail } from 'react-icons/io';
 import { PiWarningOctagonFill } from 'react-icons/pi';
-import { MdOutlineSecurity } from "react-icons/md";
-import { MdKey } from "react-icons/md";
+import { MdOutlineSecurity } from 'react-icons/md';
+import { MdKey } from 'react-icons/md';
 import { useState } from 'react';
 
 const Sidebar = () => {
@@ -574,7 +574,7 @@ const Sidebar = () => {
 			>
 				<div>
 					<div className="contribute-line--top"></div>
-					<div className="contribute-option option-one" onClick={openOptionOneSecondModal}>
+					<div className="contribute-option option-one">
 						<div className="contribute-option-icon help-icon">
 							<IoHelpCircleSharp />
 						</div>
@@ -583,11 +583,7 @@ const Sidebar = () => {
 							<span className="contribute-option-text-2">Trung tâm trợ giúp.</span>
 						</div>
 					</div>
-					<div
-						className="contribute-option option-two"
-						style={{ marginTop: '0' }}
-						onClick={openOptionTwoSecondModal}
-					>
+					<div className="contribute-option option-two" style={{ marginTop: '0' }}>
 						<div className="contribute-option-icon help-icon">
 							<IoIosMail />
 						</div>
@@ -596,11 +592,7 @@ const Sidebar = () => {
 							<span className="contribute-option-text-2">Hộp thư hỗ trợ.</span>
 						</div>
 					</div>
-					<div
-						className="contribute-option option-two"
-						style={{ marginTop: '0' }}
-						onClick={openOptionTwoSecondModal}
-					>
+					<div className="contribute-option option-two" style={{ marginTop: '0' }}>
 						<div className="contribute-option-icon help-icon">
 							<PiWarningOctagonFill />
 						</div>
@@ -665,7 +657,7 @@ const Sidebar = () => {
 			>
 				<div>
 					<div className="contribute-line--top"></div>
-					<div className="contribute-option option-one" onClick={openOptionOneSecondModal}>
+					<div className="contribute-option option-one">
 						<div className="contribute-option-icon help-icon">
 							<MdKey />
 						</div>
@@ -674,11 +666,7 @@ const Sidebar = () => {
 							<span className="contribute-option-text-2">Khóa tài khoản.</span>
 						</div>
 					</div>
-					<div
-						className="contribute-option option-two"
-						style={{ marginTop: '0' }}
-						onClick={openOptionTwoSecondModal}
-					>
+					<div className="contribute-option option-two" style={{ marginTop: '0' }}>
 						<div className="contribute-option-icon help-icon">
 							<MdOutlineSecurity />
 						</div>
@@ -687,7 +675,6 @@ const Sidebar = () => {
 							<span className="contribute-option-text-2">Cài đặt bảo mật 2 lớp.</span>
 						</div>
 					</div>
-					
 				</div>
 			</Modal>
 		</Space>

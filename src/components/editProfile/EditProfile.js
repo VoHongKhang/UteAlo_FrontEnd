@@ -83,6 +83,7 @@ const EditProfile = ({ inforUser, changeUser }) => {
 					</span>
 					<Tooltip title="Chỉnh sửa thông tin cá nhân" placement="top">
 						<Settings
+							id="icon--setting--infor"
 							htmlColor="#65676B"
 							className="icon--setting"
 							onClick={() => openModalUpdate('infor')}
@@ -123,6 +124,7 @@ const EditProfile = ({ inforUser, changeUser }) => {
 					</span>
 					<Tooltip title="Đổi mật khẩu" placement="top">
 						<Settings
+							id="icon--setting--pwd"
 							htmlColor="#65676B"
 							className="icon--setting"
 							onClick={() => openModalUpdate('pwd')}

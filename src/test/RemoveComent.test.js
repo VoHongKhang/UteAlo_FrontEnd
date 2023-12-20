@@ -28,31 +28,23 @@ test('Change Avatar Profile Success', async () => {
 	await passwordField.sendKeys('roleName@1');
 	await submitButton.click();
 	//dừng 2s để load dữ liệu
-	await driver.sleep(3000);
-	const profileImage = await driver.findElement(By.className('topbarImg'));
-	await profileImage.click();
+	await driver.sleep(5000);
+	const moreComment = await driver.findElement(By.className('handleToggleCommentOptions'));
+	await moreComment.click();
 
 	await driver.sleep(3000);
-	const changProfileButton = await driver.findElement(By.className('textChinhSua'));
-	await changProfileButton.click();
+	const buttonDeleleCmt = await driver.findElement(By.className('postCommentTextDelete'));
+	await buttonDeleleCmt.click();
 	await driver.sleep(3000);
 
 	//lấy icon--setting thứ 2
-	const changePassButton = await driver.findElement(By.id('icon--setting--pwd'));
+	const configButton = await driver.findElement(By.xpath('//button[span[text()="Đồng ý"]]'));
 
-	await changePassButton.click();
-	await driver.sleep(3000);
-	const password = await driver.findElement(By.id('info_password'));
-	const newPassword = await driver.findElement(By.id('info_newPassword'));
-	const confirmPassword = await driver.findElement(By.id('info_confirmPassword'));
-	const buttonSubmit = await driver.findElement(By.css('button[type="submit"]'));
-	await password.sendKeys('roleName@1');
-	await newPassword.sendKeys('Khang2002##');
-	await confirmPassword.sendKeys('Khang2002##');
-	await buttonSubmit.click();
+	await configButton.click();
+	await driver.sleep(5000);
 	// chụp màn hình
 	await driver.takeScreenshot().then(function (image, err) {
-		require('fs').writeFile('out.png', image, 'base64', function (err) {
+		require('fs').writeFile('RemoveCmt.png', image, 'base64', function (err) {
 			console.log(err);
 		});
 	});

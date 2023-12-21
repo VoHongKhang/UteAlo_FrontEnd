@@ -31,11 +31,10 @@ import { IoIosMail } from 'react-icons/io';
 import { PiWarningOctagonFill } from 'react-icons/pi';
 import { MdOutlineSecurity } from 'react-icons/md';
 import { MdKey } from 'react-icons/md';
-import axios from 'axios';
-import { BASE_URL } from '../../../context/apiCall';
 import { useEffect, useState } from 'react';
 import AuthEmailApi from '../../../api/auth/authEmailApi';
 import Api from '../../../api/Api';
+import { BASE_URL } from '../../../context/apiCall';
 
 const Sidebar = ({ inforUser }) => {
 	const { theme } = useTheme();
@@ -58,11 +57,6 @@ const Sidebar = ({ inforUser }) => {
 	const [clauseModal, setClauseModal] = useState(false);
 	const [securityModal, setSecurityModal] = useState(false);
 	const [isActive, setIsActive] = useState();
-	const [isModalVisible, setIsModalVisible] = useState(false);
-
-	const showModal = () => {
-		setIsModalVisible(true);
-	};
 
 	const openReport = () => {
 		setModalVisible(true);
@@ -83,25 +77,9 @@ const Sidebar = ({ inforUser }) => {
 	const openClause = () => {
 		setClauseModal(true);
 	};
-	const feacthData = async () => {
-		try {
-			const config = {
-				headers: {
-					Authorization: `Bearer ${currentUser.accessToken}`,
-				},
-			};
-			const res = await Api.get(`${BASE_URL}/v1/user/getIsActive`, config);
-			setIsActive(res.data);
-			console.log('feacthData', res);
-		} catch (error) {
-			console.log(error);
-		}
-	};
 
-	console.log('isActive', isActive);
 	const openSecurity = () => {
 		setSecurityModal(true);
-		feacthData();
 	};
 
 	const handleCancel = () => {
@@ -113,7 +91,6 @@ const Sidebar = ({ inforUser }) => {
 		setModalVisible(false);
 		setSecondModalVisible(false);
 		setReportModal(false);
-		setIsModalVisible(false);
 	};
 
 	const openOptionOneSecondModal = () => {
@@ -149,6 +126,27 @@ const Sidebar = ({ inforUser }) => {
 		setSecondModalVisible(false);
 		setReportModal(true);
 	};
+
+	useEffect(() => {
+		if (inforUser) {
+			//Fetch thông tin người dùng
+			const feacthData = async () => {
+				try {
+					const config = {
+						headers: {
+							Authorization: `Bearer ${currentUser.accessToken}`,
+						},
+					};
+					const res = await Api.get(`${BASE_URL}/v1/user/getIsActive`, config);
+					setIsActive(res.data);
+					console.log('feacthData', res);
+				} catch (error) {
+					console.log(error);
+				}
+			};
+			feacthData();
+		}
+	}, []);
 
 	// Xử lý ảnh của bài đóng góp
 	const postDetails = (e) => {
@@ -300,32 +298,6 @@ const Sidebar = ({ inforUser }) => {
 		} catch (error) {
 			console.error(error);
 			toast.error('Có lỗi xảy ra khi gửi đóng góp.');
-		}
-	};
-
-	const updateIsActive = async () => {
-		const toastId = toast.loading('Đang cập nhật...');
-		try {
-			const config = {
-				headers: {
-					Authorization: `Bearer ${currentUser.accessToken}`,
-				},
-			};
-			const formData = new FormData();
-			if (isActive === true) {
-				formData.append('isActive', String(false));
-			} else if (isActive === false) {
-				formData.append('isActive', String(true));
-			}
-			const res = await axios.put(`${BASE_URL}/v1/user/updateIsActive`, formData, config);
-			toast.success('Cập nhật thành công!', { id: toastId });
-			console.log(res);
-
-			setIsModalVisible(false);
-			setSecurityModal(false);
-		} catch (error) {
-			toast.error('Cập nhật thất bại!', { id: toastId });
-			console.log(error);
 		}
 	};
 
@@ -644,7 +616,7 @@ const Sidebar = ({ inforUser }) => {
 			>
 				<div>
 					<div className="contribute-line--top"></div>
-					<div className="contribute-option option-one">
+					<div className="contribute-option option-one" onClick={openOptionOneSecondModal}>
 						<div className="contribute-option-icon help-icon">
 							<IoHelpCircleSharp />
 						</div>
@@ -653,7 +625,11 @@ const Sidebar = ({ inforUser }) => {
 							<span className="contribute-option-text-2">Trung tâm trợ giúp.</span>
 						</div>
 					</div>
-					<div className="contribute-option option-two" style={{ marginTop: '0' }}>
+					<div
+						className="contribute-option option-two"
+						style={{ marginTop: '0' }}
+						onClick={openOptionTwoSecondModal}
+					>
 						<div className="contribute-option-icon help-icon">
 							<IoIosMail />
 						</div>
@@ -662,7 +638,11 @@ const Sidebar = ({ inforUser }) => {
 							<span className="contribute-option-text-2">Hộp thư hỗ trợ.</span>
 						</div>
 					</div>
-					<div className="contribute-option option-two" style={{ marginTop: '0' }}>
+					<div
+						className="contribute-option option-two"
+						style={{ marginTop: '0' }}
+						onClick={openOptionTwoSecondModal}
+					>
 						<div className="contribute-option-icon help-icon">
 							<PiWarningOctagonFill />
 						</div>
@@ -717,7 +697,7 @@ const Sidebar = ({ inforUser }) => {
 					</span>
 				</div>
 			</Modal>
-			{/* Mở modal bảo mật */}
+			{/* Mở modal trợ giúp và hỗ trợ */}
 			<Modal
 				title="Bảo mật"
 				open={securityModal}
@@ -727,20 +707,20 @@ const Sidebar = ({ inforUser }) => {
 			>
 				<div>
 					<div className="contribute-line--top"></div>
-					<div className="contribute-option option-one" onClick={showModal}>
+					<div className="contribute-option option-one" onClick={openOptionOneSecondModal}>
 						<div className="contribute-option-icon help-icon">
 							<MdKey />
 						</div>
 						<div className="contribute-option-text">
-							<span className="contribute-option-text-1">
-								{isActive ? 'Khóa tài khoản' : 'Mở khóa tài khoản'}
-							</span>
-							<span className="contribute-option-text-2">
-								{isActive ? 'Khóa tài khoản' : 'Mở khóa tài khoản'}.
-							</span>
+							<span className="contribute-option-text-1">Khóa tài khoản</span>
+							<span className="contribute-option-text-2">Khóa tài khoản.</span>
 						</div>
 					</div>
-					<div className="contribute-option option-two" style={{ marginTop: '0' }}>
+					<div
+						className="contribute-option option-two"
+						style={{ marginTop: '0' }}
+						onClick={openOptionTwoSecondModal}
+					>
 						<div className="contribute-option-icon help-icon">
 							<MdOutlineSecurity />
 						</div>
@@ -750,14 +730,6 @@ const Sidebar = ({ inforUser }) => {
 						</div>
 					</div>
 				</div>
-			</Modal>
-			<Modal
-				title={`Bạn có chắc muốn ${isActive ? 'Khóa' : 'Mở khóa'} tài khoản không?`}
-				open={isModalVisible}
-				onOk={updateIsActive}
-				onCancel={() => setIsModalVisible(false)}
-			>
-				<p>Vui lòng xác nhận ... </p>
 			</Modal>
 		</Space>
 	);

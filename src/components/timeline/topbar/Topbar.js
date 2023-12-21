@@ -62,7 +62,7 @@ const Topbar = ({ dataUser }) => {
 			setLoading(false);
 		};
 		fetchNotifications();
-	}, [currentUser, page]);
+	}, [page]);
 
 	// Toggle theme switch
 	const themeModeHandler = () => {
@@ -85,7 +85,7 @@ const Topbar = ({ dataUser }) => {
 			dataUser(res.data.result);
 		};
 		fetchUsers();
-	}, [currentUser]);
+	}, []);
 
 	const buttonCenterHandler = (e, link) => {
 		navigate(link);

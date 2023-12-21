@@ -1,5 +1,5 @@
-import axios from 'axios';
 import { BASE_URL } from '../../context/apiCall';
+import Api from '../Api';
 
 const notificationApi = {
 	getNotifications: async ({ user, page, size }) => {
@@ -10,7 +10,7 @@ const notificationApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.get(`${BASE_URL}/v1/notification/get?page=${page}&size=${size}`, config);
+			const res = await Api.get(`${BASE_URL}/v1/notification/get?page=${page}&size=${size}`, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data;
@@ -29,7 +29,7 @@ const notificationApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.put(`${BASE_URL}/v1/notification/read/${notificationId}`, {}, config);
+			const res = await Api.put(`${BASE_URL}/v1/notification/read/${notificationId}`, {}, config);
 			return res.data;
 		} catch (error) {
 			return error.response.data;
@@ -43,7 +43,7 @@ const notificationApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.delete(`${BASE_URL}/v1/notification/delete/${notificationId}`, config);
+			const res = await Api.delete(`${BASE_URL}/v1/notification/delete/${notificationId}`, config);
 			return res.data;
 		} catch (error) {
 			return error.response.data;
@@ -57,7 +57,7 @@ const notificationApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.delete(`${BASE_URL}/v1/notification/delete-all`, config);
+			const res = await Api.delete(`${BASE_URL}/v1/notification/delete-all`, config);
 			return res.data;
 		} catch (error) {
 			return error.response.data;
@@ -71,7 +71,7 @@ const notificationApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.put(`${BASE_URL}/v1/notification/unread-all`, {}, config);
+			const res = await Api.put(`${BASE_URL}/v1/notification/unread-all`, {}, config);
 			return res.data;
 		} catch (error) {
 			return error.response.data;

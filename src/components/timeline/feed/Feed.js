@@ -9,6 +9,7 @@ import { Skeleton, Space, Typography } from 'antd';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import LogoUte from '../../../assets/icons/logo_UTE.png';
 import PostApi from '../../../api/timeline/post/PostApi';
+import { Helmet } from 'react-helmet';
 
 const Feed = ({ inforUser }) => {
 	const isMounted = useRef(true);
@@ -147,84 +148,87 @@ const Feed = ({ inforUser }) => {
 		console.log('sorted', sorted);
 	}, [listPost]);
 	return (
-		<div className="feed" style={{ color: theme.foreground, background: theme.background }}>
-			<Share inforUser={inforUser} newPosts={getNewPost} postGroupId={null} />
-			<InfiniteScroll
-				scrollableTarget="messages-history"
-				className="feed__scroll"
-				style={{ color: theme.foreground, background: theme.background, overflow: 'visible' }}
-				dataLength={postLength}
-				next={loadMore}
-				hasMore={hasMore.posts || hasMore.share}
-				loader={
-					<Skeleton
-						style={{ marginTop: '30px' }}
-						active
-						avatar
-						paragraph={{
-							rows: 4,
-						}}
-					/>
-				}
-				endMessage={
-					<Space
-						direction="vertical"
-						style={{
-							color: theme.foreground,
-							background: theme.background,
-							width: '100%',
-							margin: '50px auto',
-						}}
-						align="center"
-					>
-						<img className="iamge_end" src={LogoUte} alt="UTEALO" />
-						<Typography.Title
-							level={4}
-							
-							style={{
-								color: theme.foreground,
-								background: theme.background, margin: 0 
+		<>
+			<Helmet title="Trang chủ" />
+			<div className="feed" style={{ color: theme.foreground, background: theme.background }}>
+				<Share inforUser={inforUser} newPosts={getNewPost} postGroupId={null} />
+				<InfiniteScroll
+					scrollableTarget="messages-history"
+					className="feed__scroll"
+					style={{ color: theme.foreground, background: theme.background, overflow: 'visible' }}
+					dataLength={postLength}
+					next={loadMore}
+					hasMore={hasMore.posts || hasMore.share}
+					loader={
+						<Skeleton
+							style={{ marginTop: '30px' }}
+							active
+							avatar
+							paragraph={{
+								rows: 4,
 							}}
-						>
-							Mạng xã hội UTEALO
-						</Typography.Title>
-
-						<Typography.Text
-							type="secondary"
+						/>
+					}
+					endMessage={
+						<Space
+							direction="vertical"
 							style={{
 								color: theme.foreground,
 								background: theme.background,
+								width: '100%',
+								margin: '50px auto',
 							}}
+							align="center"
 						>
-							Nơi kết nối, chia sẻ và trao đổi thông tin giữa sinh viên và giảng viên trường Đại học Sư
-							phạm Kỹ thuật TP.HCM
-						</Typography.Text>
-					</Space>
-				}
-			>
-				{sortedList?.map((p) => {
-					if (p.postId) {
-						return (
-							<PostCard
-								inforUser={inforUser}
-								post={p}
-								key={`post-${p.postId}`}
-								newShare={getPostUpdate}
-							/>
-						);
-					} else {
-						return (
-							<SharePostCard
-								inforUser={inforUser}
-								share={p}
-								key={`share-${p.shareId}`}
-								newSharePosts={getNewSharePost}
-							/>
-						);
+							<img className="iamge_end" src={LogoUte} alt="UTEALO" />
+							<Typography.Title
+								level={4}
+								style={{
+									color: theme.foreground,
+									background: theme.background,
+									margin: 0,
+								}}
+							>
+								Mạng xã hội UTEALO
+							</Typography.Title>
+
+							<Typography.Text
+								type="secondary"
+								style={{
+									color: theme.foreground,
+									background: theme.background,
+								}}
+							>
+								Nơi kết nối, chia sẻ và trao đổi thông tin giữa sinh viên và giảng viên trường Đại học
+								Sư phạm Kỹ thuật TP.HCM
+							</Typography.Text>
+						</Space>
 					}
-				})}
-			</InfiniteScroll>
-		</div>
+				>
+					{sortedList?.map((p) => {
+						if (p.postId) {
+							return (
+								<PostCard
+									inforUser={inforUser}
+									post={p}
+									key={`post-${p.postId}`}
+									newShare={getPostUpdate}
+								/>
+							);
+						} else {
+							return (
+								<SharePostCard
+									inforUser={inforUser}
+									share={p}
+									key={`share-${p.shareId}`}
+									newSharePosts={getNewSharePost}
+								/>
+							);
+						}
+					})}
+				</InfiniteScroll>
+			</div>
+		</>
 	);
 };
 

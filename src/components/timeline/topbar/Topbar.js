@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './Topbar.css';
 import axios from 'axios';
-import { NightsStay, Search, WbSunny, Home, Group, GroupAdd, Notifications, MoreHoriz } from '@material-ui/icons';
+import { NightsStay, Search, WbSunny, Home, Group, GroupAdd, Notifications } from '@material-ui/icons';
 import { Link } from 'react-router-dom';
 import useAuth from '../../../context/auth/AuthContext';
 import useTheme, { themes } from '../../../context/ThemeContext';

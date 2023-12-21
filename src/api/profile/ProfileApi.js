@@ -1,5 +1,5 @@
-import axios from 'axios';
 import { BASE_URL } from '../../context/apiCall';
+import Api from '../Api';
 const ProfileApi = {
 	getProfile: async ({ user, userId }) => {
 		const config = {
@@ -8,7 +8,7 @@ const ProfileApi = {
 			},
 		};
 		try {
-			const res = await axios.get(`${BASE_URL}/v1/user/profile/${userId}`, config);
+			const res = await Api.get(`${BASE_URL}/v1/user/profile/${userId}`, config);
 			if (res.data.success) {
 				return res.data; // Trả về dữ liệu từ thành công
 			} else {
@@ -20,7 +20,7 @@ const ProfileApi = {
 	},
 	getAvatarAndName : async ({userId }) => {
 		try {
-			const res = await axios.get(`${BASE_URL}/v1/user/avatarAndName/${userId}`);
+			const res = await Api.get(`${BASE_URL}/v1/user/avatarAndName/${userId}`);
 			if (res.data.success) {
 				return res.data; // Trả về dữ liệu từ thành công
 			} else {

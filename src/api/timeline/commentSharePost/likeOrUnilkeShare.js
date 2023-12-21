@@ -1,5 +1,5 @@
-import axios from 'axios';
 import { BASE_URL } from '../../../context/apiCall';
+import Api from '../../Api';
 
 // like or unlike post
 const LikeOrUnlikeApi = {
@@ -10,7 +10,7 @@ const LikeOrUnlikeApi = {
                 Authorization: `Bearer ${token}`,
             },
         };
-        await axios
+        await Api
             .post(`${BASE_URL}/v1/share/like/toggleLike/${shareId}`,{userId}, config)
             .then((res) => {
                 if (res.data.success) {

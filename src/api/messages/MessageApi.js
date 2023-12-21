@@ -1,5 +1,5 @@
-import axios from 'axios';
 import { BASE_URL } from '../../context/apiCall';
+import Api from '../Api';
 
 const MessageApi = {
 	getMessage: async ({ userId, page, size }) => {
@@ -13,7 +13,7 @@ const MessageApi = {
 					}`,
 				},
 			};
-			const res = await axios.get(`${BASE_URL}/v1/messages/get/user/${userId}?page=${page}&size=${size}`, config);
+			const res = await Api.get(`${BASE_URL}/v1/messages/get/user/${userId}?page=${page}&size=${size}`, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data;
@@ -27,8 +27,7 @@ const MessageApi = {
 	getMessageGroup: async ({ currentUser, groupId, page, size }) => {
 		console.log('groupId', groupId);
 		try {
-			
-			const res = await axios.get(`${BASE_URL}/v1/messages/get/group/${groupId}?page=${page}&size=${size}`);
+			const res = await Api.get(`${BASE_URL}/v1/messages/get/group/${groupId}?page=${page}&size=${size}`);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data;
@@ -49,7 +48,7 @@ const MessageApi = {
 					}`,
 				},
 			};
-			const res = await axios.put(`${BASE_URL}/v1/message/delete`, data, config);
+			const res = await Api.put(`${BASE_URL}/v1/message/delete`, data, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data;

@@ -156,7 +156,7 @@ const FeedOfUser = ({ inforUser, userProfile }) => {
 	}, [hasMore, postLength, listPost]);
 	return (
 		<div className="feed" style={{ color: theme.foreground, background: theme.background }}>
-			{userProfile === inforUser.userId && <Share inforUser={inforUser} newPosts={getNewPost} />}
+			{userProfile === inforUser?.userId && <Share inforUser={inforUser} newPosts={getNewPost} />}
 			<div className="feedUser">
 				<InfiniteScroll
 					scrollableTarget="messages-history"

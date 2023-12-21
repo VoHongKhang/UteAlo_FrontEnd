@@ -1,7 +1,7 @@
 // Trong useGetMessage.js
 import { useState } from 'react';
-import axios from 'axios';
 import { BASE_URL } from '../../context/apiCall';
+import Api from '../Api';
 const useGetMessage = ({ isGroup, userId, groupId, page, size }) => {
   const [data, setData] = useState([]);
   const [hasMore, setHasMore] = useState(true);
@@ -18,9 +18,9 @@ const useGetMessage = ({ isGroup, userId, groupId, page, size }) => {
       };
       let res;
       if (isGroup) {
-        res = await axios.get(`${BASE_URL}/v1/message/group/${groupId}?page=${page}&size=${size}`, config);
+        res = await Api.get(`${BASE_URL}/v1/message/group/${groupId}?page=${page}&size=${size}`, config);
       } else {
-        res = await axios.get(`${BASE_URL}/v1/message/user/${userId}?page=${page}&size=${size}`, config);
+        res = await Api.get(`${BASE_URL}/v1/message/user/${userId}?page=${page}&size=${size}`, config);
       }
 
       if (res.data.success) {

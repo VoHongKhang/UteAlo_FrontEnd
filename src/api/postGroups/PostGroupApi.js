@@ -1,6 +1,6 @@
-import axios from 'axios';
 import { BASE_URL } from '../../context/apiCall';
 import toast from 'react-hot-toast';
+import Api from '../Api';
 const PostGroupApi = {
 	listAllGroup: async (user) => {
 		try {
@@ -10,7 +10,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${user?.accessToken}`,
 				},
 			};
-			const res = await axios.get(`${BASE_URL}/v1/groupPost/list/all`, config);
+			const res = await Api.get(`${BASE_URL}/v1/groupPost/list/all`, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data;
@@ -29,7 +29,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.get(`${BASE_URL}/v1/groupPost/list/owner`, config);
+			const res = await Api.get(`${BASE_URL}/v1/groupPost/list/owner`, config);
 			if (res.data.success) {
 				return res.data; // Trả về dữ liệu từ thành công
 			} else {
@@ -47,7 +47,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.get(`${BASE_URL}/v1/groupPost/list/join`, config);
+			const res = await Api.get(`${BASE_URL}/v1/groupPost/list/join`, config);
 			if (res.data.success) {
 				return res.data; // Trả về dữ liệu từ thành công
 			} else {
@@ -65,7 +65,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.get(`${BASE_URL}/v1/groupPost/list/suggestion`, config);
+			const res = await Api.get(`${BASE_URL}/v1/groupPost/list/suggestion`, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công
@@ -84,7 +84,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.get(`${BASE_URL}/v1/groupPost/list/invited`, config);
+			const res = await Api.get(`${BASE_URL}/v1/groupPost/list/invited`, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công
@@ -103,7 +103,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${user?.accessToken}`,
 				},
 			};
-			const res = await axios.get(`${BASE_URL}/v1/groupPost/list/invited`, config);
+			const res = await Api.get(`${BASE_URL}/v1/groupPost/list/invited`, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data;
@@ -122,7 +122,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${user?.accessToken}`,
 				},
 			};
-			const res = await axios.get(`${BASE_URL}/v1/groupPost/list/isInvited`, config);
+			const res = await Api.get(`${BASE_URL}/v1/groupPost/list/isInvited`, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data;
@@ -141,7 +141,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.post(`${BASE_URL}/v1/groupPost/create`, data, config);
+			const res = await Api.post(`${BASE_URL}/v1/groupPost/create`, data, config);
 			if (res.data.success) {
 				return res; // Trả về dữ liệu từ thành công
 			} else {
@@ -159,7 +159,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.put(`${BASE_URL}/v1/groupPost/update/bio`, data, config);
+			const res = await Api.put(`${BASE_URL}/v1/groupPost/update/bio`, data, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công
@@ -178,7 +178,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.put(`${BASE_URL}/v1/groupPost/update/photo`, data, config);
+			const res = await Api.put(`${BASE_URL}/v1/groupPost/update/photo`, data, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công
@@ -197,7 +197,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.put(`${BASE_URL}/v1/groupPost/delete/${postId}`, config);
+			const res = await Api.put(`${BASE_URL}/v1/groupPost/delete/${postId}`, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công
@@ -216,7 +216,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.post(`${BASE_URL}/v1/groupPost/accept/${postId}`, config);
+			const res = await Api.post(`${BASE_URL}/v1/groupPost/accept/${postId}`, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công
@@ -235,7 +235,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.post(`${BASE_URL}/v1/groupPost/decline/${postId}`, config);
+			const res = await Api.post(`${BASE_URL}/v1/groupPost/decline/${postId}`, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công
@@ -254,7 +254,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.post(`${BASE_URL}/v1/groupPost/invite`, data, config);
+			const res = await Api.post(`${BASE_URL}/v1/groupPost/invite`, data, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công
@@ -273,7 +273,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.post(`${BASE_URL}/v1/groupPost/acceptMember`, data, config);
+			const res = await Api.post(`${BASE_URL}/v1/groupPost/acceptMember`, data, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công
@@ -292,7 +292,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.get(`${BASE_URL}/v1/groupPost/get/${postId}`, config);
+			const res = await Api.get(`${BASE_URL}/v1/groupPost/get/${postId}`, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công
@@ -314,7 +314,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${token}`,
 				},
 			};
-			const res = await axios.post(`${BASE_URL}/v1/groupPost/joinGroup/${postGroupId}`, {}, config);
+			const res = await Api.post(`${BASE_URL}/v1/groupPost/joinGroup/${postGroupId}`, {}, config);
 			if (res.data.success) {
 				toast.success('Thành công!', { id: toastId });
 				console.log(res.data);
@@ -334,7 +334,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.get(`${BASE_URL}/v1/groupPost/list/member/${postId}`, config);
+			const res = await Api.get(`${BASE_URL}/v1/groupPost/list/member/${postId}`, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công
@@ -353,7 +353,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.get(`${BASE_URL}/v1/groupPost/list/memberRequired/${postId}`, config);
+			const res = await Api.get(`${BASE_URL}/v1/groupPost/list/memberRequired/${postId}`, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công
@@ -372,7 +372,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.post(`${BASE_URL}/v1/groupPost/appoint-admin`, data, config);
+			const res = await Api.post(`${BASE_URL}/v1/groupPost/appoint-admin`, data, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công
@@ -392,7 +392,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.post(`${BASE_URL}/v1/groupPost/delete/member`, data, config);
+			const res = await Api.post(`${BASE_URL}/v1/groupPost/delete/member`, data, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công
@@ -411,7 +411,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.post(`${BASE_URL}/v1/groupPost/decline/memberRequired`, data, config);
+			const res = await Api.post(`${BASE_URL}/v1/groupPost/decline/memberRequired`, data, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công
@@ -431,7 +431,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${token}`,
 				},
 			};
-			const res = await axios.put(`${BASE_URL}/v1/groupPost/cancel/request/group/${postGroupId}`, {}, config);
+			const res = await Api.put(`${BASE_URL}/v1/groupPost/cancel/request/group/${postGroupId}`, {}, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công
@@ -452,7 +452,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${token}`,
 				},
 			};
-			const res = await axios.put(`${BASE_URL}/v1/groupPost/request/cancel/${postGroupRequestId}`, {}, config);
+			const res = await Api.put(`${BASE_URL}/v1/groupPost/request/cancel/${postGroupRequestId}`, {}, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công
@@ -471,7 +471,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${token}`,
 				},
 			};
-			const res = await axios.post(`${BASE_URL}/v1/groupPost/accept/${postGroupId}`, {}, config);
+			const res = await Api.post(`${BASE_URL}/v1/groupPost/accept/${postGroupId}`, {}, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công
@@ -490,7 +490,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${token}`,
 				},
 			};
-			const res = await axios.post(`${BASE_URL}/v1/groupPost/decline/${postGroupId}`, {}, config);
+			const res = await Api.post(`${BASE_URL}/v1/groupPost/decline/${postGroupId}`, {}, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công
@@ -509,7 +509,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${token}`,
 				},
 			};
-			const res = await axios.put(`${BASE_URL}/v1/groupPost/leaveGroup/${postGroupId}`, {}, config);
+			const res = await Api.put(`${BASE_URL}/v1/groupPost/leaveGroup/${postGroupId}`, {}, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công
@@ -522,7 +522,7 @@ const PostGroupApi = {
 	},
 	searchAllGroup: async (searchKey) => {
 		try {
-			const res = await axios.get(`${BASE_URL}/api/v1/groupPost/getPostGroups/key?search=${searchKey}`);
+			const res = await Api.get(`${BASE_URL}/api/v1/groupPost/getPostGroups/key?search=${searchKey}`);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data;
@@ -542,7 +542,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${user?.accessToken}`,
 				},
 			};
-			const res = await axios.post(`${BASE_URL}/v1/groupPost/appoint-deputy`, data, config);
+			const res = await Api.post(`${BASE_URL}/v1/groupPost/appoint-deputy`, data, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công
@@ -563,7 +563,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${user?.accessToken}`,
 				},
 			};
-			const res = await axios.post(`${BASE_URL}/v1/groupPost/remove-deputy`, data, config);
+			const res = await Api.post(`${BASE_URL}/v1/groupPost/remove-deputy`, data, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công
@@ -583,7 +583,7 @@ const PostGroupApi = {
 					Authorization: `Bearer ${user?.accessToken}`,
 				},
 			};
-			const res = await axios.delete(`${BASE_URL}/v1/groupPost/delete/${postGroupId}`, config);
+			const res = await Api.delete(`${BASE_URL}/v1/groupPost/delete/${postGroupId}`, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công

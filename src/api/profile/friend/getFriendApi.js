@@ -1,12 +1,12 @@
-import axios from 'axios';
 import { BASE_URL } from '../../../context/apiCall';
+import Api from '../../Api';
 
 //get 10 friend
 const GetFriendApi = {
 	// Lấy danh sách nhóm đã tham gia
 	getFriend: async (user) => {
 		try {
-			const res = await axios.get(`${BASE_URL}/v1/friend/list/${user.userId}`);
+			const res = await Api.get(`${BASE_URL}/v1/friend/list/${user.userId}`);
 			if (res.data.success) {
 				return res.data; // Trả về dữ liệu từ thành công
 			} else {
@@ -18,7 +18,7 @@ const GetFriendApi = {
 	},
 	getFriendPageable: async (user) => {
 		try {
-			const res = await axios.get(`${BASE_URL}/v1/friend/list/pageable/${user.userId}`);
+			const res = await Api.get(`${BASE_URL}/v1/friend/list/pageable/${user.userId}`);
 			if (res.data.success) {
 				return res.data; // Trả về dữ liệu từ thành công
 			} else {
@@ -36,7 +36,7 @@ const GetFriendApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.get(`${BASE_URL}/v1/friend/request/list`, config);
+			const res = await Api.get(`${BASE_URL}/v1/friend/request/list`, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công
@@ -55,7 +55,7 @@ const GetFriendApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.get(`${BASE_URL}/v1/friend/request/list/pageable`, config);
+			const res = await Api.get(`${BASE_URL}/v1/friend/request/list/pageable`, config);
 			if (res.data.success) {
 				console.log(res.data);
 				return res.data; // Trả về dữ liệu từ thành công
@@ -74,7 +74,7 @@ const GetFriendApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.get(`${BASE_URL}/v1/friend/suggestion/list`, config);
+			const res = await Api.get(`${BASE_URL}/v1/friend/suggestion/list`, config);
 			if (res.data.success) {
 				return res.data; // Trả về dữ liệu từ thành công
 			} else {
@@ -92,7 +92,7 @@ const GetFriendApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.get(`${BASE_URL}/v1/friend/requestFrom/list`, config);
+			const res = await Api.get(`${BASE_URL}/v1/friend/requestFrom/list`, config);
 			if (res.data.success) {
 				return res.data; // Trả về dữ liệu từ thành công
 			} else {
@@ -109,8 +109,7 @@ const GetFriendApi = {
 				Authorization: `Bearer ${token}`,
 			},
 		};
-		await axios
-			.put(`${BASE_URL}/v1/friend/request/delete/${userId}`, {}, config)
+		await Api.put(`${BASE_URL}/v1/friend/request/delete/${userId}`, {}, config)
 			.then((res) => {
 				if (res.data.success) {
 					return res.data.result;
@@ -129,8 +128,7 @@ const GetFriendApi = {
 				Authorization: `Bearer ${token}`,
 			},
 		};
-		await axios
-			.put(`${BASE_URL}/v1/friend/request/accept/${userId}`, {}, config)
+		await Api.put(`${BASE_URL}/v1/friend/request/accept/${userId}`, {}, config)
 			.then((res) => {
 				if (res.data.success) {
 					return res.data.result;
@@ -150,7 +148,7 @@ const GetFriendApi = {
 					Authorization: `Bearer ${token}`,
 				},
 			};
-			const res = await axios.post(`${BASE_URL}/v1/friend/request/send/${userId}`, {}, config);
+			const res = await Api.post(`${BASE_URL}/v1/friend/request/send/${userId}`, {}, config);
 
 			return res;
 		} catch (err) {
@@ -164,8 +162,7 @@ const GetFriendApi = {
 				Authorization: `Bearer ${token}`,
 			},
 		};
-		await axios
-			.put(`${BASE_URL}/v1/friend/delete/${userId}`, {}, config)
+		await Api.put(`${BASE_URL}/v1/friend/delete/${userId}`, {}, config)
 			.then((res) => {
 				if (res.data.success) {
 					return res.data.result;
@@ -184,8 +181,7 @@ const GetFriendApi = {
 				Authorization: `Bearer ${token}`,
 			},
 		};
-		await axios
-			.put(`${BASE_URL}/v1/friend/request/cancel/${userId}`, {}, config)
+		await Api.put(`${BASE_URL}/v1/friend/request/cancel/${userId}`, {}, config)
 			.then((res) => {
 				if (res.data.success) {
 					return res.data.result;

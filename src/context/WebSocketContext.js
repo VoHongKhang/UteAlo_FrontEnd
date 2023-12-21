@@ -44,17 +44,16 @@ export const WebSocketProvider = ({ children }) => {
 	const disconnectWebSocket = (currentUser) => {
 		if (stompClient) {
 			// Set timeout để đảm bảo tin nhắn cuối cùng có đủ thời gian để gửi đi
-			setTimeout(() => {
-				const data = {
-					userId: currentUser.userId,
-					isOnline: false,
-				};
-				stompClient.send('/app/isOnline', {}, JSON.stringify(data));
 
-				// Đóng kết nối WebSocket sau khi tin nhắn cuối cùng đã được gửi đi
-				stompClient.disconnect();
-				setStompClient(null);
-			}, 1000); // Thời gian trì hoãn 1 giây (có thể điều chỉnh theo nhu cầu)
+			const data = {
+				userId: currentUser.userId,
+				isOnline: false,
+			};
+			stompClient.send('/app/isOnline', {}, JSON.stringify(data));
+
+			// Đóng kết nối WebSocket sau khi tin nhắn cuối cùng đã được gửi đi
+			stompClient.disconnect();
+			setStompClient(null);
 		}
 	};
 

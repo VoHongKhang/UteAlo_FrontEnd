@@ -1,6 +1,6 @@
-import axios from 'axios';
 import { BASE_URL } from '../../../src/context/apiCall';
 import toast from 'react-hot-toast';
+import Api from '../Api';
 
 const InviteFriendApi = {
 	inviteFriendApi: async (token, postGroupId, userIds) => {
@@ -17,7 +17,7 @@ const InviteFriendApi = {
 		};
 		const toastId = toast.loading('Đang gửi yêu cầu...');
 		try {
-			const response = await axios.post(`${BASE_URL}/v1/groupPost/invite`, requestData, config);
+			const response = await Api.post(`${BASE_URL}/v1/groupPost/invite`, requestData, config);
 
 			if (response.data.success) {
 				if (response.data.result.length > 0) {

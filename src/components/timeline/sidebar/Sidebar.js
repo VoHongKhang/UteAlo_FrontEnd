@@ -29,11 +29,12 @@ import PrivacyOptionFive from '../../../assets/appImages/privacy-option-five.jpg
 import { IoHelpCircleSharp } from 'react-icons/io5';
 import { IoIosMail } from 'react-icons/io';
 import { PiWarningOctagonFill } from 'react-icons/pi';
-import { MdOutlineSecurity } from "react-icons/md";
-import { MdKey } from "react-icons/md";
+import { MdOutlineSecurity } from 'react-icons/md';
+import { MdKey } from 'react-icons/md';
 import { useState } from 'react';
+import AuthEmailApi from '../../../api/auth/authEmailApi';
 
-const Sidebar = () => {
+const Sidebar = ({ inforUser }) => {
 	const { theme } = useTheme();
 	const { disconnectWebSocket } = useWebSocket();
 	const { user: currentUser } = useAuth();
@@ -147,17 +148,22 @@ const Sidebar = () => {
 
 	//Đăng xuất
 	const logoutHandler = async () => {
+		const toastId = toast.loading('Đăng xuất...');
 		await disconnectWebSocket(currentUser);
+		const { refreshToken } = JSON.parse(localStorage.getItem('userInfo'));
 
-		setTimeout(() => {
-			localStorage.removeItem('userInfo');
-			// try {
-			// 	await AuthEmailApi.logout(currentUser);
-			// } catch {
-			// 	console.log('Lỗi đăng xuất');
-			// }
-			window.location.href = '/login';
-		}, 1000);
+		try {
+			const res = await AuthEmailApi.logout(currentUser, refreshToken);
+			console.log('res', res);
+			if (res.data.success === true) {
+				toast.success('Đăng xuất thành công!', { id: toastId });
+			}
+		} catch (error) {
+			console.log(error);
+			toast.dismiss(toastId);
+		}
+		localStorage.removeItem('userInfo');
+		window.location.href = '/login';
 	};
 
 	const listAccountAction = [
@@ -220,7 +226,7 @@ const Sidebar = () => {
 			data: listShortCutAction,
 		},
 	];
-
+	const { stompClient } = useWebSocket();
 	// Đăng bài đóng góp
 	const postSubmitHandler = async (e) => {
 		e.preventDefault();
@@ -246,7 +252,19 @@ const Sidebar = () => {
 				privacyLevel = 'BUG';
 			}
 			const res = await createReport('', newPost.content, newPost.photos, '', privacyLevel, 0);
+
 			if (res.success === true) {
+				const data = {
+					content: `${inforUser?.userName} đã gửi một báo cáo đến bạn!!!`,
+					isAdmin: true,
+					photo: inforUser?.avatar,
+					link: `/report/${res.result.reportId}`,
+					isRead: false,
+					createdAt: new Date().toISOString(),
+					updatedAt: new Date().toISOString(),
+				};
+				stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
+
 				setReportModal(false);
 			}
 
@@ -687,7 +705,6 @@ const Sidebar = () => {
 							<span className="contribute-option-text-2">Cài đặt bảo mật 2 lớp.</span>
 						</div>
 					</div>
-					
 				</div>
 			</Modal>
 		</Space>

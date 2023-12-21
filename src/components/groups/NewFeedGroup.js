@@ -6,6 +6,7 @@ import { Skeleton, Space } from 'antd';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import SharePostCard from '../timeline/post/SharePostCard';
 import PostApi from '../../api/timeline/post/PostApi';
+import { Helmet } from 'react-helmet';
 
 const NewFeedGroup = ({ inforUser, currentUser }) => {
 	const isMounted = useRef(true);
@@ -130,62 +131,65 @@ const NewFeedGroup = ({ inforUser, currentUser }) => {
 		console.log('sorted', sorted);
 	}, [listPost]);
 	return (
-		<div className="feed" style={{ color: theme.foreground, background: theme.background }}>
-			<div className="feedWrapper">
-				<InfiniteScroll
-					scrollableTarget="feed"
-					dataLength={postLength}
-					style={{ color: theme.foreground, background: theme.background, overflow: 'visible' }}
-					className="feed__scroll"
-					next={loadMore}
-					hasMore={hasMore.posts || hasMore.share}
-					loader={
-						<Skeleton
-							style={{ marginTop: '30px' }}
-							active
-							avatar
-							paragraph={{
-								rows: 4,
-							}}
-						/>
-					}
-					endMessage={
-						<Space
-							direction="vertical"
-							style={{ width: '100%', textAlign: 'center', marginBottom: '20px' }}
-						>
-							<h3>Yay! You have seen it all</h3>
-						</Space>
-					}
-				>
-					{inforUser && currentUser && (
-						<>
-							{sortedList?.map((p) => {
-								if (p.postId) {
-									return (
-										<PostCard
-											inforUser={inforUser}
-											post={p}
-											key={`post-${p.postId}`}
-											newShare={getPostUpdate}
-										/>
-									);
-								} else {
-									return (
-										<SharePostCard
-											inforUser={inforUser}
-											share={p}
-											key={`share-${p.shareId}`}
-											newSharePosts={getNewSharePost}
-										/>
-									);
-								}
-							})}
-						</>
-					)}
-				</InfiniteScroll>
+		<>
+			<Helmet title="Nhóm của bạn" />
+			<div className="feed" style={{ color: theme.foreground, background: theme.background }}>
+				<div className="feedWrapper">
+					<InfiniteScroll
+						scrollableTarget="feed"
+						dataLength={postLength}
+						style={{ color: theme.foreground, background: theme.background, overflow: 'visible' }}
+						className="feed__scroll"
+						next={loadMore}
+						hasMore={hasMore.posts || hasMore.share}
+						loader={
+							<Skeleton
+								style={{ marginTop: '30px' }}
+								active
+								avatar
+								paragraph={{
+									rows: 4,
+								}}
+							/>
+						}
+						endMessage={
+							<Space
+								direction="vertical"
+								style={{ width: '100%', textAlign: 'center', marginBottom: '20px' }}
+							>
+								<h3>Yay! You have seen it all</h3>
+							</Space>
+						}
+					>
+						{inforUser && currentUser && (
+							<>
+								{sortedList?.map((p) => {
+									if (p.postId) {
+										return (
+											<PostCard
+												inforUser={inforUser}
+												post={p}
+												key={`post-${p.postId}`}
+												newShare={getPostUpdate}
+											/>
+										);
+									} else {
+										return (
+											<SharePostCard
+												inforUser={inforUser}
+												share={p}
+												key={`share-${p.shareId}`}
+												newSharePosts={getNewSharePost}
+											/>
+										);
+									}
+								})}
+							</>
+						)}
+					</InfiniteScroll>
+				</div>
 			</div>
-		</div>
+		</>
 	);
 };
 

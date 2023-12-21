@@ -50,7 +50,7 @@ const ChatRoom = ({ user, data, Toggeinfo, currentUser }) => {
 				const res = await MessageApi.getMessageGroup({ groupId: data?.postGroupId, page: nextPage, size: 20 });
 				if (res?.success) {
 					messages.get(data?.postGroupId.toString()).push(...res?.result);
-					if (res?.result?.length < 40) {
+					if (res?.result?.length < 20) {
 						setHasMore(false);
 					} else {
 						setHasMore(true);
@@ -62,7 +62,7 @@ const ChatRoom = ({ user, data, Toggeinfo, currentUser }) => {
 				const res = await MessageApi.getMessage({ userId: data?.userId, page: nextPage, size: 20 });
 				if (res?.success) {
 					messages.get(data?.userId).push(...res?.result);
-					if (res?.result?.length < 40) {
+					if (res?.result?.length < 20) {
 						setHasMore(false);
 					} else {
 						setHasMore(true);
@@ -449,7 +449,7 @@ const ChatRoom = ({ user, data, Toggeinfo, currentUser }) => {
 									: messages.get(data?.userId)?.length || 0
 							}
 							style={{ display: 'flex', flexDirection: 'column-reverse' }}
-							next={loadMore}
+							next={() => loadMore(checkGroup)}
 							hasMore={hasMore}
 							inverse={true}
 							loader={<Spin style={{ margin: '8px auto' }} />}

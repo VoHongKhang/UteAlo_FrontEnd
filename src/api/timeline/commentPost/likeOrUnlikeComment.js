@@ -1,5 +1,6 @@
-import axios from 'axios';
+
 import { BASE_URL } from '../../../context/apiCall';
+import Api from '../../Api';
 
 // like or unlike post
 const LikeOrUnlikeCommentApi = {
@@ -10,7 +11,7 @@ const LikeOrUnlikeCommentApi = {
                 Authorization: `Bearer ${token}`,
             },
         };
-        await axios
+        await Api
             .post(`${BASE_URL}/v1/comment/like/toggleLike/${commentId}`,{userId}, config)
             .then((res) => {
                 if (res.data.success) {

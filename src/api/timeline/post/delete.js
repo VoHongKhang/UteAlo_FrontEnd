@@ -1,5 +1,5 @@
-import axios from 'axios';
 import { BASE_URL } from '../../../context/apiCall';
+import Api from '../../Api';
 
 // delete post
 const DeletePostApi = {
@@ -10,7 +10,7 @@ const DeletePostApi = {
                 Authorization: `Bearer ${token}`,
             },
         };
-        await axios
+        await Api
             .delete(`${BASE_URL}/v1/post/delete/${postId}`, config)
             .then((res) => {
                 if (res.data.success) {

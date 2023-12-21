@@ -71,7 +71,7 @@ const LoginForm = () => {
 					<Input.Password />
 				</Form.Item>
 
-				<Button type="primary" htmlType="submit" loading={loading} style={{ float: 'right' }}>
+				<Button id='btn--login' type="primary" htmlType="submit" loading={loading} style={{ float: 'right' }}>
 					Đăng nhập
 				</Button>
 

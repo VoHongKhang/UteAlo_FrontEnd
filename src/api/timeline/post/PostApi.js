@@ -1,5 +1,5 @@
-import axios from 'axios';
 import { BASE_URL } from '../../../context/apiCall';
+import Api from '../../Api';
 
 const PostApi = {
 	// Lấy danh sách bài share
@@ -11,7 +11,7 @@ const PostApi = {
 				},
 			};
 
-			const res = await axios.get(`${BASE_URL}/v1/share/get/timeLine?page=${page}&size=${size}`, config);
+			const res = await Api.get(`${BASE_URL}/v1/share/get/timeLine?page=${page}&size=${size}`, config);
 			if (res?.status === 200) {
 				return res.data.result;
 			}
@@ -28,7 +28,7 @@ const PostApi = {
 				},
 			};
 
-			const res = await axios.get(`${BASE_URL}/v1/post/get/timeLine?page=${page}&size=${size}`, config);
+			const res = await Api.get(`${BASE_URL}/v1/post/get/timeLine?page=${page}&size=${size}`, config);
 			if (res?.status === 200) {
 				return res.data.result;
 			}
@@ -45,7 +45,7 @@ const PostApi = {
 				},
 			};
 
-			const res = await axios.get(`${BASE_URL}/v1/post/${userId}/page-posts`, config);
+			const res = await Api.get(`${BASE_URL}/v1/post/${userId}/page-posts`, config);
 			if (res?.success) {
 				return res.data.result;
 			}
@@ -62,7 +62,7 @@ const PostApi = {
 				},
 			};
 
-			const res = await axios.get(`${BASE_URL}/v1/post/${userId}/user-posts`, config);
+			const res = await Api.get(`${BASE_URL}/v1/post/${userId}/user-posts`, config);
 			if (res?.success) {
 				return res.data.result;
 			}
@@ -79,7 +79,7 @@ const PostApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.put(`${BASE_URL}/v1/post/delete/${postId}`, postUserid, config);
+			const res = await Api.put(`${BASE_URL}/v1/post/delete/${postId}`, postUserid, config);
 			return res.data;
 		} catch (error) {
 			throw new Error(error?.response ? error.response.data.message : error.message);
@@ -92,7 +92,7 @@ const PostApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.get(`${BASE_URL}/v1/post/${postId}`, config);
+			const res = await Api.get(`${BASE_URL}/v1/post/${postId}`, config);
 			return res.data.result;
 		} catch (error) {
 			throw new Error(error?.response ? error.response.data.message : error.message);
@@ -105,7 +105,7 @@ const PostApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.get(`${BASE_URL}/v1/post/${userId}/page-posts?page=${page}&size=${size}`, config);
+			const res = await Api.get(`${BASE_URL}/v1/post/${userId}/page-posts?page=${page}&size=${size}`, config);
 			return res.data.result;
 		} catch (error) {
 			throw new Error(error?.response ? error.response.data.message : error.message);
@@ -118,7 +118,7 @@ const PostApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.get(`${BASE_URL}/v1/share/${userId}/page-shares?page=${page}&size=${size}`, config);
+			const res = await Api.get(`${BASE_URL}/v1/share/${userId}/page-shares?page=${page}&size=${size}`, config);
 			return res.data.result;
 		} catch (error) {
 			throw new Error(error?.response ? error.response.data.message : error.message);
@@ -131,7 +131,7 @@ const PostApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.get(`${BASE_URL}/v1/groupPost/posts?page=${page}&size=${size}`, config);
+			const res = await Api.get(`${BASE_URL}/v1/groupPost/posts?page=${page}&size=${size}`, config);
 			return res.data.result;
 		} catch (error) {
 			throw new Error(error?.response ? error.response.data.message : error.message);
@@ -144,7 +144,7 @@ const PostApi = {
 					Authorization: `Bearer ${user.accessToken}`,
 				},
 			};
-			const res = await axios.get(`${BASE_URL}/v1/share/inGroup?page=${page}&size=${size}`, config);
+			const res = await Api.get(`${BASE_URL}/v1/share/inGroup?page=${page}&size=${size}`, config);
 			return res.data.result;
 		} catch (error) {
 			throw new Error(error?.response ? error.response.data.message : error.message);
@@ -160,7 +160,7 @@ const PostApi = {
 				},
 			};
 			console.log('userId', userId);
-			const res = await axios.get(`${BASE_URL}/v1/post/user/${userId}?page=${page}&size=${size}`, config);
+			const res = await Api.get(`${BASE_URL}/v1/post/user/${userId}?page=${page}&size=${size}`, config);
 			console.log('res', res);
 			return res.data.result;
 		} catch (error) {
@@ -177,7 +177,7 @@ const PostApi = {
 				},
 			};
 
-			const res = await axios.get(`${BASE_URL}/v1/share/${userId}/post?page=${page}&size=${size}`, config);
+			const res = await Api.get(`${BASE_URL}/v1/share/${userId}/post?page=${page}&size=${size}`, config);
 			console.log('res', res);
 			return res.data.result;
 		} catch (error) {

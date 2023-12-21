@@ -75,19 +75,21 @@ const CreateGroup = ({ inforUser }) => {
 			const res = await PostGroupApi.createGroup({ user: currentUser, data: dataGroup });
 			toast.success('Tạo nhóm thành công!!!', { id: toastId });
 			console.log('res', res);
-			for (let i = 0; i < dataGroup.userId.length; i++) {
-				const data = {
-					groupId: res.data.result.postGroupId,
-					userId: dataGroup.userId[i],
-					photo: inforUser.avatar,
-					content: inforUser.userName + ' đã mời bạn vào nhóm ' + dataGroup.postGroupName,
-					link: `/groups/${res.data.result.postGroupId}`,
-					isRead: false,
-					createAt: new Date().toISOString(),
-					updateAt: new Date().toISOString(),
-				};
-				// Gửi thông báo cho từng người bạn
-				stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
+			if (dataGroup?.userId?.length > 0) {
+				for (let i = 0; i < dataGroup?.userId?.length; i++) {
+					const data = {
+						groupId: res.data.result.postGroupId,
+						userId: dataGroup.userId[i],
+						photo: inforUser.avatar,
+						content: inforUser.userName + ' đã mời bạn vào nhóm ' + dataGroup.postGroupName,
+						link: `/groups/${res.data.result.postGroupId}`,
+						isRead: false,
+						createAt: new Date().toISOString(),
+						updateAt: new Date().toISOString(),
+					};
+					// Gửi thông báo cho từng người bạn
+					stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(data));
+				}
 			}
 			navigate(`/groups/${res.data.result.postGroupId}`);
 		} catch (e) {

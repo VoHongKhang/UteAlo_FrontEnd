@@ -17,7 +17,7 @@ const DefaultLayout = ({ Title, Topbar, SideBar, RightBar, Page }) => {
 			{Topbar && <Topbar dataUser={getUser} />}
 			{SideBar ? (
 				<div className="homeContainer">
-					{SideBar && <SideBar user={currentUser} />}
+					{SideBar && <SideBar user={currentUser} inforUser={inforUser ? inforUser : null} />}
 					{Page && <Page inforUser={inforUser ? inforUser : null} currentUser={currentUser} />}
 					{RightBar && <RightBar user={currentUser} inforUser={inforUser ? inforUser : null} />}
 				</div>

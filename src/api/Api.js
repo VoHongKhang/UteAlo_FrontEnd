@@ -39,7 +39,6 @@ Api.interceptors.response.use(
 
 	async (error) => {
 		const originalRequest = error.config;
-
 		if (error.response.status === 401 && !originalRequest._retry) {
 			originalRequest._retry = true;
 
@@ -54,19 +53,18 @@ Api.interceptors.response.use(
 				const config = {
 					headers: {
 						'Content-Type': 'application/json',
-						'Access-Control-Allow-Origin': '*',
-						'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
 					},
 				};
 				try {
 					const response = await axios.post(url + '/v1/auth/refresh-access-token', data, config);
-
+					console.log('response', response);
+					console.log('originalRequest', originalRequest);
 					if (response.data.statusCode === 200) {
 						// Lưu token mới và thử lại yêu cầu gốc
 						const userInfo = {
-							accessToken: response.data.data.accessToken,
-							refreshToken: response.data.data.refreshToken,
-							userId: response.data.data.userId,
+							accessToken: response.data.result.accessToken,
+							refreshToken: response.data.result.refreshToken,
+							userId: response.data.result.userId,
 						};
 						localStorage.setItem('userInfo', JSON.stringify(userInfo));
 						return Api(originalRequest);
@@ -87,8 +85,9 @@ Api.interceptors.response.use(
 				// Xử lý lỗi khi không có refreshToken
 				handleTokenRefreshError();
 			}
+		} else {
+			console.log('error', error);
 		}
-
 		// Xử lý các trường hợp lỗi khác (ví dụ: 403, 404, ...)
 		// ...
 

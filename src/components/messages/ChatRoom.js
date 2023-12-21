@@ -257,7 +257,7 @@ const ChatRoom = ({ user, data, Toggeinfo, currentUser }) => {
 		if (data.userId || data.postGroupId) {
 			console.log('data', data);
 			fetchData();
-			let Sock = new SockJS('http://192.168.102.36:8089/ws');
+			let Sock = new SockJS('http://localhost:8089/ws');
 			stompClient = over(Sock);
 			stompClient.connect({}, onConnected, (err) => console.log(err));
 		}

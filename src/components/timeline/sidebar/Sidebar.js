@@ -31,7 +31,9 @@ import { IoIosMail } from 'react-icons/io';
 import { PiWarningOctagonFill } from 'react-icons/pi';
 import { MdOutlineSecurity } from 'react-icons/md';
 import { MdKey } from 'react-icons/md';
-import { useState } from 'react';
+import axios from 'axios';
+import { BASE_URL } from '../../../context/apiCall';
+import { useEffect, useState } from 'react';
 
 const Sidebar = () => {
 	const { theme } = useTheme();
@@ -53,6 +55,13 @@ const Sidebar = () => {
 	const [helpModal, setHelpModal] = useState(false);
 	const [clauseModal, setClauseModal] = useState(false);
 	const [securityModal, setSecurityModal] = useState(false);
+	const [isActive, setIsActive] = useState();
+	const [isModalVisible, setIsModalVisible] = useState(false);
+
+	const showModal = () => {
+		setIsModalVisible(true);
+	};
+
 
 	const openReport = () => {
 		setModalVisible(true);
@@ -74,8 +83,23 @@ const Sidebar = () => {
 		setClauseModal(true);
 	};
 
+	const feacthData = async () => {
+		try {
+			const config = {
+				headers: {
+					Authorization: `Bearer ${currentUser.accessToken}`,
+				},
+			};
+			const res = await axios.get(`${BASE_URL}/v1/user/getIsActive`, config);
+			setIsActive(res.data);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+	console.log('isActive', isActive);
 	const openSecurity = () => {
 		setSecurityModal(true);
+		feacthData();
 	};
 
 	const handleCancel = () => {
@@ -87,6 +111,7 @@ const Sidebar = () => {
 		setModalVisible(false);
 		setSecondModalVisible(false);
 		setReportModal(false);
+		setIsModalVisible(false);
 	};
 
 	const openOptionOneSecondModal = () => {
@@ -256,6 +281,41 @@ const Sidebar = () => {
 		} catch (error) {
 			console.error(error);
 			toast.error('Có lỗi xảy ra khi gửi đóng góp.');
+		}
+	};
+
+
+	const updateIsActive = async () => {
+		try {
+			const config = {
+				headers: {
+					Authorization: `Bearer ${currentUser.accessToken}`,
+				},
+			};
+
+			if (isActive === true) {
+				const formData = new FormData();
+				console.log('isActive', isActive);
+				console.log('true');
+				formData.append('isActive', String(false));
+				const res = await axios.put(`${BASE_URL}/v1/user/updateIsActive`, formData, config);
+				console.log(res);
+				setIsActive(res.data);
+				setIsModalVisible(false);
+				setSecurityModal(false);
+			} else if (isActive === false) {
+				const formData = new FormData();
+				console.log('isActive', isActive);
+				console.log('false');
+				formData.append('isActive', String(true));
+				const res = await axios.put(`${BASE_URL}/v1/user/updateIsActive`, formData, config);
+				console.log(res);
+				setIsActive(res.data);
+				setIsModalVisible(false);
+				setSecurityModal(false);
+			}
+		} catch (error) {
+			console.log(error);
 		}
 	};
 
@@ -661,10 +721,22 @@ const Sidebar = () => {
 						<div className="contribute-option-icon help-icon">
 							<MdKey />
 						</div>
-						<div className="contribute-option-text">
-							<span className="contribute-option-text-1">Khóa tài khoản</span>
-							<span className="contribute-option-text-2">Khóa tài khoản.</span>
+						<div className="contribute-option-text" onClick={showModal}>
+							<span className="contribute-option-text-1">
+								{isActive ? 'Khóa tài khoản' : 'Mở khóa tài khoản'}
+							</span>
+							<span className="contribute-option-text-2">
+								{isActive ? 'Khóa tài khoản' : 'Mở khóa tài khoản'}.
+							</span>
 						</div>
+						<Modal
+							title={`Bạn có chắc muốn ${isActive ? 'Khóa' : 'Mở khóa'} tài khoản không?`}
+							open={isModalVisible}
+							onOk={updateIsActive}
+							onCancel={setIsModalVisible(false)}
+						>
+							<p>Vui lòng xác nhận ... </p>
+						</Modal>
 					</div>
 					<div className="contribute-option option-two" style={{ marginTop: '0' }}>
 						<div className="contribute-option-icon help-icon">

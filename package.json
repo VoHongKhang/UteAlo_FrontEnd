@@ -29,7 +29,7 @@
     "stompjs": "^2.3.3",
     "web-vitals": "^3.5.0"
   },
-  "proxy": "http://192.168.102.36:8089",
+  "proxy": "http://localhost:8089",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
@@ -53,5 +53,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-html-reporters": "^3.1.6",
+    "selenium-webdriver": "^4.16.0"
   }
 }

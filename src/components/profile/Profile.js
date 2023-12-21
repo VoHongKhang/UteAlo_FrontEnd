@@ -26,8 +26,18 @@ const Profile = ({ inforUser, currentUser }) => {
 	const navigate = useNavigate();
 	const { stompClient } = useWebSocket();
 	const params = useParams();
-	const [isActive, setIsActive] = useState(false);
+	const [isActive, setIsActive] = useState();
 
+	useEffect(() => {
+		const fetchUsers = async () => {
+			const res = await axios.get(`${BASE_URL}/v1/user/getIsActiveOfUser/${params?.userId}`);
+			setIsActive(res.data);
+		};
+		fetchUsers();
+	}, [params?.userId, currentUser.accessToken]);
+
+
+	console.log('isActive',isActive);
 	const { theme } = useTheme();
 
 	const [listImage, setListImage] = useState([]);
@@ -529,11 +539,11 @@ const Profile = ({ inforUser, currentUser }) => {
 							{params?.userId && <FeedOfUser inforUser={inforUser} userProfile={params?.userId} />}
 						</div>
 					) : (
-						<div>
+						<div style={{display:'flex'}}>
 							{params?.userId === inforUser?.userId  ? (
-								<div>Bạn đang khóa tài khoản của mình</div>
+								<div style={{display:'flex',margin:'auto',width:'500px',height:'100px',background:'#edeceb',borderRadius:'10px',justifyContent:'center',alignItems:'center'}}><span>Bạn đang khóa tài khoản của mình</span></div>
 							) : (
-								<div>Chủ tài khoản hiện đang khóa tài khoản của họ</div>
+								<div style={{display:'flex',margin:'auto',width:'500px',height:'100px',background:'#edeceb',borderRadius:'10px',justifyContent:'center',alignItems:'center'}}><span>Chủ tài khoản hiện đang khóa tài khoản của họ</span></div>
 							)}
 						</div>
 					)}

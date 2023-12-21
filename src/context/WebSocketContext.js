@@ -15,7 +15,7 @@ export const WebSocketProvider = ({ children }) => {
 	const [notification, setNotification] = useState(null);
 	const connectWebSocket = (currentUser, onConnectedCallback) => {
 		if (currentUser && !stompClient) {
-			let Sock = new SockJS('http://192.168.102.36:8089/ws');
+			let Sock = new SockJS('http://localhost:8089/ws');
 			const client = over(Sock);
 
 			client.connect(

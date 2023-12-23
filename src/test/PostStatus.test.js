@@ -24,8 +24,8 @@ test('spam post', async () => {
 	const submitButton = await driver.findElement(By.id('btn--login'));
 
 	// Enter the email and password, and click the submit button
-	await emailField.sendKeys('20110614@student.hcmute.edu.vn');
-	await passwordField.sendKeys('19052002Chi03!');
+	await emailField.sendKeys('20110650@student.hcmute.edu.vn');
+	await passwordField.sendKeys('Khang2002##');
 	await submitButton.click();
 	//dừng 5s để load dữ liệu
 	await driver.sleep(5000);
@@ -41,26 +41,14 @@ test('spam post', async () => {
 
 		await driver.sleep(2000);
 	};
-
-	const runEvery2Minutes = async () => {
-		while (true) {
-			await performAction(); // Thực hiện các hành động
-
-			// Chờ 2 phút trước khi lặp lại
-			await new Promise((resolve) => setTimeout(resolve, 2 * 60 * 1000));
-		}
-	};
-
-	runEvery2Minutes();
-
-	// Lặp lại mỗi 1 phút (60000 miligiây)
+	await performAction(); // Thực hiện các hành động
 
 	/// chờ load xong
 
 	await driver.sleep(5000);
 	// chụp màn hình
 	await driver.takeScreenshot().then(function (image, err) {
-		require('fs').writeFile('spampost.png', image, 'base64', function (err) {
+		require('fs').writeFile('PostStatus.png', image, 'base64', function (err) {
 			console.log(err);
 		});
 	});

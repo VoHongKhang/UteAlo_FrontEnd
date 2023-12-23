@@ -33,7 +33,7 @@ import { MdOutlineSecurity } from 'react-icons/md';
 import { MdKey } from 'react-icons/md';
 import axios from 'axios';
 import { BASE_URL } from '../../../context/apiCall';
-import { useEffect, useState } from 'react';
+import {  useState } from 'react';
 import AuthEmailApi from '../../../api/auth/authEmailApi';
 import Api from '../../../api/Api';
 
@@ -297,6 +297,7 @@ const Sidebar = ({ inforUser }) => {
 			// Xóa nội dung và ảnh đã chọn
 			setContent('');
 			setPhotos(null);
+			setPhotosUrl('');
 		} catch (error) {
 			console.error(error);
 			toast.error('Có lỗi xảy ra khi gửi đóng góp.');

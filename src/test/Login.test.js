@@ -25,6 +25,6 @@ test('Login Success', async () => {
 
 	// Enter the email and password, and click the submit button
 	await emailField.sendKeys('20110650@student.hcmute.edu.vn');
-	await passwordField.sendKeys('roleName@1');
+	await passwordField.sendKeys('Khang2002##');
 	await submitButton.click();
 });

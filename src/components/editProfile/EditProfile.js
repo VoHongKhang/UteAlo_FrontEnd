@@ -23,14 +23,16 @@ const EditProfile = ({ inforUser, changeUser }) => {
 	const [photosUrl, setPhotosUrl] = useState();
 	const [photos, setPhotos] = useState(null);
 	const [targetPhoto, setTargetPhoto] = useState(null);
-
+	const [loading, setLoading] = useState(false);
 	console.log('profileUser', profileUser);
 	const hanldeEditPhoto = async () => {
+		setLoading(true);
 		if (targetPhoto === 'fileAvatar') {
 			try {
+				
 				// trong quá trình thực thi thì không cho phép tác động gì hết
 				await updateUserAvatar(photos);
-
+				
 				setProfileUser({ ...profileUser, avatar: photosUrl });
 				setPhotos(null);
 				//reload lại trang
@@ -42,14 +44,16 @@ const EditProfile = ({ inforUser, changeUser }) => {
 
 		if (targetPhoto === 'fileBackgroup') {
 			try {
+				
 				await updateUserBackground(photos);
-
+				
 				setProfileUser({ ...profileUser, background: photosUrl });
 				setPhotos(null);
 			} catch (err) {
 				console.log(err);
 			}
 		}
+		setLoading(false);
 	};
 	const openModal = (e) => {
 		const file = e.target.files[0];
@@ -258,7 +262,7 @@ const EditProfile = ({ inforUser, changeUser }) => {
 											<Button className="button--cancel" onClick={() => setPhotos(null)}>
 												Hủy
 											</Button>
-											<Button type="primary" className="button--save" onClick={hanldeEditPhoto}>
+											<Button type="primary" loading={loading} className="button--save" onClick={hanldeEditPhoto}>
 												Lưu
 											</Button>
 										</Space>

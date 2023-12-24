@@ -25,7 +25,7 @@ const ResetPassord = () => {
 			toast.success('Đặt lại mật khẩu thành công! Vui lòng đăng nhập lại.', { id: toastId });
 
 			setTimeout(() => {
-				window.location.href = '/auth/login';
+				window.location.href = '/login';
 			}, 1000);
 		} catch (error) {
 			toast.error(`Đặt lại mật khẩu thất bại! Lỗi: ${error.response ? error.response.data.message : error}`, { id: toastId });

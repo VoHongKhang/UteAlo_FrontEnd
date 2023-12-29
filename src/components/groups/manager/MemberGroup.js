@@ -1,11 +1,9 @@
 import { Helmet } from 'react-helmet';
-import toast, { Toaster } from 'react-hot-toast';
-import SidebarManagerGroup from './sidebarManagerGroup/SidebarManagerGroup';
+import toast from 'react-hot-toast';
 import PostGroupApi from '../../../api/postGroups/PostGroupApi';
 import { useParams } from 'react-router-dom';
 import useAuth from '../../../context/auth/AuthContext';
 import { useState, useEffect } from 'react';
-import Topbar from '../../timeline/topbar/Topbar';
 import { Avatar, Button, List, Typography } from 'antd';
 import { MoreHoriz } from '@material-ui/icons';
 import './ManagerGroup.css';
@@ -23,7 +21,10 @@ import {
 	Popover,
 } from '@material-ui/core';
 import useTheme from '../../../context/ThemeContext';
-const MemberGroup = () => {
+import { useWebSocket } from '../../../context/WebSocketContext';
+const MemberGroup = ({ inforUser }) => {
+	const { stompClient } = useWebSocket();
+	const [group, setGroup] = useState();
 	const params = useParams();
 	const navigate = useNavigate();
 	const { user: currentUser } = useAuth();
@@ -54,6 +55,8 @@ const MemberGroup = () => {
 	};
 	useEffect(() => {
 		const fetchGroup = async () => {
+			const nameGroup = await PostGroupApi.getGroup({ user: currentUser, postId: params.postGroupId });
+			setGroup(nameGroup.result);
 			const res = await PostGroupApi.listMemberGroup({ user: currentUser, postId: params.postGroupId });
 			setMemberGroup(res.result);
 		};
@@ -80,6 +83,18 @@ const MemberGroup = () => {
 						}
 						return member;
 					});
+					const dataNotification = {
+						groupId: params.postGroupId,
+						userId: [selectedItem.userId][0],
+						photo: inforUser.avatar,
+						content: inforUser.userName + ' đã cấp quyền phó quản trị viên cho nhóm ' + group.postGroupName,
+						link: `/groups/${params.postGroupId}`,
+						isRead: false,
+						createAt: new Date().toISOString(),
+						updateAt: new Date().toISOString(),
+					};
+					stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(dataNotification));
+
 					setMemberGroup(updatedMemberGroup);
 				} catch (e) {
 					toast.error(`Bạn không có quyền thêm phó quản trị viên`, { id: toastId });
@@ -96,6 +111,18 @@ const MemberGroup = () => {
 						}
 						return member;
 					});
+					const dataNotification = {
+						groupId: params.postGroupId,
+						userId: [selectedItem.userId][0],
+						photo: inforUser.avatar,
+						content: inforUser.userName + ' xóa quyền phó quản trị viên cho nhóm ' + group.postGroupName,
+						link: `/groups/${params.postGroupId}`,
+						isRead: false,
+						createAt: new Date().toISOString(),
+						updateAt: new Date().toISOString(),
+					};
+					stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(dataNotification));
+
 					setMemberGroup(updatedMemberGroup);
 				} catch (e) {
 					toast.error(`Bạn không có quyền xóa phó quản trị viên`, { id: toastId1 });
@@ -111,6 +138,17 @@ const MemberGroup = () => {
 						toast.success('Xóa thành viên thành công!', { id: toastId });
 						const updatedMemberGroup = memberGroup.filter((member) => member !== selectedItem);
 						setMemberGroup(updatedMemberGroup);
+						const dataNotification = {
+							groupId: params.postGroupId,
+							userId: [selectedItem.userId][0],
+							photo: inforUser.avatar,
+							content: inforUser.userName + ' đã xóa bạn khỏi nhóm ' + group.postGroupName,
+							link: `/groups/${params.postGroupId}`,
+							isRead: false,
+							createAt: new Date().toISOString(),
+							updateAt: new Date().toISOString(),
+						};
+						stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(dataNotification));
 					} catch (e) {
 						toast.error(`Xóa thành viên thất bại! Lỗi: ${e}`, { id: toastId });
 					}
@@ -121,6 +159,22 @@ const MemberGroup = () => {
 				try {
 					await PostGroupApi.appointAdminGroup({ user: currentUser, data: data });
 					toast.success('Nhượng quyền thành công!', { id: toastId2 });
+					const dataNotification = {
+						groupId: params.postGroupId,
+						userId: [selectedItem.userId][0],
+						photo: inforUser.avatar,
+						content:
+							inforUser.userName +
+							' đã nhượng quyền quản trị viên của nhóm ' +
+							group.postGroupName +
+							' cho bạn!!!',
+						link: `/groups/${params.postGroupId}`,
+						isRead: false,
+						createAt: new Date().toISOString(),
+						updateAt: new Date().toISOString(),
+					};
+					stompClient.send('/app/userNotify/' + inforUser?.userId, {}, JSON.stringify(dataNotification));
+
 					navigate(`/groups/${params.postGroupId}`);
 				} catch (e) {
 					toast.error(`Bạn không có quyền nhượng quyền quản trị viên`, { id: toastId2 });
@@ -208,7 +262,7 @@ const MemberGroup = () => {
 													? 'Rời khỏi nhóm'
 													: 'Xóa khỏi nhóm'}
 											</Typography>
-											{selectedItem?.roleName !== 'Admin' && 
+											{selectedItem?.roleName !== 'Admin' &&
 												selectedItem?.userId !== currentUser.userId && (
 													<Typography
 														className="poper--member--item"
